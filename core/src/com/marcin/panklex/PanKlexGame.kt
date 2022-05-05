@@ -36,11 +36,31 @@ class PanKlexGame : Game()
 
     fun loadAssets()
     {
-        assetManager.load("tilesets/testTileset.png", Texture::class.java)
-        assetManager.load("tilesets/holeTileset.png", Texture::class.java)
-        assetManager.load("tilesets/baseTileset.png", Texture::class.java)
-        assetManager.load("tilesets/wallTileset.png", Texture::class.java)
-        assetManager.load("tilesets/coverTileset.png", Texture::class.java)
+        assetManager.load("tiles/entities/player.png", Texture::class.java)
+
+        assetManager.load("tiles/special.png", Texture::class.java)
+        assetManager.load("tiles/cover.png", Texture::class.java)
+
+        assetManager.load("tiles/example/hole.png", Texture::class.java)
+        assetManager.load("tiles/example/base.png", Texture::class.java)
+        assetManager.load("tiles/example/wall.png", Texture::class.java)
+
+        assetManager.load("tiles/undamagedStone/hole.png", Texture::class.java)
+        assetManager.load("tiles/undamagedStone/base.png", Texture::class.java)
+        assetManager.load("tiles/undamagedStone/wall.png", Texture::class.java)
+
+        assetManager.load("tiles/damagedStone/hole.png", Texture::class.java)
+        assetManager.load("tiles/damagedStone/base.png", Texture::class.java)
+        assetManager.load("tiles/damagedStone/wall.png", Texture::class.java)
+
+        assetManager.load("tiles/brick/hole.png", Texture::class.java)
+        assetManager.load("tiles/brick/base.png", Texture::class.java)
+        assetManager.load("tiles/brick/wall.png", Texture::class.java)
+
+        assetManager.load("tiles/metal/hole.png", Texture::class.java)
+        assetManager.load("tiles/metal/base.png", Texture::class.java)
+        assetManager.load("tiles/metal/wall.png", Texture::class.java)
+
         assetManager.finishLoading()
     }
 

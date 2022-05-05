@@ -7,11 +7,11 @@ class LevelBlock
 {
     var position = Vector3()
     var entity: BaseEntity? = null
-    var rock = Rock.Empty
+    var rock = Block.Empty
     var depth = 0
 
     fun isEntity(): Boolean = entity != null
-    fun isRock(): Boolean = rock != Rock.Empty
+    fun isRock(): Boolean = rock != Block.Empty
     fun isGap(): Boolean = depth > 0
 }
 

@@ -5,7 +5,7 @@ enum class Direction
     None, Up, Down, Left, Right
 }
 
-enum class Rock
+enum class Block
 {
-    Empty, Weak, Strong, Indestructible
+    Empty, UndamagedStone, DamagedStone, Brick, Metal
 }

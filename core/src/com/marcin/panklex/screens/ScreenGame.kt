@@ -22,93 +22,27 @@ import kotlin.math.truncate
 
 class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, game)
 {
+    // main
+
     val mapCamera = OrthographicCamera()
     val mapViewport = ScreenViewport(mapCamera)
 
     val level = KlexLevel()
     val map = KlexMap(100, 100, 32, 32)
+    val tiles = KlexTiles(game.assetManager)
 
-    val testTileset = game.assetManager.get<Texture>("tilesets/testTileset.png")
-    val blueTile = StaticTiledMapTile(TextureRegion(testTileset, 0 * 32, 0 * 32, 32, 32))
-    val greenTile = StaticTiledMapTile(TextureRegion(testTileset, 1 * 32, 0 * 32, 32, 32))
-    val redTile = StaticTiledMapTile(TextureRegion(testTileset, 2 * 32, 0 * 32, 32, 32))
-    val yellowTile = StaticTiledMapTile(TextureRegion(testTileset, 3 * 32, 0 * 32, 32, 32))
-    val purpleTile = StaticTiledMapTile(TextureRegion(testTileset, 0 * 32, 1 * 32, 32, 32))
-    val selectTile = StaticTiledMapTile(TextureRegion(testTileset, 1 * 32, 1 * 32, 32, 32))
-    val objectTile = StaticTiledMapTile(TextureRegion(testTileset, 2 * 32, 1 * 32, 32, 32))
-    val emptyTile = StaticTiledMapTile(TextureRegion(testTileset, 3 * 32, 1 * 32, 32, 32))
+    // hud
 
-    val holeTileset = game.assetManager.get<Texture>("tilesets/holeTileset.png")
-    val hole_l_m_r = StaticTiledMapTile(TextureRegion(holeTileset, 0 * 32, 0 * 32, 32, 32))
-    val hole_l_m = StaticTiledMapTile(TextureRegion(holeTileset, 1 * 32, 0 * 32, 32, 32))
-    val hole_m = StaticTiledMapTile(TextureRegion(holeTileset, 2 * 32, 0 * 32, 32, 32))
-    val hole_m_r = StaticTiledMapTile(TextureRegion(holeTileset, 3 * 32, 0 * 32, 32, 32))
-    val hole_none = StaticTiledMapTile(TextureRegion(holeTileset, 4 * 32, 0 * 32, 32, 32))
-    val hole_empty = StaticTiledMapTile(TextureRegion(holeTileset, 5 * 32, 0 * 32, 32, 32))
+    val levelLabel = Label("level: 0", Label.LabelStyle(BitmapFont(), Color.GREEN))
+    val upButton = TextButton("Up", TextButton.TextButtonStyle(null, null, null, BitmapFont()))
+    val downButton = TextButton("Down", TextButton.TextButtonStyle(null, null, null, BitmapFont()))
+    val endGameButton = TextButton("End Game", TextButton.TextButtonStyle(null, null, null, BitmapFont()))
+    val blockTypeLabel = Label("undam stone", Label.LabelStyle(BitmapFont(), Color.CYAN))
 
-    val baseTileset = game.assetManager.get<Texture>("tilesets/baseTileset.png")
-    val base_ul = StaticTiledMapTile(TextureRegion(baseTileset, 0 * 32, 0 * 32, 32, 32))
-    val base_ur = StaticTiledMapTile(TextureRegion(baseTileset, 1 * 32, 0 * 32, 32, 32))
-    val base_ul_ur = StaticTiledMapTile(TextureRegion(baseTileset, 2 * 32, 0 * 32, 32, 32))
-    val base_ur_dr = StaticTiledMapTile(TextureRegion(baseTileset, 3 * 32, 0 * 32, 32, 32))
-    val base_ul_ur_dr = StaticTiledMapTile(TextureRegion(baseTileset, 4 * 32, 0 * 32, 32, 32))
-    val base_ur_dr_dl = StaticTiledMapTile(TextureRegion(baseTileset, 5 * 32, 0 * 32, 32, 32))
-    val base_ul_u_ur_r_dr = StaticTiledMapTile(TextureRegion(baseTileset, 6 * 32, 0 * 32, 32, 32))
-    val base_ur_r_dr_d_dl = StaticTiledMapTile(TextureRegion(baseTileset, 7 * 32, 0 * 32, 32, 32))
-    val base_ul_u_ur_r_dr_dl = StaticTiledMapTile(TextureRegion(baseTileset, 8 * 32, 0 * 32, 32, 32))
-    val base_ul_ur_r_dr_d_dl = StaticTiledMapTile(TextureRegion(baseTileset, 9 * 32, 0 * 32, 32, 32))
-    val base_ul_u_ur_r_dr_d_dl = StaticTiledMapTile(TextureRegion(baseTileset, 10 * 32, 0 * 32, 32, 32))
-    val base_ul_ur_r_dr_d_dl_l = StaticTiledMapTile(TextureRegion(baseTileset, 11 * 32, 0 * 32, 32, 32))
-    val base_dl = StaticTiledMapTile(TextureRegion(baseTileset, 0 * 32, 1 * 32, 32, 32))
-    val base_dr = StaticTiledMapTile(TextureRegion(baseTileset, 1 * 32, 1 * 32, 32, 32))
-    val base_ul_dl = StaticTiledMapTile(TextureRegion(baseTileset, 2 * 32, 1 * 32, 32, 32))
-    val base_dr_dl = StaticTiledMapTile(TextureRegion(baseTileset, 3 * 32, 1 * 32, 32, 32))
-    val base_ul_ur_dl = StaticTiledMapTile(TextureRegion(baseTileset, 4 * 32, 1 * 32, 32, 32))
-    val base_ul_dr_dl = StaticTiledMapTile(TextureRegion(baseTileset, 5 * 32, 1 * 32, 32, 32))
-    val base_ul_u_ur_dl_l = StaticTiledMapTile(TextureRegion(baseTileset, 6 * 32, 1 * 32, 32, 32))
-    val base_ul_dr_d_dl_l = StaticTiledMapTile(TextureRegion(baseTileset, 7 * 32, 1 * 32, 32, 32))
-    val base_ul_u_ur_dr_dl_l = StaticTiledMapTile(TextureRegion(baseTileset, 8 * 32, 1 * 32, 32, 32))
-    val base_ul_ur_dr_d_dl_l = StaticTiledMapTile(TextureRegion(baseTileset, 9 * 32, 1 * 32, 32, 32))
-    val base_ul_u_ur_r_dr_dl_l = StaticTiledMapTile(TextureRegion(baseTileset, 10 * 32, 1 * 32, 32, 32))
-    val base_ul_u_ur_dr_d_dl_l = StaticTiledMapTile(TextureRegion(baseTileset, 11 * 32, 1 * 32, 32, 32))
-    val base_ul_u_ur = StaticTiledMapTile(TextureRegion(baseTileset, 0 * 32, 2 * 32, 32, 32))
-    val base_ur_r_dr = StaticTiledMapTile(TextureRegion(baseTileset, 1 * 32, 2 * 32, 32, 32))
-    val base_ul_u_ur_dl = StaticTiledMapTile(TextureRegion(baseTileset, 2 * 32, 2 * 32, 32, 32))
-    val base_ul_ur_r_dr = StaticTiledMapTile(TextureRegion(baseTileset, 3 * 32, 2 * 32, 32, 32))
-    val base_ul_u_ur_dr = StaticTiledMapTile(TextureRegion(baseTileset, 4 * 32, 2 * 32, 32, 32))
-    val base_ur_r_dr_dl = StaticTiledMapTile(TextureRegion(baseTileset, 5 * 32, 2 * 32, 32, 32))
-    val base_ul_u_ur_dr_dl = StaticTiledMapTile(TextureRegion(baseTileset, 6 * 32, 2 * 32, 32, 32))
-    val base_ul_ur_r_dr_dl = StaticTiledMapTile(TextureRegion(baseTileset, 7 * 32, 2 * 32, 32, 32))
-    val base_ul_u_ur_dr_d_dl = StaticTiledMapTile(TextureRegion(baseTileset, 8 * 32, 2 * 32, 32, 32))
-    val base_ul_dr = StaticTiledMapTile(TextureRegion(baseTileset, 9 * 32, 2 * 32, 32, 32))
-    val base_ul_ur_dr_dl = StaticTiledMapTile(TextureRegion(baseTileset, 10 * 32, 2 * 32, 32, 32))
-    val base_none = StaticTiledMapTile(TextureRegion(baseTileset, 11 * 32, 2 * 32, 32, 32))
-    val base_ul_dl_l = StaticTiledMapTile(TextureRegion(baseTileset, 0 * 32, 3 * 32, 32, 32))
-    val base_dr_d_dl = StaticTiledMapTile(TextureRegion(baseTileset, 1 * 32, 3 * 32, 32, 32))
-    val base_ul_dr_dl_l = StaticTiledMapTile(TextureRegion(baseTileset, 2 * 32, 3 * 32, 32, 32))
-    val base_ur_dr_d_dl = StaticTiledMapTile(TextureRegion(baseTileset, 3 * 32, 3 * 32, 32, 32))
-    val base_ul_ur_dl_l = StaticTiledMapTile(TextureRegion(baseTileset, 4 * 32, 3 * 32, 32, 32))
-    val base_ul_dr_d_dl = StaticTiledMapTile(TextureRegion(baseTileset, 5 * 32, 3 * 32, 32, 32))
-    val base_ul_ur_dr_dl_l = StaticTiledMapTile(TextureRegion(baseTileset, 6 * 32, 3 * 32, 32, 32))
-    val base_ul_ur_dr_d_dl = StaticTiledMapTile(TextureRegion(baseTileset, 7 * 32, 3 * 32, 32, 32))
-    val base_ul_ur_r_dr_dl_l = StaticTiledMapTile(TextureRegion(baseTileset, 8 * 32, 3 * 32, 32, 32))
-    val base_ur_dl = StaticTiledMapTile(TextureRegion(baseTileset, 9 * 32, 3 * 32, 32, 32))
-    val base_ul_u_ur_r_dr_d_dl_l = StaticTiledMapTile(TextureRegion(baseTileset, 10 * 32, 3 * 32, 32, 32))
-    val base_empty = StaticTiledMapTile(TextureRegion(baseTileset, 11 * 32, 3 * 32, 32, 32))
-
-    val wallTileset = game.assetManager.get<Texture>("tilesets/wallTileset.png")
-    val wall_l_m_r = StaticTiledMapTile(TextureRegion(wallTileset, 0 * 32, 0 * 32, 32, 32))
-    val wall_l_m = StaticTiledMapTile(TextureRegion(wallTileset, 1 * 32, 0 * 32, 32, 32))
-    val wall_m = StaticTiledMapTile(TextureRegion(wallTileset, 2 * 32, 0 * 32, 32, 32))
-    val wall_m_r = StaticTiledMapTile(TextureRegion(wallTileset, 3 * 32, 0 * 32, 32, 32))
-    val wall_empty = StaticTiledMapTile(TextureRegion(wallTileset, 4 * 32, 0 * 32, 32, 32))
-
-    val coverTileset = game.assetManager.get<Texture>("tilesets/coverTileset.png")
-    val cover_half = StaticTiledMapTile(TextureRegion(coverTileset, 0 * 32, 0 * 32, 32, 32))
-    val cover_all = StaticTiledMapTile(TextureRegion(coverTileset, 1 * 32, 0 * 32, 32, 32))
-    val cover_empty = StaticTiledMapTile(TextureRegion(coverTileset, 2 * 32, 0 * 32, 32, 32))
+    // other
 
     var currentLevel = 0
+    var currentBlockType = Block.UndamagedStone
 
     var selectPosition = Vector2()
     var isMouseInMap = true
@@ -119,49 +53,46 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
     var dragDifference = Vector2()
 
     init
-    { // stage
-
-        val levelLabel = Label("Level: 0", Label.LabelStyle(BitmapFont(), Color.GREEN))
-        val upButton = TextButton("Up", TextButton.TextButtonStyle(null, null, null, BitmapFont()))
-        val downButton = TextButton("Down", TextButton.TextButtonStyle(null, null, null, BitmapFont()))
-        val endGameButton = TextButton("End Game", TextButton.TextButtonStyle(null, null, null, BitmapFont()))
+    {
+        // hud
 
         upButton.addListener(object : ClickListener()
-        {
-            override fun clicked(event: InputEvent?, x: Float, y: Float)
-            {
-                if (currentLevel < level.levels - 1)
-                {
-                    currentLevel++
-                    levelLabel.setText("Level: $currentLevel")
-                    loadLevelToMap(currentLevel)
-                }
-            }
-        })
+                             {
+                                 override fun clicked(event: InputEvent?, x: Float, y: Float)
+                                 {
+                                     if (currentLevel < level.levels - 1)
+                                     {
+                                         currentLevel++
+                                         levelLabel.setText("level: $currentLevel")
+                                         loadLevelToMap(currentLevel)
+                                     }
+                                 }
+                             })
 
         downButton.addListener(object : ClickListener()
-        {
-            override fun clicked(event: InputEvent?, x: Float, y: Float)
-            {
-                if (currentLevel > 0)
-                {
-                    currentLevel--
-                    levelLabel.setText("Level: $currentLevel")
-                    loadLevelToMap(currentLevel)
-                }
-            }
-        })
+                               {
+                                   override fun clicked(event: InputEvent?, x: Float, y: Float)
+                                   {
+                                       if (currentLevel > 0)
+                                       {
+                                           currentLevel--
+                                           levelLabel.setText("level: $currentLevel")
+                                           loadLevelToMap(currentLevel)
+                                       }
+                                   }
+                               })
 
         endGameButton.addListener(object : ClickListener()
-        {
-            override fun clicked(event: InputEvent?, x: Float, y: Float)
-            {
-                game.changeScreen(game.screenEndGame)
-            }
-        })
+                                  {
+                                      override fun clicked(event: InputEvent?, x: Float, y: Float)
+                                      {
+                                          game.changeScreen(game.screenEndGame)
+                                      }
+                                  })
 
         val table = Table()
         table.top().setFillParent(true)
+        table.add(blockTypeLabel).pad(10f)
         table.add(levelLabel).pad(10f)
         table.add(upButton).pad(10f)
         table.add(downButton).pad(10f)
@@ -205,11 +136,12 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
                     levelBlock.position.z = i.toFloat()
                     levelBlock.rock = when (jsonLevel.map[i][j][k])
                     {
-                        0 -> Rock.Empty
-                        1 -> Rock.Weak
-                        2 -> Rock.Strong
-                        3 -> Rock.Indestructible
-                        else -> Rock.Empty
+                        0 -> Block.Empty
+                        1 -> Block.UndamagedStone
+                        2 -> Block.DamagedStone
+                        3 -> Block.Brick
+                        4 -> Block.Metal
+                        else -> Block.Empty
                     }
 
                     rowList.add(levelBlock)
@@ -230,46 +162,77 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
         {
             for (j in 0..level.height - 1)
             {
-                val isRock = level.map[levelNr][j][i].rock != Rock.Empty
-                val isUpLeftRock =
-                    !(j < level.height - 1 && i > 0 && level.map[levelNr][j + 1][i - 1].rock == Rock.Empty)
-                val isUpRock = !(j < level.height - 1 && level.map[levelNr][j + 1][i].rock == Rock.Empty)
-                val isUpRightRock =
-                    !(j < level.height - 1 && i < level.width - 1 && level.map[levelNr][j + 1][i + 1].rock == Rock.Empty)
-                val isRightRock = !(i < level.width - 1 && level.map[levelNr][j][i + 1].rock == Rock.Empty)
-                val isDownRightRock =
-                    !(j > 0 && i < level.width - 1 && level.map[levelNr][j - 1][i + 1].rock == Rock.Empty)
-                val isDownRock = !(j > 0 && level.map[levelNr][j - 1][i].rock == Rock.Empty)
-                val isDownLeftRock = !(j > 0 && i > 0 && level.map[levelNr][j - 1][i - 1].rock == Rock.Empty)
-                val isLeftRock = !(i > 0 && level.map[levelNr][j][i - 1].rock == Rock.Empty)
+                val blockType = if (level.map[levelNr][j][i].rock != Block.Empty) level.map[levelNr][j][i].rock else Block.Metal
+                val UpBlockType = if (j < level.height - 1) level.map[levelNr][j + 1][i].rock else Block.Metal
+                val AboveBlockType = if (levelNr < level.levels - 1) level.map[levelNr + 1][j][i].rock else Block.Metal
 
-                val isAboveRock = !(levelNr < level.levels - 1 && level.map[levelNr + 1][j][i].rock == Rock.Empty)
+                val isRock = level.map[levelNr][j][i].rock != Block.Empty
+                val isUpLeftRock = !(j < level.height - 1 && i > 0 && level.map[levelNr][j + 1][i - 1].rock == Block.Empty)
+                val isUpRock = !(j < level.height - 1 && level.map[levelNr][j + 1][i].rock == Block.Empty)
+                val isUpRightRock = !(j < level.height - 1 && i < level.width - 1 && level.map[levelNr][j + 1][i + 1].rock == Block.Empty)
+                val isRightRock = !(i < level.width - 1 && level.map[levelNr][j][i + 1].rock == Block.Empty)
+                val isDownRightRock = !(j > 0 && i < level.width - 1 && level.map[levelNr][j - 1][i + 1].rock == Block.Empty)
+                val isDownRock = !(j > 0 && level.map[levelNr][j - 1][i].rock == Block.Empty)
+                val isDownLeftRock = !(j > 0 && i > 0 && level.map[levelNr][j - 1][i - 1].rock == Block.Empty)
+                val isLeftRock = !(i > 0 && level.map[levelNr][j][i - 1].rock == Block.Empty)
+
+                val isAboveRock = !(levelNr < level.levels - 1 && level.map[levelNr + 1][j][i].rock == Block.Empty)
                 val isAboveUpLeftRock =
-                    !(levelNr < level.levels - 1 && j < level.height - 1 && i > 0 && level.map[levelNr + 1][j + 1][i - 1].rock == Rock.Empty)
-                val isAboveUpRock =
-                    !(levelNr < level.levels - 1 && j < level.height - 1 && level.map[levelNr + 1][j + 1][i].rock == Rock.Empty)
+                        !(levelNr < level.levels - 1 && j < level.height - 1 && i > 0 && level.map[levelNr + 1][j + 1][i - 1].rock == Block.Empty)
+                val isAboveUpRock = !(levelNr < level.levels - 1 && j < level.height - 1 && level.map[levelNr + 1][j + 1][i].rock == Block.Empty)
                 val isAboveUpRightRock =
-                    !(levelNr < level.levels - 1 && j < level.height - 1 && i < level.width - 1 && level.map[levelNr + 1][j + 1][i + 1].rock == Rock.Empty)
-                val isAboveRightRock =
-                    !(levelNr < level.levels - 1 && i < level.width - 1 && level.map[levelNr + 1][j][i + 1].rock == Rock.Empty)
+                        !(levelNr < level.levels - 1 && j < level.height - 1 && i < level.width - 1 && level.map[levelNr + 1][j + 1][i + 1].rock == Block.Empty)
+                val isAboveRightRock = !(levelNr < level.levels - 1 && i < level.width - 1 && level.map[levelNr + 1][j][i + 1].rock == Block.Empty)
                 val isAboveDownRightRock =
-                    !(levelNr < level.levels - 1 && j > 0 && i < level.width - 1 && level.map[levelNr + 1][j - 1][i + 1].rock == Rock.Empty)
-                val isAboveDownRock =
-                    !(levelNr < level.levels - 1 && j > 0 && level.map[levelNr + 1][j - 1][i].rock == Rock.Empty)
-                val isAboveDownLeftRock =
-                    !(levelNr < level.levels - 1 && j > 0 && i > 0 && level.map[levelNr + 1][j - 1][i - 1].rock == Rock.Empty)
-                val isAboveLeftRock =
-                    !(levelNr < level.levels - 1 && i > 0 && level.map[levelNr + 1][j][i - 1].rock == Rock.Empty)
+                        !(levelNr < level.levels - 1 && j > 0 && i < level.width - 1 && level.map[levelNr + 1][j - 1][i + 1].rock == Block.Empty)
+                val isAboveDownRock = !(levelNr < level.levels - 1 && j > 0 && level.map[levelNr + 1][j - 1][i].rock == Block.Empty)
+                val isAboveDownLeftRock = !(levelNr < level.levels - 1 && j > 0 && i > 0 && level.map[levelNr + 1][j - 1][i - 1].rock == Block.Empty)
+                val isAboveLeftRock = !(levelNr < level.levels - 1 && i > 0 && level.map[levelNr + 1][j][i - 1].rock == Block.Empty)
 
                 val holeTile = when
                 {
-                    isRock -> hole_empty
-                    !isUpRock -> hole_none
-                    !isUpLeftRock && !isUpRightRock -> hole_l_m_r
-                    !isUpLeftRock && isUpRightRock -> hole_l_m
-                    isUpLeftRock && isUpRightRock -> hole_m
-                    isUpLeftRock && !isUpRightRock -> hole_m_r
-                    else -> hole_empty
+                    isRock -> tiles.emptyTile
+                    !isUpRock -> when (UpBlockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneHole_none
+                        Block.DamagedStone -> tiles.damStoneHole_none
+                        Block.Brick -> tiles.brickHole_none
+                        Block.Metal -> tiles.metalHole_none
+                        else -> tiles.exampleHole_none
+                    }
+                    !isUpLeftRock && !isUpRightRock -> when (UpBlockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneHole_l_m_r
+                        Block.DamagedStone -> tiles.damStoneHole_l_m_r
+                        Block.Brick -> tiles.brickHole_l_m_r
+                        Block.Metal -> tiles.metalHole_l_m_r
+                        else -> tiles.exampleHole_l_m_r
+                    }
+                    !isUpLeftRock && isUpRightRock -> when (UpBlockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneHole_l_m
+                        Block.DamagedStone -> tiles.damStoneHole_l_m
+                        Block.Brick -> tiles.brickHole_l_m
+                        Block.Metal -> tiles.metalHole_l_m
+                        else -> tiles.exampleHole_l_m
+                    }
+                    isUpLeftRock && isUpRightRock -> when (UpBlockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneHole_m
+                        Block.DamagedStone -> tiles.damStoneHole_m
+                        Block.Brick -> tiles.brickHole_m
+                        Block.Metal -> tiles.metalHole_m
+                        else -> tiles.exampleHole_m
+                    }
+                    isUpLeftRock && !isUpRightRock -> when (UpBlockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneHole_m_r
+                        Block.DamagedStone -> tiles.damStoneHole_m_r
+                        Block.Brick -> tiles.brickHole_m_r
+                        Block.Metal -> tiles.metalHole_m_r
+                        else -> tiles.exampleHole_m_r
+                    }
+                    else -> tiles.emptyTile
                 }
 
                 val ul = !isUpLeftRock || (isUpLeftRock && isAboveUpLeftRock)
@@ -283,78 +246,441 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
 
                 val baseTile = when
                 {
-                    !isRock -> base_empty
-                    ul && !u && !ur && !r && !dr && !d && !dl && !l -> base_ul
-                    !ul && !u && ur && !r && !dr && !d && !dl && !l -> base_ur
-                    !ul && !u && !ur && !r && dr && !d && !dl && !l -> base_dr
-                    !ul && !u && !ur && !r && !dr && !d && dl && !l -> base_dl
-                    ul && !u && ur && !r && !dr && !d && !dl && !l -> base_ul_ur
-                    !ul && !u && ur && !r && dr && !d && !dl && !l -> base_ur_dr
-                    !ul && !u && !ur && !r && dr && !d && dl && !l -> base_dr_dl
-                    ul && !u && !ur && !r && !dr && !d && dl && !l -> base_ul_dl
-                    ul && !u && ur && !r && dr && !d && !dl && !l -> base_ul_ur_dr
-                    !ul && !u && ur && !r && dr && !d && dl && !l -> base_ur_dr_dl
-                    ul && !u && !ur && !r && dr && !d && dl && !l -> base_ul_dr_dl
-                    ul && !u && ur && !r && !dr && !d && dl && !l -> base_ul_ur_dl
-                    u && r && !d && !dl && !l -> base_ul_u_ur_r_dr
-                    !ul && !u && r && d && !l -> base_ur_r_dr_d_dl
-                    !u && !ur && !r && d && l -> base_ul_dr_d_dl_l
-                    u && !r && !dr && !d && l -> base_ul_u_ur_dl_l
-                    u && r && !d && dl && !l -> base_ul_u_ur_r_dr_dl
-                    ul && !u && r && d && !l -> base_ul_ur_r_dr_d_dl
-                    !u && ur && !r && d && l -> base_ul_ur_dr_d_dl_l
-                    u && !r && dr && !d && l -> base_ul_u_ur_dr_dl_l
-                    u && r && d && !l -> base_ul_u_ur_r_dr_d_dl
-                    !u && r && d && l -> base_ul_ur_r_dr_d_dl_l
-                    u && !r && d && l -> base_ul_u_ur_dr_d_dl_l
-                    u && r && !d && l -> base_ul_u_ur_r_dr_dl_l
-                    u && !r && !dr && !d && !dl && !l -> base_ul_u_ur
-                    !ul && !u && r && !d && !dl && !l -> base_ur_r_dr
-                    !ul && !u && !ur && !r && d && !l -> base_dr_d_dl
-                    !u && !ur && !r && !d && !dr && l -> base_ul_dl_l
-                    u && !r && !dr && !d && dl && !l -> base_ul_u_ur_dl
-                    ul && !u && r && !dl && !d && !l -> base_ul_ur_r_dr
-                    !ul && !u && ur && !r && d && !l -> base_ur_dr_d_dl
-                    !u && !ur && !r && !d && dr && l -> base_ul_dr_dl_l
-                    u && !r && dr && !d && !dl && !l -> base_ul_u_ur_dr
-                    !ul && !u && r && !d && dl && !l -> base_ur_r_dr_dl
-                    ul && !u && !ur && !r && d && !l -> base_ul_dr_d_dl
-                    !u && ur && !r && !d && !dr && l -> base_ul_ur_dl_l
-                    u && !r && dr && !d && dl && !l -> base_ul_u_ur_dr_dl
-                    ul && !u && r && !d && dl && !l -> base_ul_ur_r_dr_dl
-                    ul && !u && ur && !r && d && !l -> base_ul_ur_dr_d_dl
-                    !u && ur && !r && !d && dl && l -> base_ul_ur_dr_dl_l
-                    u && !r && d && !l -> base_ul_u_ur_dr_d_dl
-                    !u && r && !d && l -> base_ul_ur_r_dr_dl_l
-                    ul && !u && !ur && !r && dr && !d && !dl && !l -> base_ul_dr
-                    !ul && !u && ur && !r && !dr && !d && dl && !l -> base_ur_dl
-                    ul && !u && ur && !r && dr && !d && dl && !l -> base_ul_ur_dr_dl
-                    u && r && d && l -> base_ul_u_ur_r_dr_d_dl_l
-                    !u && !r && !d && !l -> base_none
-                    else -> base_empty
+                    !isRock -> tiles.emptyTile
+                    ul && !u && !ur && !r && !dr && !d && !dl && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul
+                        Block.DamagedStone -> tiles.damStoneBase_ul
+                        Block.Brick -> tiles.brickBase_ul
+                        Block.Metal -> tiles.metalBase_ul
+                        else -> tiles.exampleBase_ul
+                    }
+                    !ul && !u && ur && !r && !dr && !d && !dl && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ur
+                        Block.DamagedStone -> tiles.damStoneBase_ur
+                        Block.Brick -> tiles.brickBase_ur
+                        Block.Metal -> tiles.metalBase_ur
+                        else -> tiles.exampleBase_ur
+                    }
+                    !ul && !u && !ur && !r && dr && !d && !dl && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_dr
+                        Block.DamagedStone -> tiles.damStoneBase_dr
+                        Block.Brick -> tiles.brickBase_dr
+                        Block.Metal -> tiles.metalBase_dr
+                        else -> tiles.exampleBase_dr
+                    }
+                    !ul && !u && !ur && !r && !dr && !d && dl && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_dl
+                        Block.DamagedStone -> tiles.damStoneBase_dl
+                        Block.Brick -> tiles.brickBase_dl
+                        Block.Metal -> tiles.metalBase_dl
+                        else -> tiles.exampleBase_dl
+                    }
+                    ul && !u && ur && !r && !dr && !d && !dl && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_ur
+                        Block.DamagedStone -> tiles.damStoneBase_ul_ur
+                        Block.Brick -> tiles.brickBase_ul_ur
+                        Block.Metal -> tiles.metalBase_ul_ur
+                        else -> tiles.exampleBase_ul_ur
+                    }
+                    !ul && !u && ur && !r && dr && !d && !dl && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ur_dr
+                        Block.DamagedStone -> tiles.damStoneBase_ur_dr
+                        Block.Brick -> tiles.brickBase_ur_dr
+                        Block.Metal -> tiles.metalBase_ur_dr
+                        else -> tiles.exampleBase_ur_dr
+                    }
+                    !ul && !u && !ur && !r && dr && !d && dl && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_dr_dl
+                        Block.DamagedStone -> tiles.damStoneBase_dr_dl
+                        Block.Brick -> tiles.brickBase_dr_dl
+                        Block.Metal -> tiles.metalBase_dr_dl
+                        else -> tiles.exampleBase_dr_dl
+                    }
+                    ul && !u && !ur && !r && !dr && !d && dl && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_dl
+                        Block.DamagedStone -> tiles.damStoneBase_ul_dl
+                        Block.Brick -> tiles.brickBase_ul_dl
+                        Block.Metal -> tiles.metalBase_ul_dl
+                        else -> tiles.exampleBase_ul_dl
+                    }
+                    ul && !u && ur && !r && dr && !d && !dl && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_ur_dr
+                        Block.DamagedStone -> tiles.damStoneBase_ul_ur_dr
+                        Block.Brick -> tiles.brickBase_ul_ur_dr
+                        Block.Metal -> tiles.metalBase_ul_ur_dr
+                        else -> tiles.exampleBase_ul_ur_dr
+                    }
+                    !ul && !u && ur && !r && dr && !d && dl && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ur_dr_dl
+                        Block.DamagedStone -> tiles.damStoneBase_ur_dr_dl
+                        Block.Brick -> tiles.brickBase_ur_dr_dl
+                        Block.Metal -> tiles.metalBase_ur_dr_dl
+                        else -> tiles.exampleBase_ur_dr_dl
+                    }
+                    ul && !u && !ur && !r && dr && !d && dl && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_dr_dl
+                        Block.DamagedStone -> tiles.damStoneBase_ul_dr_dl
+                        Block.Brick -> tiles.brickBase_ul_dr_dl
+                        Block.Metal -> tiles.metalBase_ul_dr_dl
+                        else -> tiles.exampleBase_ul_dr_dl
+                    }
+                    ul && !u && ur && !r && !dr && !d && dl && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_ur_dl
+                        Block.DamagedStone -> tiles.damStoneBase_ul_ur_dl
+                        Block.Brick -> tiles.brickBase_ul_ur_dl
+                        Block.Metal -> tiles.metalBase_ul_ur_dl
+                        else -> tiles.exampleBase_ul_ur_dl
+                    }
+                    u && r && !d && !dl && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_u_ur_r_dr
+                        Block.DamagedStone -> tiles.damStoneBase_ul_u_ur_r_dr
+                        Block.Brick -> tiles.brickBase_ul_u_ur_r_dr
+                        Block.Metal -> tiles.metalBase_ul_u_ur_r_dr
+                        else -> tiles.exampleBase_ul_u_ur_r_dr
+                    }
+                    !ul && !u && r && d && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ur_r_dr_d_dl
+                        Block.DamagedStone -> tiles.damStoneBase_ur_r_dr_d_dl
+                        Block.Brick -> tiles.brickBase_ur_r_dr_d_dl
+                        Block.Metal -> tiles.metalBase_ur_r_dr_d_dl
+                        else -> tiles.exampleBase_ur_r_dr_d_dl
+                    }
+                    !u && !ur && !r && d && l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_dr_d_dl_l
+                        Block.DamagedStone -> tiles.damStoneBase_ul_dr_d_dl_l
+                        Block.Brick -> tiles.brickBase_ul_dr_d_dl_l
+                        Block.Metal -> tiles.metalBase_ul_dr_d_dl_l
+                        else -> tiles.exampleBase_ul_dr_d_dl_l
+                    }
+                    u && !r && !dr && !d && l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_u_ur_dl_l
+                        Block.DamagedStone -> tiles.damStoneBase_ul_u_ur_dl_l
+                        Block.Brick -> tiles.brickBase_ul_u_ur_dl_l
+                        Block.Metal -> tiles.metalBase_ul_u_ur_dl_l
+                        else -> tiles.exampleBase_ul_u_ur_dl_l
+                    }
+                    u && r && !d && dl && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_u_ur_r_dr_dl
+                        Block.DamagedStone -> tiles.damStoneBase_ul_u_ur_r_dr_dl
+                        Block.Brick -> tiles.brickBase_ul_u_ur_r_dr_dl
+                        Block.Metal -> tiles.metalBase_ul_u_ur_r_dr_dl
+                        else -> tiles.exampleBase_ul_u_ur_r_dr_dl
+                    }
+                    ul && !u && r && d && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_ur_r_dr_d_dl
+                        Block.DamagedStone -> tiles.damStoneBase_ul_ur_r_dr_d_dl
+                        Block.Brick -> tiles.brickBase_ul_ur_r_dr_d_dl
+                        Block.Metal -> tiles.metalBase_ul_ur_r_dr_d_dl
+                        else -> tiles.exampleBase_ul_ur_r_dr_d_dl
+                    }
+                    !u && ur && !r && d && l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_ur_dr_d_dl_l
+                        Block.DamagedStone -> tiles.damStoneBase_ul_ur_dr_d_dl_l
+                        Block.Brick -> tiles.brickBase_ul_ur_dr_d_dl_l
+                        Block.Metal -> tiles.metalBase_ul_ur_dr_d_dl_l
+                        else -> tiles.exampleBase_ul_ur_dr_d_dl_l
+                    }
+                    u && !r && dr && !d && l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_u_ur_dr_dl_l
+                        Block.DamagedStone -> tiles.damStoneBase_ul_u_ur_dr_dl_l
+                        Block.Brick -> tiles.brickBase_ul_u_ur_dr_dl_l
+                        Block.Metal -> tiles.metalBase_ul_u_ur_dr_dl_l
+                        else -> tiles.exampleBase_ul_u_ur_dr_dl_l
+                    }
+                    u && r && d && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_u_ur_r_dr_d_dl
+                        Block.DamagedStone -> tiles.damStoneBase_ul_u_ur_r_dr_d_dl
+                        Block.Brick -> tiles.brickBase_ul_u_ur_r_dr_d_dl
+                        Block.Metal -> tiles.metalBase_ul_u_ur_r_dr_d_dl
+                        else -> tiles.exampleBase_ul_u_ur_r_dr_d_dl
+                    }
+                    !u && r && d && l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_ur_r_dr_d_dl_l
+                        Block.DamagedStone -> tiles.damStoneBase_ul_ur_r_dr_d_dl_l
+                        Block.Brick -> tiles.brickBase_ul_ur_r_dr_d_dl_l
+                        Block.Metal -> tiles.metalBase_ul_ur_r_dr_d_dl_l
+                        else -> tiles.exampleBase_ul_ur_r_dr_d_dl_l
+                    }
+                    u && !r && d && l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_u_ur_dr_d_dl_l
+                        Block.DamagedStone -> tiles.damStoneBase_ul_u_ur_dr_d_dl_l
+                        Block.Brick -> tiles.brickBase_ul_u_ur_dr_d_dl_l
+                        Block.Metal -> tiles.metalBase_ul_u_ur_dr_d_dl_l
+                        else -> tiles.exampleBase_ul_u_ur_dr_d_dl_l
+                    }
+                    u && r && !d && l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_u_ur_r_dr_dl_l
+                        Block.DamagedStone -> tiles.damStoneBase_ul_u_ur_r_dr_dl_l
+                        Block.Brick -> tiles.brickBase_ul_u_ur_r_dr_dl_l
+                        Block.Metal -> tiles.metalBase_ul_u_ur_r_dr_dl_l
+                        else -> tiles.exampleBase_ul_u_ur_r_dr_dl_l
+                    }
+                    u && !r && !dr && !d && !dl && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_u_ur
+                        Block.DamagedStone -> tiles.damStoneBase_ul_u_ur
+                        Block.Brick -> tiles.brickBase_ul_u_ur
+                        Block.Metal -> tiles.metalBase_ul_u_ur
+                        else -> tiles.exampleBase_ul_u_ur
+                    }
+                    !ul && !u && r && !d && !dl && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ur_r_dr
+                        Block.DamagedStone -> tiles.damStoneBase_ur_r_dr
+                        Block.Brick -> tiles.brickBase_ur_r_dr
+                        Block.Metal -> tiles.metalBase_ur_r_dr
+                        else -> tiles.exampleBase_ur_r_dr
+                    }
+                    !ul && !u && !ur && !r && d && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_dr_d_dl
+                        Block.DamagedStone -> tiles.damStoneBase_dr_d_dl
+                        Block.Brick -> tiles.brickBase_dr_d_dl
+                        Block.Metal -> tiles.metalBase_dr_d_dl
+                        else -> tiles.exampleBase_dr_d_dl
+                    }
+                    !u && !ur && !r && !d && !dr && l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_dl_l
+                        Block.DamagedStone -> tiles.damStoneBase_ul_dl_l
+                        Block.Brick -> tiles.brickBase_ul_dl_l
+                        Block.Metal -> tiles.metalBase_ul_dl_l
+                        else -> tiles.exampleBase_ul_dl_l
+                    }
+                    u && !r && !dr && !d && dl && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_u_ur_dl
+                        Block.DamagedStone -> tiles.damStoneBase_ul_u_ur_dl
+                        Block.Brick -> tiles.brickBase_ul_u_ur_dl
+                        Block.Metal -> tiles.metalBase_ul_u_ur_dl
+                        else -> tiles.exampleBase_ul_u_ur_dl
+                    }
+                    ul && !u && r && !dl && !d && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_ur_r_dr
+                        Block.DamagedStone -> tiles.damStoneBase_ul_ur_r_dr
+                        Block.Brick -> tiles.brickBase_ul_ur_r_dr
+                        Block.Metal -> tiles.metalBase_ul_ur_r_dr
+                        else -> tiles.exampleBase_ul_ur_r_dr
+                    }
+                    !ul && !u && ur && !r && d && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ur_dr_d_dl
+                        Block.DamagedStone -> tiles.damStoneBase_ur_dr_d_dl
+                        Block.Brick -> tiles.brickBase_ur_dr_d_dl
+                        Block.Metal -> tiles.metalBase_ur_dr_d_dl
+                        else -> tiles.exampleBase_ur_dr_d_dl
+                    }
+                    !u && !ur && !r && !d && dr && l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_dr_dl_l
+                        Block.DamagedStone -> tiles.damStoneBase_ul_dr_dl_l
+                        Block.Brick -> tiles.brickBase_ul_dr_dl_l
+                        Block.Metal -> tiles.metalBase_ul_dr_dl_l
+                        else -> tiles.exampleBase_ul_dr_dl_l
+                    }
+                    u && !r && dr && !d && !dl && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_u_ur_dr
+                        Block.DamagedStone -> tiles.damStoneBase_ul_u_ur_dr
+                        Block.Brick -> tiles.brickBase_ul_u_ur_dr
+                        Block.Metal -> tiles.metalBase_ul_u_ur_dr
+                        else -> tiles.exampleBase_ul_u_ur_dr
+                    }
+                    !ul && !u && r && !d && dl && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ur_r_dr_dl
+                        Block.DamagedStone -> tiles.damStoneBase_ur_r_dr_dl
+                        Block.Brick -> tiles.brickBase_ur_r_dr_dl
+                        Block.Metal -> tiles.metalBase_ur_r_dr_dl
+                        else -> tiles.exampleBase_ur_r_dr_dl
+                    }
+                    ul && !u && !ur && !r && d && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_dr_d_dl
+                        Block.DamagedStone -> tiles.damStoneBase_ul_dr_d_dl
+                        Block.Brick -> tiles.brickBase_ul_dr_d_dl
+                        Block.Metal -> tiles.metalBase_ul_dr_d_dl
+                        else -> tiles.exampleBase_ul_dr_d_dl
+                    }
+                    !u && ur && !r && !d && !dr && l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_ur_dl_l
+                        Block.DamagedStone -> tiles.damStoneBase_ul_ur_dl_l
+                        Block.Brick -> tiles.brickBase_ul_ur_dl_l
+                        Block.Metal -> tiles.metalBase_ul_ur_dl_l
+                        else -> tiles.exampleBase_ul_ur_dl_l
+                    }
+                    u && !r && dr && !d && dl && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_u_ur_dr_dl
+                        Block.DamagedStone -> tiles.damStoneBase_ul_u_ur_dr_dl
+                        Block.Brick -> tiles.brickBase_ul_u_ur_dr_dl
+                        Block.Metal -> tiles.metalBase_ul_u_ur_dr_dl
+                        else -> tiles.exampleBase_ul_u_ur_dr_dl
+                    }
+                    ul && !u && r && !d && dl && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_ur_r_dr_dl
+                        Block.DamagedStone -> tiles.damStoneBase_ul_ur_r_dr_dl
+                        Block.Brick -> tiles.brickBase_ul_ur_r_dr_dl
+                        Block.Metal -> tiles.metalBase_ul_ur_r_dr_dl
+                        else -> tiles.exampleBase_ul_ur_r_dr_dl
+                    }
+                    ul && !u && ur && !r && d && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_ur_dr_d_dl
+                        Block.DamagedStone -> tiles.damStoneBase_ul_ur_dr_d_dl
+                        Block.Brick -> tiles.brickBase_ul_ur_dr_d_dl
+                        Block.Metal -> tiles.metalBase_ul_ur_dr_d_dl
+                        else -> tiles.exampleBase_ul_ur_dr_d_dl
+                    }
+                    !u && ur && !r && !d && dr && l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_ur_dr_dl_l
+                        Block.DamagedStone -> tiles.damStoneBase_ul_ur_dr_dl_l
+                        Block.Brick -> tiles.brickBase_ul_ur_dr_dl_l
+                        Block.Metal -> tiles.metalBase_ul_ur_dr_dl_l
+                        else -> tiles.exampleBase_ul_ur_dr_dl_l
+                    }
+                    u && !r && d && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_u_ur_dr_d_dl
+                        Block.DamagedStone -> tiles.damStoneBase_ul_u_ur_dr_d_dl
+                        Block.Brick -> tiles.brickBase_ul_u_ur_dr_d_dl
+                        Block.Metal -> tiles.metalBase_ul_u_ur_dr_d_dl
+                        else -> tiles.exampleBase_ul_u_ur_dr_d_dl
+                    }
+                    !u && r && !d && l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_ur_r_dr_dl_l
+                        Block.DamagedStone -> tiles.damStoneBase_ul_ur_r_dr_dl_l
+                        Block.Brick -> tiles.brickBase_ul_ur_r_dr_dl_l
+                        Block.Metal -> tiles.metalBase_ul_ur_r_dr_dl_l
+                        else -> tiles.exampleBase_ul_ur_r_dr_dl_l
+                    }
+                    ul && !u && !ur && !r && dr && !d && !dl && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_dr
+                        Block.DamagedStone -> tiles.damStoneBase_ul_dr
+                        Block.Brick -> tiles.brickBase_ul_dr
+                        Block.Metal -> tiles.metalBase_ul_dr
+                        else -> tiles.exampleBase_ul_dr
+                    }
+                    !ul && !u && ur && !r && !dr && !d && dl && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ur_dl
+                        Block.DamagedStone -> tiles.damStoneBase_ur_dl
+                        Block.Brick -> tiles.brickBase_ur_dl
+                        Block.Metal -> tiles.metalBase_ur_dl
+                        else -> tiles.exampleBase_ur_dl
+                    }
+                    ul && !u && ur && !r && dr && !d && dl && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_ur_dr_dl
+                        Block.DamagedStone -> tiles.damStoneBase_ul_ur_dr_dl
+                        Block.Brick -> tiles.brickBase_ul_ur_dr_dl
+                        Block.Metal -> tiles.metalBase_ul_ur_dr_dl
+                        else -> tiles.exampleBase_ul_ur_dr_dl
+                    }
+                    u && r && d && l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_ul_u_ur_r_dr_d_dl_l
+                        Block.DamagedStone -> tiles.damStoneBase_ul_u_ur_r_dr_d_dl_l
+                        Block.Brick -> tiles.brickBase_ul_u_ur_r_dr_d_dl_l
+                        Block.Metal -> tiles.metalBase_ul_u_ur_r_dr_d_dl_l
+                        else -> tiles.exampleBase_ul_u_ur_r_dr_d_dl_l
+                    }
+                    !u && !r && !d && !l -> when (blockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneBase_none
+                        Block.DamagedStone -> tiles.damStoneBase_none
+                        Block.Brick -> tiles.brickBase_none
+                        Block.Metal -> tiles.metalBase_none
+                        else -> tiles.exampleBase_none
+                    }
+                    else -> tiles.emptyTile
                 }
 
-                val coverTile = when
+                val blockTile = when
                 {
-                    !isAboveRock && (isAboveDownRock || j == 0) -> cover_half
-                    isAboveRock -> cover_all
-                    else -> cover_empty
+                    isAboveRock -> tiles.cover_all
+                    else -> tiles.emptyTile
                 }
 
                 val wallTile = when
                 {
-                    !isAboveRock || isAboveDownRock -> wall_empty
-                    isAboveLeftRock && isAboveRightRock -> wall_m
-                    !isAboveLeftRock && isAboveRightRock -> wall_l_m
-                    isAboveLeftRock && !isAboveRightRock -> wall_m_r
-                    !isAboveLeftRock && !isAboveRightRock -> wall_l_m_r
-                    else -> wall_empty
+                    !isAboveRock || isAboveDownRock -> tiles.emptyTile
+                    isAboveLeftRock && isAboveRightRock -> when (AboveBlockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneWall_m
+                        Block.DamagedStone -> tiles.damStoneWall_m
+                        Block.Brick -> tiles.brickWall_m
+                        Block.Metal -> tiles.metalWall_m
+                        else -> tiles.exampleWall_m
+                    }
+                    !isAboveLeftRock && isAboveRightRock -> when (AboveBlockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneWall_l_m
+                        Block.DamagedStone -> tiles.damStoneWall_l_m
+                        Block.Brick -> tiles.brickWall_l_m
+                        Block.Metal -> tiles.metalWall_l_m
+                        else -> tiles.exampleWall_l_m
+                    }
+                    isAboveLeftRock && !isAboveRightRock -> when (AboveBlockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneWall_m_r
+                        Block.DamagedStone -> tiles.damStoneWall_m_r
+                        Block.Brick -> tiles.brickWall_m_r
+                        Block.Metal -> tiles.metalWall_m_r
+                        else -> tiles.exampleWall_m_r
+                    }
+                    !isAboveLeftRock && !isAboveRightRock -> when (AboveBlockType)
+                    {
+                        Block.UndamagedStone -> tiles.undamStoneWall_l_m_r
+                        Block.DamagedStone -> tiles.damStoneWall_l_m_r
+                        Block.Brick -> tiles.brickWall_l_m_r
+                        Block.Metal -> tiles.metalWall_l_m_r
+                        else -> tiles.exampleWall_l_m_r
+                    }
+                    else -> tiles.emptyTile
+                }
+
+                val coverTile = when
+                {
+                    (isAboveDownRock || j == 0) -> tiles.cover_half
+                    else -> tiles.emptyTile
                 }
 
                 map.setTile("hole", i, j, holeTile)
                 map.setTile("base", i, j, baseTile)
-                map.setTile("cover", i, j, coverTile)
+                map.setTile("block", i, j, blockTile)
                 map.setTile("wall", i, j, wallTile)
+                map.setTile("cover", i, j, coverTile)
             }
         }
 
@@ -375,6 +701,11 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
 
         // input
 
+        val is1KeyJustPressed = Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)
+        val is2KeyJustPressed = Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)
+        val is3KeyJustPressed = Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)
+        val is4KeyJustPressed = Gdx.input.isKeyJustPressed(Input.Keys.NUM_4)
+
         val isLeftButtonPressed = Gdx.input.isButtonPressed(0)
         val isRightButtonPressed = Gdx.input.isButtonPressed(1)
         val isLeftButtonJustPressed = Gdx.input.isButtonJustPressed(0)
@@ -382,12 +713,42 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
 
         val screenMousePos = Vector2(Gdx.input.x.toFloat(), Gdx.input.y.toFloat())
         val worldMousePos = mapViewport.unproject(screenMousePos)
+        val isMouseInMap = (worldMousePos.x > 0 && worldMousePos.x < map.width() && worldMousePos.y > 0 && worldMousePos.y < map.height())
+
+
+        // block type
+
+        if (is1KeyJustPressed) currentBlockType = Block.UndamagedStone
+        if (is2KeyJustPressed) currentBlockType = Block.DamagedStone
+        if (is3KeyJustPressed) currentBlockType = Block.Brick
+        if (is4KeyJustPressed) currentBlockType = Block.Metal
+
+        blockTypeLabel.setText(
+                when (currentBlockType)
+                {
+                    Block.UndamagedStone -> "undam stone"
+                    Block.DamagedStone -> "dam stone"
+                    Block.Brick -> "brick"
+                    Block.Metal -> "metal"
+                    else -> "?"
+                }
+                              )
+
+        // block
+
+        if (isLeftButtonPressed && isMouseInMap)
+        {
+            level.map[currentLevel][selectPosition.y.toInt()][selectPosition.x.toInt()].rock = Block.Empty
+            loadLevelToMap(currentLevel)
+        }
+
+        if (isRightButtonPressed && isMouseInMap)
+        {
+            level.map[currentLevel][selectPosition.y.toInt()][selectPosition.x.toInt()].rock = currentBlockType
+            loadLevelToMap(currentLevel)
+        }
 
         // select
-
-        isMouseInMap =
-            (worldMousePos.x > 0 && worldMousePos.x < map.width() && worldMousePos.y > 0 && worldMousePos.y < map.height())
-
 
         if (isSelectFixed)
         {
@@ -395,12 +756,12 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
             {
                 if (isMouseInMap)
                 {
-                    map.setTile("select", selectPosition.x.toInt(), selectPosition.y.toInt(), emptyTile)
+                    map.setTile("select", selectPosition.x.toInt(), selectPosition.y.toInt(), tiles.emptyTile)
 
                     selectPosition.x = truncate(worldMousePos.x / map.tileWidth)
                     selectPosition.y = truncate(worldMousePos.y / map.tileHeight)
 
-                    map.setTile("select", selectPosition.x.toInt(), selectPosition.y.toInt(), selectTile)
+                    map.setTile("select", selectPosition.x.toInt(), selectPosition.y.toInt(), tiles.selectTile)
                 }
                 else
                 {
@@ -410,14 +771,14 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
         }
         else
         {
-            map.setTile("select", selectPosition.x.toInt(), selectPosition.y.toInt(), emptyTile)
+            map.setTile("select", selectPosition.x.toInt(), selectPosition.y.toInt(), tiles.emptyTile)
 
             if (isMouseInMap)
             {
                 selectPosition.x = truncate(worldMousePos.x / map.tileWidth)
                 selectPosition.y = truncate(worldMousePos.y / map.tileHeight)
 
-                map.setTile("select", selectPosition.x.toInt(), selectPosition.y.toInt(), selectTile)
+                map.setTile("select", selectPosition.x.toInt(), selectPosition.y.toInt(), tiles.selectTile)
             }
 
             if (isLeftButtonJustPressed)
@@ -447,20 +808,6 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
                 //dragOrigin = worldMousePos
                 //isDragging = true
             }
-        }
-
-        // block
-
-        if(isLeftButtonJustPressed && isMouseInMap)
-        {
-            level.map[currentLevel][selectPosition.y.toInt()][selectPosition.x.toInt()].rock=Rock.Empty
-            loadLevelToMap(currentLevel)
-        }
-
-        if(isRightButtonJustPressed && isMouseInMap)
-        {
-            level.map[currentLevel][selectPosition.y.toInt()][selectPosition.x.toInt()].rock=Rock.Weak
-            loadLevelToMap(currentLevel)
         }
 
         // draw
