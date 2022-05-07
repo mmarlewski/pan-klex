@@ -10,19 +10,20 @@ class LevelBlock
     var rock = Block.Empty
     var depth = 0
 
-    fun isEntity(): Boolean = entity != null
-    fun isRock(): Boolean = rock != Block.Empty
-    fun isGap(): Boolean = depth > 0
+    fun isEntity() = entity != null
+    fun isRock() = rock != Block.Empty
+    fun isGap() = depth > 0
 }
 
 class JsonLevel
 {
-    var version: String = ""
-    var name: String = ""
-    var levels: Int = 0
-    var width: Int = 0
-    var height: Int = 0
-    var map: Array<Array<Array<Int>>> = emptyArray<Array<Array<Int>>>()
+    var version = ""
+    var name = ""
+    var levels = 0
+    var width = 0
+    var height = 0
+    var map = emptyArray<Array<Array<Int>>>()
+    var entities = emptyList<BaseEntity>()
 }
 
 class KlexLevel

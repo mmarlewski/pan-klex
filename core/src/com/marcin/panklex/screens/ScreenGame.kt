@@ -4,11 +4,10 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
@@ -18,6 +17,7 @@ import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.ScreenUtils
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.marcin.panklex.*
+import com.marcin.panklex.entities.*
 import kotlin.math.truncate
 
 class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, game)
@@ -62,9 +62,10 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
                                  {
                                      if (currentLevel < level.levels - 1)
                                      {
-                                         currentLevel++
+                                         changeLevel(currentLevel + 1)
+                                         refreshLevel()
+                                         refreshMap()
                                          levelLabel.setText("level: $currentLevel")
-                                         loadLevelToMap(currentLevel)
                                      }
                                  }
                              })
@@ -75,9 +76,10 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
                                    {
                                        if (currentLevel > 0)
                                        {
-                                           currentLevel--
+                                           changeLevel(currentLevel - 1)
+                                           refreshLevel()
+                                           refreshMap()
                                            levelLabel.setText("level: $currentLevel")
-                                           loadLevelToMap(currentLevel)
                                        }
                                    }
                                })
@@ -101,12 +103,14 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
 
         // init
 
-        loadMapFromJson("levels/3.json")
-        loadLevelToMap(0)
+        loadLevelFromJson("levels/3.json")
+        changeLevel(0)
+        refreshLevel()
+        refreshMap()
         mapCamera.zoom = 0.5f
     }
 
-    fun loadMapFromJson(jsonPath: String)
+    fun loadLevelFromJson(jsonPath: String)
     {
         val jsonFile = Gdx.files.internal(jsonPath)
         val jsonString = jsonFile.readString()
@@ -154,40 +158,99 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
         }
 
         level.map = levelList
+        level.entities = jsonLevel.entities
     }
 
-    fun loadLevelToMap(levelNr: Int)
+    fun changeLevel(levelNr: Int)
+    {
+        currentLevel = levelNr
+    }
+
+    fun refreshLevel()
     {
         for (i in 0..level.width - 1)
         {
             for (j in 0..level.height - 1)
             {
-                val blockType = if (level.map[levelNr][j][i].rock != Block.Empty) level.map[levelNr][j][i].rock else Block.Metal
-                val UpBlockType = if (j < level.height - 1) level.map[levelNr][j + 1][i].rock else Block.Metal
-                val AboveBlockType = if (levelNr < level.levels - 1) level.map[levelNr + 1][j][i].rock else Block.Metal
+                level.map[currentLevel][j][i].entity = null
+            }
+        }
 
-                val isRock = level.map[levelNr][j][i].rock != Block.Empty
-                val isUpLeftRock = !(j < level.height - 1 && i > 0 && level.map[levelNr][j + 1][i - 1].rock == Block.Empty)
-                val isUpRock = !(j < level.height - 1 && level.map[levelNr][j + 1][i].rock == Block.Empty)
-                val isUpRightRock = !(j < level.height - 1 && i < level.width - 1 && level.map[levelNr][j + 1][i + 1].rock == Block.Empty)
-                val isRightRock = !(i < level.width - 1 && level.map[levelNr][j][i + 1].rock == Block.Empty)
-                val isDownRightRock = !(j > 0 && i < level.width - 1 && level.map[levelNr][j - 1][i + 1].rock == Block.Empty)
-                val isDownRock = !(j > 0 && level.map[levelNr][j - 1][i].rock == Block.Empty)
-                val isDownLeftRock = !(j > 0 && i > 0 && level.map[levelNr][j - 1][i - 1].rock == Block.Empty)
-                val isLeftRock = !(i > 0 && level.map[levelNr][j][i - 1].rock == Block.Empty)
+        for (e in level.entities)
+        {
+            val positions = mutableListOf<Vector3>()
+            when (e)
+            {
+                is EntityPlayer -> positions.add(e.position)
+                is EntityContainer -> positions.add(e.position)
+                is EntityVendingMachine -> positions.add(e.position)
+                is EntityElevator ->
+                {
+                    positions.addAll(e.positions)
+                    positions.addAll(e.exitPositions)
+                }
+                is EntityTeleporter ->
+                {
+                    positions.add(e.firstTelePosition)
+                    positions.add(e.secondTelePosition)
+                }
+                is EntityFlag -> positions.add(e.position)
+                is EntityStairs ->
+                {
+                    positions.add(e.position)
+                    positions.add(e.lowerEnd)
+                    positions.add(e.upperEnd)
+                }
+                is EntityPoweredGate ->
+                {
+                    positions.add(e.firstPartPosition)
+                    positions.add(e.secondPartPosition)
+                    positions.add(e.gatePosition)
+                }
+            }
 
-                val isAboveRock = !(levelNr < level.levels - 1 && level.map[levelNr + 1][j][i].rock == Block.Empty)
+            for (p in positions)
+            {
+                level.map[p.z.toInt()][p.y.toInt()][p.x.toInt()].entity = e
+            }
+        }
+    }
+
+    fun refreshMap()
+    {
+        for (i in 0..level.width - 1)
+        {
+            for (j in 0..level.height - 1)
+            {
+                val blockType = if (level.map[currentLevel][j][i].rock != Block.Empty) level.map[currentLevel][j][i].rock else Block.Metal
+                val UpBlockType = if (j < level.height - 1) level.map[currentLevel][j + 1][i].rock else Block.Metal
+                val AboveBlockType = if (currentLevel < level.levels - 1) level.map[currentLevel + 1][j][i].rock else Block.Metal
+
+                val isRock = level.map[currentLevel][j][i].rock != Block.Empty
+                val isUpLeftRock = !(j < level.height - 1 && i > 0 && level.map[currentLevel][j + 1][i - 1].rock == Block.Empty)
+                val isUpRock = !(j < level.height - 1 && level.map[currentLevel][j + 1][i].rock == Block.Empty)
+                val isUpRightRock = !(j < level.height - 1 && i < level.width - 1 && level.map[currentLevel][j + 1][i + 1].rock == Block.Empty)
+                val isRightRock = !(i < level.width - 1 && level.map[currentLevel][j][i + 1].rock == Block.Empty)
+                val isDownRightRock = !(j > 0 && i < level.width - 1 && level.map[currentLevel][j - 1][i + 1].rock == Block.Empty)
+                val isDownRock = !(j > 0 && level.map[currentLevel][j - 1][i].rock == Block.Empty)
+                val isDownLeftRock = !(j > 0 && i > 0 && level.map[currentLevel][j - 1][i - 1].rock == Block.Empty)
+                val isLeftRock = !(i > 0 && level.map[currentLevel][j][i - 1].rock == Block.Empty)
+
+                val isAboveRock = !(currentLevel < level.levels - 1 && level.map[currentLevel + 1][j][i].rock == Block.Empty)
                 val isAboveUpLeftRock =
-                        !(levelNr < level.levels - 1 && j < level.height - 1 && i > 0 && level.map[levelNr + 1][j + 1][i - 1].rock == Block.Empty)
-                val isAboveUpRock = !(levelNr < level.levels - 1 && j < level.height - 1 && level.map[levelNr + 1][j + 1][i].rock == Block.Empty)
+                        !(currentLevel < level.levels - 1 && j < level.height - 1 && i > 0 && level.map[currentLevel + 1][j + 1][i - 1].rock == Block.Empty)
+                val isAboveUpRock =
+                        !(currentLevel < level.levels - 1 && j < level.height - 1 && level.map[currentLevel + 1][j + 1][i].rock == Block.Empty)
                 val isAboveUpRightRock =
-                        !(levelNr < level.levels - 1 && j < level.height - 1 && i < level.width - 1 && level.map[levelNr + 1][j + 1][i + 1].rock == Block.Empty)
-                val isAboveRightRock = !(levelNr < level.levels - 1 && i < level.width - 1 && level.map[levelNr + 1][j][i + 1].rock == Block.Empty)
+                        !(currentLevel < level.levels - 1 && j < level.height - 1 && i < level.width - 1 && level.map[currentLevel + 1][j + 1][i + 1].rock == Block.Empty)
+                val isAboveRightRock =
+                        !(currentLevel < level.levels - 1 && i < level.width - 1 && level.map[currentLevel + 1][j][i + 1].rock == Block.Empty)
                 val isAboveDownRightRock =
-                        !(levelNr < level.levels - 1 && j > 0 && i < level.width - 1 && level.map[levelNr + 1][j - 1][i + 1].rock == Block.Empty)
-                val isAboveDownRock = !(levelNr < level.levels - 1 && j > 0 && level.map[levelNr + 1][j - 1][i].rock == Block.Empty)
-                val isAboveDownLeftRock = !(levelNr < level.levels - 1 && j > 0 && i > 0 && level.map[levelNr + 1][j - 1][i - 1].rock == Block.Empty)
-                val isAboveLeftRock = !(levelNr < level.levels - 1 && i > 0 && level.map[levelNr + 1][j][i - 1].rock == Block.Empty)
+                        !(currentLevel < level.levels - 1 && j > 0 && i < level.width - 1 && level.map[currentLevel + 1][j - 1][i + 1].rock == Block.Empty)
+                val isAboveDownRock = !(currentLevel < level.levels - 1 && j > 0 && level.map[currentLevel + 1][j - 1][i].rock == Block.Empty)
+                val isAboveDownLeftRock =
+                        !(currentLevel < level.levels - 1 && j > 0 && i > 0 && level.map[currentLevel + 1][j - 1][i - 1].rock == Block.Empty)
+                val isAboveLeftRock = !(currentLevel < level.levels - 1 && i > 0 && level.map[currentLevel + 1][j][i - 1].rock == Block.Empty)
 
                 val holeTile = when
                 {
@@ -676,10 +739,146 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
                     else -> tiles.emptyTile
                 }
 
+                val entity = level.map[currentLevel][j][i].entity
+                val position = Vector3(i.toFloat(), j.toFloat(), currentLevel.toFloat())
+
+                val entityTile = when (entity)
+                {
+                    null -> tiles.emptyTile
+                    is EntityPlayer -> tiles.player
+                    is EntityContainer -> tiles.container
+                    is EntityVendingMachine -> tiles.vendingMachine
+                    is EntityElevator -> tiles.elevator
+                    is EntityTeleporter -> tiles.teleporter
+                    is EntityFlag -> tiles.flag
+                    is EntityStairs -> when
+                    {
+                        position.equals(entity.position) -> when (entity.direction)
+                        {
+                            Direction.Up -> tiles.stairs_a_u
+                            Direction.Right -> tiles.stairs_a_r
+                            Direction.Down -> tiles.stairs_a_d
+                            Direction.Left -> tiles.stairs_a_l
+                            else -> tiles.emptyTile
+                        }
+
+                        position.equals(entity.upperEnd) -> when (entity.direction)
+                        {
+                            Direction.Up -> tiles.stairs_b_u
+                            Direction.Right -> tiles.stairs_b_r
+                            Direction.Down -> tiles.stairs_b_d
+                            Direction.Left -> tiles.stairs_b_l
+                            else -> tiles.emptyTile
+                        }
+                        else -> tiles.emptyTile
+                    }
+                    is EntityPoweredGate -> when
+                    {
+                        position.equals(entity.gatePosition) -> if (entity.isGateVertical)
+                        {
+                            if (entity.firstPartDirection == Direction.Down && entity.secondPartDirection == Direction.Up)
+                            {
+                                when
+                                {
+                                    !entity.isFirstPartPowered && !entity.isSecondPartPowered -> tiles.emptyTile
+                                    entity.isFirstPartPowered && !entity.isSecondPartPowered -> tiles.poweredGate_gate_ver_u
+                                    !entity.isFirstPartPowered && entity.isSecondPartPowered -> tiles.poweredGate_gate_ver_d
+                                    entity.isFirstPartPowered && entity.isSecondPartPowered -> tiles.poweredGate_gate_ver_u_d
+                                    else -> tiles.emptyTile
+                                }
+                            }
+                            else
+                            {
+                                when
+                                {
+                                    !entity.isFirstPartPowered && !entity.isSecondPartPowered -> tiles.emptyTile
+                                    entity.isFirstPartPowered && !entity.isSecondPartPowered -> tiles.poweredGate_gate_ver_d
+                                    !entity.isFirstPartPowered && entity.isSecondPartPowered -> tiles.poweredGate_gate_ver_u
+                                    entity.isFirstPartPowered && entity.isSecondPartPowered -> tiles.poweredGate_gate_ver_u_d
+                                    else -> tiles.emptyTile
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (entity.firstPartDirection == Direction.Right && entity.secondPartDirection == Direction.Left)
+                            {
+                                when
+                                {
+                                    !entity.isFirstPartPowered && !entity.isSecondPartPowered -> tiles.emptyTile
+                                    entity.isFirstPartPowered && !entity.isSecondPartPowered -> tiles.poweredGate_gate_hor_l
+                                    !entity.isFirstPartPowered && entity.isSecondPartPowered -> tiles.poweredGate_gate_hor_r
+                                    entity.isFirstPartPowered && entity.isSecondPartPowered -> tiles.poweredGate_gate_hor_l_r
+                                    else -> tiles.emptyTile
+                                }
+                            }
+                            else
+                            {
+                                when
+                                {
+                                    !entity.isFirstPartPowered && !entity.isSecondPartPowered -> tiles.emptyTile
+                                    entity.isFirstPartPowered && !entity.isSecondPartPowered -> tiles.poweredGate_gate_hor_r
+                                    !entity.isFirstPartPowered && entity.isSecondPartPowered -> tiles.poweredGate_gate_hor_l
+                                    entity.isFirstPartPowered && entity.isSecondPartPowered -> tiles.poweredGate_gate_hor_l_r
+                                    else -> tiles.emptyTile
+                                }
+                            }
+                        }
+
+                        position.equals(entity.firstPartPosition) -> if (entity.isFirstPartPowered)
+                        {
+                            when (entity.firstPartDirection)
+                            {
+                                Direction.Up -> tiles.poweredGate_part_pow_l_r
+                                Direction.Right -> tiles.poweredGate_part_pow_r
+                                Direction.Down -> tiles.poweredGate_part_pow_l_r
+                                Direction.Left -> tiles.poweredGate_part_pow_l
+                                else -> tiles.emptyTile
+                            }
+                        }
+                        else
+                        {
+                            when (entity.firstPartDirection)
+                            {
+                                Direction.Up -> tiles.poweredGate_part_unp_l_r
+                                Direction.Right -> tiles.poweredGate_part_unp_r
+                                Direction.Down -> tiles.poweredGate_part_unp_l_r
+                                Direction.Left -> tiles.poweredGate_part_unp_l
+                                else -> tiles.emptyTile
+                            }
+                        }
+                        position.equals(entity.secondPartPosition) -> if (entity.isSecondPartPowered)
+                        {
+                            when (entity.secondPartDirection)
+                            {
+                                Direction.Up -> tiles.poweredGate_part_pow_l_r
+                                Direction.Right -> tiles.poweredGate_part_pow_r
+                                Direction.Down -> tiles.poweredGate_part_pow_l_r
+                                Direction.Left -> tiles.poweredGate_part_pow_l
+                                else -> tiles.emptyTile
+                            }
+                        }
+                        else
+                        {
+                            when (entity.secondPartDirection)
+                            {
+                                Direction.Up -> tiles.poweredGate_part_unp_l_r
+                                Direction.Right -> tiles.poweredGate_part_unp_r
+                                Direction.Down -> tiles.poweredGate_part_unp_l_r
+                                Direction.Left -> tiles.poweredGate_part_unp_l
+                                else -> tiles.emptyTile
+                            }
+                        }
+                        else -> tiles.emptyTile
+                    }
+                    else -> tiles.emptyTile
+                }
+
                 map.setTile("hole", i, j, holeTile)
                 map.setTile("base", i, j, baseTile)
                 map.setTile("block", i, j, blockTile)
                 map.setTile("wall", i, j, wallTile)
+                map.setTile("entity", i, j, entityTile)
                 map.setTile("cover", i, j, coverTile)
             }
         }
@@ -739,13 +938,13 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
         if (isLeftButtonPressed && isMouseInMap)
         {
             level.map[currentLevel][selectPosition.y.toInt()][selectPosition.x.toInt()].rock = Block.Empty
-            loadLevelToMap(currentLevel)
+            refreshMap()
         }
 
         if (isRightButtonPressed && isMouseInMap)
         {
             level.map[currentLevel][selectPosition.y.toInt()][selectPosition.x.toInt()].rock = currentBlockType
-            loadLevelToMap(currentLevel)
+            refreshMap()
         }
 
         // select

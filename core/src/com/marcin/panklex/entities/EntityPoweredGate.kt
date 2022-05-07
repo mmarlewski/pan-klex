@@ -12,6 +12,7 @@ class EntityPoweredGate : BaseEntity("entity PoweredGate")
     var secondPartPosition = Vector3()
     var secondPartDirection = Direction.None
     var isSecondPartPowered = false
-    var gapePosition = Vector3()
+    var gatePosition = Vector3()
+    var isGateVertical = false
     var isGateOpen = false
 }
