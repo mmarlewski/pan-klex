@@ -36,7 +36,12 @@ class PanKlexGame : Game()
 
     fun loadAssets()
     {
-        assetManager.load("images/actions.png", Texture::class.java)
+        assetManager.load("images/pickaxe.png", Texture::class.java)
+        assetManager.load("images/bomb.png", Texture::class.java)
+        assetManager.load("images/coin.png", Texture::class.java)
+        assetManager.load("images/cell.png", Texture::class.java)
+        assetManager.load("images/walk.png", Texture::class.java)
+        assetManager.load("images/cancel.png", Texture::class.java)
 
         assetManager.load("tiles/entities/player.png", Texture::class.java)
         assetManager.load("tiles/entities/container.png", Texture::class.java)

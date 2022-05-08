@@ -7,6 +7,31 @@ import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile
 
 class KlexTiles(val assetManager: AssetManager)
 {
+    // special
+
+    val testTileset = TextureRegion(assetManager.get<Texture>("tiles/special.png")).split(32, 32)
+    val blueTile = StaticTiledMapTile(testTileset[0][0])
+    val greenTile = StaticTiledMapTile(testTileset[0][1])
+    val redTile = StaticTiledMapTile(testTileset[0][2])
+    val yellowTile = StaticTiledMapTile(testTileset[0][3])
+    val purpleTile = StaticTiledMapTile(testTileset[1][0])
+    val selectTile = StaticTiledMapTile(testTileset[1][1])
+    val objectTile = StaticTiledMapTile(testTileset[1][2])
+    val emptyTile = StaticTiledMapTile(testTileset[1][3])
+
+    val coverTileset = TextureRegion(assetManager.get<Texture>("tiles/cover.png")).split(32, 32)
+    val cover_half = StaticTiledMapTile(coverTileset[0][0])
+    val cover_all = StaticTiledMapTile(coverTileset[0][1])
+
+    // action
+
+    val pickaxeTile = StaticTiledMapTile(TextureRegion(assetManager.get<Texture>("images/pickaxe.png")))
+    val bombTile = StaticTiledMapTile(TextureRegion(assetManager.get<Texture>("images/bomb.png")))
+    val coinTile = StaticTiledMapTile(TextureRegion(assetManager.get<Texture>("images/coin.png")))
+    val cellTile = StaticTiledMapTile(TextureRegion(assetManager.get<Texture>("images/cell.png")))
+    val walkTile = StaticTiledMapTile(TextureRegion(assetManager.get<Texture>("images/walk.png")))
+
+
     // entities
 
     val player = StaticTiledMapTile(TextureRegion(assetManager.get<Texture>("tiles/entities/player.png")))
@@ -41,22 +66,6 @@ class KlexTiles(val assetManager: AssetManager)
     val poweredGate_gate_ver_u_d = StaticTiledMapTile(poweredGate[0][8])
     val poweredGate_gate_ver_d = StaticTiledMapTile(poweredGate[0][9])
     val poweredGate_gate_ver_u = StaticTiledMapTile(poweredGate[0][10])
-
-    // special
-
-    val testTileset = TextureRegion(assetManager.get<Texture>("tiles/special.png")).split(32, 32)
-    val blueTile = StaticTiledMapTile(testTileset[0][0])
-    val greenTile = StaticTiledMapTile(testTileset[0][1])
-    val redTile = StaticTiledMapTile(testTileset[0][2])
-    val yellowTile = StaticTiledMapTile(testTileset[0][3])
-    val purpleTile = StaticTiledMapTile(testTileset[1][0])
-    val selectTile = StaticTiledMapTile(testTileset[1][1])
-    val objectTile = StaticTiledMapTile(testTileset[1][2])
-    val emptyTile = StaticTiledMapTile(testTileset[1][3])
-
-    val coverTileset = TextureRegion(assetManager.get<Texture>("tiles/cover.png")).split(32, 32)
-    val cover_half = StaticTiledMapTile(coverTileset[0][0])
-    val cover_all = StaticTiledMapTile(coverTileset[0][1])
 
     // example
 

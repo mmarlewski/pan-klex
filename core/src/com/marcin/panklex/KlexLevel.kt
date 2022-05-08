@@ -22,8 +22,9 @@ class JsonLevel
     var levels = 0
     var width = 0
     var height = 0
-    var map = emptyArray<Array<Array<Int>>>()
-    var entities = emptyList<BaseEntity>()
+    var map = arrayOf<Array<Array<Int>>>()
+    var player= EntityPlayer()
+    var entities = listOf<BaseEntity>()
 }
 
 class KlexLevel
@@ -33,7 +34,7 @@ class KlexLevel
     var levels = 0
     var width = 0
     var height = 0
-    var map = emptyList<List<List<LevelBlock>>>()
-    var entities = emptyList<BaseEntity>()
-    var playerEntity = EntityPlayer()
+    var map = listOf<List<List<LevelBlock>>>()
+    var player= EntityPlayer()
+    var entities = mutableListOf<BaseEntity>()
 }

@@ -9,3 +9,8 @@ enum class Block
 {
     Empty, UndamagedStone, DamagedStone, Brick, Metal
 }
+
+enum class Action
+{
+    None, Pickaxe, Bomb, Coin, Cell, Walk
+}

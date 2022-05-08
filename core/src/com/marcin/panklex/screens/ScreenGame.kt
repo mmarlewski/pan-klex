@@ -4,15 +4,18 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
-import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.scenes.scene2d.InputEvent
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.ScreenUtils
 import com.badlogic.gdx.utils.viewport.ScreenViewport
@@ -33,18 +36,45 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
 
     // hud
 
+    val blockTypeLabel = Label("undam stone", Label.LabelStyle(BitmapFont(), Color.CYAN))
     val levelLabel = Label("level: 0", Label.LabelStyle(BitmapFont(), Color.GREEN))
     val upButton = TextButton("Up", TextButton.TextButtonStyle(null, null, null, BitmapFont()))
     val downButton = TextButton("Down", TextButton.TextButtonStyle(null, null, null, BitmapFont()))
     val endGameButton = TextButton("End Game", TextButton.TextButtonStyle(null, null, null, BitmapFont()))
-    val blockTypeLabel = Label("undam stone", Label.LabelStyle(BitmapFont(), Color.CYAN))
+
+    val pickaxeImage = game.assetManager.get<Texture>("images/pickaxe.png")
+    val bombImage = game.assetManager.get<Texture>("images/bomb.png")
+    val coinImage = game.assetManager.get<Texture>("images/coin.png")
+    val cellImage = game.assetManager.get<Texture>("images/cell.png")
+    val walkImage = game.assetManager.get<Texture>("images/walk.png")
+    val cancelImage = game.assetManager.get<Texture>("images/cancel.png")
+
+    val pickaxeButton = ImageButton(TextureRegionDrawable(pickaxeImage))
+    val bombButton = ImageButton(TextureRegionDrawable(bombImage))
+    val coinButton = ImageButton(TextureRegionDrawable(coinImage))
+    val cellButton = ImageButton(TextureRegionDrawable(cellImage))
+    val walkButton = ImageButton(TextureRegionDrawable(walkImage))
+    val cancellButton = ImageButton(TextureRegionDrawable(cancelImage))
+
+    val pickaxeCountLabel = Label("0", Label.LabelStyle(BitmapFont(), Color.YELLOW))
+    val bombCountLabel = Label("0", Label.LabelStyle(BitmapFont(), Color.YELLOW))
+    val coinCountLabel = Label("0", Label.LabelStyle(BitmapFont(), Color.YELLOW))
+    val cellCountLabel = Label("0", Label.LabelStyle(BitmapFont(), Color.YELLOW))
 
     // other
 
     var currentLevel = 0
     var currentBlockType = Block.UndamagedStone
+    var currentAction = Action.None
+    var isActionPossible = false
+
+    var pickaxeCount = 3
+    var bombCount = 3
+    var coinCount = 3
+    var cellCount = 3
 
     var selectPosition = Vector2()
+    var actionPosition = Vector2()
     var isMouseInMap = true
     var isSelectFixed = false
 
@@ -92,13 +122,74 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
                                       }
                                   })
 
+        pickaxeButton.addListener(object : ClickListener()
+                                  {
+                                      override fun clicked(event: InputEvent?, x: Float, y: Float)
+                                      {
+                                          if (pickaxeCount > 0) changeAction(Action.Pickaxe)
+                                      }
+                                  })
+
+        bombButton.addListener(object : ClickListener()
+                               {
+                                   override fun clicked(event: InputEvent?, x: Float, y: Float)
+                                   {
+                                       if (bombCount > 0) changeAction(Action.Bomb)
+                                   }
+                               })
+
+        coinButton.addListener(object : ClickListener()
+                               {
+                                   override fun clicked(event: InputEvent?, x: Float, y: Float)
+                                   {
+                                       if (coinCount > 0) changeAction(Action.Coin)
+                                   }
+                               })
+
+        cellButton.addListener(object : ClickListener()
+                               {
+                                   override fun clicked(event: InputEvent?, x: Float, y: Float)
+                                   {
+                                       if (cellCount > 0) changeAction(Action.Cell)
+                                   }
+                               })
+
+        walkButton.addListener(object : ClickListener()
+                               {
+                                   override fun clicked(event: InputEvent?, x: Float, y: Float)
+                                   {
+                                       changeAction(Action.Walk)
+                                   }
+                               })
+
+        cancellButton.addListener(object : ClickListener()
+                                  {
+                                      override fun clicked(event: InputEvent?, x: Float, y: Float)
+                                      {
+                                          changeAction(Action.None)
+                                      }
+                                  })
+
         val table = Table()
-        table.top().setFillParent(true)
+        table.top()
+        table.setFillParent(true)
         table.add(blockTypeLabel).pad(10f)
         table.add(levelLabel).pad(10f)
         table.add(upButton).pad(10f)
         table.add(downButton).pad(10f)
         table.add(endGameButton).pad(10f)
+        table.row()
+        table.add(pickaxeButton).pad(10f)
+        table.add(bombButton).pad(10f)
+        table.add(coinButton).pad(10f)
+        table.add(cellButton).pad(10f)
+        table.add(walkButton).pad(10f)
+        table.add(cancellButton).pad(10f)
+        table.row()
+        table.add(pickaxeCountLabel).pad(10f)
+        table.add(bombCountLabel).pad(10f)
+        table.add(coinCountLabel).pad(10f)
+        table.add(cellCountLabel).pad(10f)
         stage.addActor(table)
 
         // init
@@ -107,7 +198,13 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
         changeLevel(0)
         refreshLevel()
         refreshMap()
+        refreshEquipmentCountLabels()
         mapCamera.zoom = 0.5f
+    }
+
+    fun changeAction(action: Action)
+    {
+        currentAction = action
     }
 
     fun loadLevelFromJson(jsonPath: String)
@@ -158,7 +255,9 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
         }
 
         level.map = levelList
-        level.entities = jsonLevel.entities
+        level.player = jsonLevel.player
+        level.entities.add(level.player)
+        level.entities.addAll(jsonLevel.entities)
     }
 
     fun changeLevel(levelNr: Int)
@@ -748,9 +847,13 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
                     is EntityPlayer -> tiles.player
                     is EntityContainer -> tiles.container
                     is EntityVendingMachine -> tiles.vendingMachine
-                    is EntityElevator -> tiles.elevator
                     is EntityTeleporter -> tiles.teleporter
                     is EntityFlag -> tiles.flag
+                    is EntityElevator ->
+                    {
+                        if (entity.positions.contains(position)) tiles.elevator
+                        else tiles.emptyTile
+                    }
                     is EntityStairs -> when
                     {
                         position.equals(entity.position) -> when (entity.direction)
@@ -886,6 +989,14 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
         map.setDimensions(level.width, level.height)
     }
 
+    fun refreshEquipmentCountLabels()
+    {
+        pickaxeCountLabel.setText(pickaxeCount)
+        bombCountLabel.setText(bombCount)
+        coinCountLabel.setText(coinCount)
+        cellCountLabel.setText(cellCount)
+    }
+
     override fun show()
     {
         super.show()
@@ -937,7 +1048,7 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
 
         if (isLeftButtonPressed && isMouseInMap)
         {
-            level.map[currentLevel][selectPosition.y.toInt()][selectPosition.x.toInt()].rock = Block.Empty
+            //level.map[currentLevel][selectPosition.y.toInt()][selectPosition.x.toInt()].rock = Block.Empty
             refreshMap()
         }
 
@@ -945,6 +1056,193 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
         {
             level.map[currentLevel][selectPosition.y.toInt()][selectPosition.x.toInt()].rock = currentBlockType
             refreshMap()
+        }
+
+        // action
+
+        map.setTile("action", actionPosition.x.toInt(), actionPosition.y.toInt(), tiles.emptyTile)
+
+        if (isMouseInMap)
+        {
+            actionPosition.x = truncate(worldMousePos.x / map.tileWidth)
+            actionPosition.y = truncate(worldMousePos.y / map.tileHeight)
+
+            isActionPossible = when (currentAction)
+            {
+                Action.Pickaxe ->
+                {
+                    when (level.map[currentLevel][selectPosition.y.toInt()][selectPosition.x.toInt()].rock)
+                    {
+                        Block.UndamagedStone, Block.DamagedStone, Block.Brick -> true
+                        else -> false
+                    }
+                }
+                Action.Bomb ->
+                {
+                    level.map[currentLevel][selectPosition.y.toInt()][selectPosition.x.toInt()].rock != Block.Empty
+                }
+                Action.Coin ->
+                {
+                    level.map[currentLevel][selectPosition.y.toInt()][selectPosition.x.toInt()].entity is EntityVendingMachine
+                }
+                Action.Cell ->
+                {
+                    level.map[currentLevel][selectPosition.y.toInt()][selectPosition.x.toInt()].entity is EntityPoweredGate
+                }
+                Action.Walk ->
+                {
+                    level.map[currentLevel][selectPosition.y.toInt()][selectPosition.x.toInt()].rock != Block.Empty && level.map[currentLevel][selectPosition.y.toInt()][selectPosition.x.toInt()].entity == null
+                }
+                else -> false
+            }
+
+            val tile = if (isActionPossible)
+            {
+                when (currentAction)
+                {
+                    Action.Pickaxe -> tiles.pickaxeTile
+                    Action.Bomb -> tiles.bombTile
+                    Action.Coin -> tiles.coinTile
+                    Action.Cell -> tiles.cellTile
+                    Action.Walk -> tiles.walkTile
+                    else -> tiles.emptyTile
+                }
+            }
+            else tiles.emptyTile
+
+            refreshMap()
+
+            map.setTile("action", actionPosition.x.toInt(), actionPosition.y.toInt(), tile)
+        }
+
+        if (isLeftButtonJustPressed)
+        {
+            if (isMouseInMap && isActionPossible)
+            {
+                when (currentAction)
+                {
+                    Action.Pickaxe ->
+                    {
+                        level.map[currentLevel][selectPosition.y.toInt()][selectPosition.x.toInt()].rock =
+                                when (level.map[currentLevel][selectPosition.y.toInt()][selectPosition.x.toInt()].rock)
+                                {
+                                    Block.UndamagedStone -> Block.DamagedStone
+                                    Block.DamagedStone, Block.Brick -> Block.Empty
+                                    else -> Block.Metal
+                                }
+
+                        pickaxeCount--
+                        if (pickaxeCount <= 0)
+                        {
+                            changeAction(Action.None)
+                        }
+                        refreshEquipmentCountLabels()
+                    }
+                    Action.Bomb ->
+                    {
+                        val entity = level.map[currentLevel][selectPosition.y.toInt()][selectPosition.x.toInt()].entity
+                        val position = Vector3(selectPosition.x, selectPosition.y, currentLevel.toFloat())
+
+                        when (entity)
+                        {
+                            is EntityContainer -> level.entities.remove(entity)
+                            is EntityVendingMachine -> level.entities.remove(entity)
+                            is EntityFlag -> level.entities.remove(entity)
+                            is EntityTeleporter ->
+                            {
+                                if (position.equals(entity.firstTelePosition) || position.equals(entity.secondTelePosition))
+                                {
+                                    level.entities.remove(entity)
+                                }
+                            }
+                            is EntityStairs ->
+                            {
+                                if (position.equals(entity.position))
+                                {
+                                    level.entities.remove(entity)
+                                }
+                            }
+                            is EntityElevator ->
+                            {
+                                if (entity.positions.contains(position))
+                                {
+                                    level.entities.remove(entity)
+                                }
+                            }
+                            is EntityPoweredGate ->
+                            {
+                                if (position.equals(entity.gatePosition))
+                                {
+                                    entity.isFirstPartPowered = false
+                                    entity.isSecondPartPowered = false
+                                }
+                                else if (position.equals(entity.firstPartPosition) || position.equals(entity.secondPartPosition))
+                                {
+                                    level.entities.remove(entity)
+                                }
+                            }
+                            else ->
+                            {
+                            }
+                        }
+
+                        bombCount--
+                        if (bombCount <= 0)
+                        {
+                            changeAction(Action.None)
+                        }
+                        refreshEquipmentCountLabels()
+
+                        refreshLevel()
+                    }
+                    Action.Coin ->
+                    {
+                        pickaxeCount++
+                        bombCount++
+                        cellCount++
+
+                        coinCount--
+                        if (coinCount <= 0)
+                        {
+                            changeAction(Action.None)
+                        }
+                        refreshEquipmentCountLabels()
+                    }
+                    Action.Cell ->
+                    {
+                        val position = Vector3(selectPosition.x, selectPosition.y, currentLevel.toFloat())
+                        val poweredGate = (level.map[currentLevel][selectPosition.y.toInt()][selectPosition.x.toInt()].entity as EntityPoweredGate)
+
+                        if (position.equals(poweredGate.firstPartPosition))
+                        {
+                            poweredGate.isFirstPartPowered = true
+                        }
+
+                        if (position.equals(poweredGate.secondPartPosition))
+                        {
+                            poweredGate.isSecondPartPowered = true
+                        }
+
+                        cellCount--
+                        if (cellCount <= 0)
+                        {
+                            changeAction(Action.None)
+                        }
+                        refreshEquipmentCountLabels()
+                    }
+                    Action.Walk ->
+                    {
+                        level.player.position.x = actionPosition.x
+                        level.player.position.y = actionPosition.y
+                        level.player.position.z = currentLevel.toFloat()
+
+                        refreshLevel()
+                    }
+                    else ->
+                    {
+                    }
+                }
+            }
         }
 
         // select

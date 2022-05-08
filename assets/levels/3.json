@@ -339,15 +339,15 @@
             ]
         ]
     ],
+    "player": {
+        "class" : "com.marcin.panklex.entities.EntityPlayer",
+        "position" : {
+            "x" : 2,
+            "y" : 1,
+            "z" : 0
+        }
+    },
     "entities" : [
-        {
-            "class" : "com.marcin.panklex.entities.EntityPlayer",
-            "position" : {
-                "x" : 2,
-                "y" : 1,
-                "z" : 0
-            }
-        },
         {
             "class" : "com.marcin.panklex.entities.EntityContainer",
             "position" : {
