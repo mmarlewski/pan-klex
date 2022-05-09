@@ -25,12 +25,32 @@ class KlexTiles(val assetManager: AssetManager)
 
     // action
 
-    val pickaxeTile = StaticTiledMapTile(TextureRegion(assetManager.get<Texture>("images/pickaxe.png")))
-    val bombTile = StaticTiledMapTile(TextureRegion(assetManager.get<Texture>("images/bomb.png")))
-    val coinTile = StaticTiledMapTile(TextureRegion(assetManager.get<Texture>("images/coin.png")))
-    val cellTile = StaticTiledMapTile(TextureRegion(assetManager.get<Texture>("images/cell.png")))
-    val walkTile = StaticTiledMapTile(TextureRegion(assetManager.get<Texture>("images/walk.png")))
+    val pickaxe = TextureRegion(assetManager.get<Texture>("tiles/actions/pickaxe.png")).split(32, 32)
+    val pickaxe_unsel = StaticTiledMapTile(pickaxe[0][0])
+    val pickaxe_sel = StaticTiledMapTile(pickaxe[0][1])
+    val pickaxe_tile = StaticTiledMapTile(pickaxe[0][2])
 
+    val bomb = TextureRegion(assetManager.get<Texture>("tiles/actions/bomb.png")).split(32, 32)
+    val bomb_unsel = StaticTiledMapTile(bomb[0][0])
+    val bomb_sel = StaticTiledMapTile(bomb[0][1])
+    val bomb_tile = StaticTiledMapTile(bomb[0][2])
+
+    val coin = TextureRegion(assetManager.get<Texture>("tiles/actions/coin.png")).split(32, 32)
+    val coin_unsel = StaticTiledMapTile(coin[0][0])
+    val coin_sel = StaticTiledMapTile(coin[0][1])
+    val coin_tile = StaticTiledMapTile(coin[0][2])
+
+    val cell = TextureRegion(assetManager.get<Texture>("tiles/actions/cell.png")).split(32, 32)
+    val cell_unsel = StaticTiledMapTile(cell[0][0])
+    val cell_sel = StaticTiledMapTile(cell[0][1])
+    val cell_tile = StaticTiledMapTile(cell[0][2])
+
+    val walk = TextureRegion(assetManager.get<Texture>("tiles/actions/walk.png")).split(32, 32)
+    val walk_unsel = StaticTiledMapTile(walk[0][0])
+    val walk_sel = StaticTiledMapTile(walk[0][1])
+    val walk_tile = StaticTiledMapTile(walk[0][2])
+
+    val cancel = StaticTiledMapTile(TextureRegion(assetManager.get<Texture>("tiles/actions/cancel.png")))
 
     // entities
 
@@ -47,7 +67,7 @@ class KlexTiles(val assetManager: AssetManager)
     val stairs_b_d = StaticTiledMapTile(stairs[0][1])
     val stairs_b_u = StaticTiledMapTile(stairs[0][2])
     val stairs_a_r = StaticTiledMapTile(stairs[0][3])
-    val stairs_a_l = StaticTiledMapTile(TextureRegion(stairs[0][0]).apply { flip(true, false) })
+    val stairs_a_l = StaticTiledMapTile(TextureRegion(stairs[0][3]).apply { flip(true, false) })
     val stairs_a_u = StaticTiledMapTile(stairs[0][4])
     val stairs_a_d = StaticTiledMapTile(stairs[0][5])
 
@@ -161,13 +181,17 @@ class KlexTiles(val assetManager: AssetManager)
     val undamStoneBase_ul_dr_d_dl_l = StaticTiledMapTile(TextureRegion(undamStoneBaseTileset[1][0]).apply { flip(true, true) })
     val undamStoneBase_ul_u_ur_dl_l = StaticTiledMapTile(TextureRegion(undamStoneBaseTileset[1][0]).apply { flip(true, false) })
     val undamStoneBase_ul_u_ur_r_dr_dl = StaticTiledMapTile(undamStoneBaseTileset[1][1])
-    val undamStoneBase_ul_ur_r_dr_d_dl = StaticTiledMapTile(TextureRegion(undamStoneBaseTileset[1][1]).apply { flip(false, true) })
+    val undamStoneBase_ul_ur_r_dr_d_dl =
+            StaticTiledMapTile(TextureRegion(undamStoneBaseTileset[1][1]).apply { flip(false, true) })
     val undamStoneBase_ul_ur_dr_d_dl_l = StaticTiledMapTile(TextureRegion(undamStoneBaseTileset[1][1]).apply { flip(true, true) })
-    val undamStoneBase_ul_u_ur_dr_dl_l = StaticTiledMapTile(TextureRegion(undamStoneBaseTileset[1][1]).apply { flip(true, false) })
+    val undamStoneBase_ul_u_ur_dr_dl_l =
+            StaticTiledMapTile(TextureRegion(undamStoneBaseTileset[1][1]).apply { flip(true, false) })
     val undamStoneBase_ul_u_ur_r_dr_d_dl = StaticTiledMapTile(undamStoneBaseTileset[1][2])
     val undamStoneBase_ul_ur_r_dr_d_dl_l = StaticTiledMapTile(undamStoneBaseTileset[1][3])
-    val undamStoneBase_ul_u_ur_dr_d_dl_l = StaticTiledMapTile(TextureRegion(undamStoneBaseTileset[1][2]).apply { flip(true, false) })
-    val undamStoneBase_ul_u_ur_r_dr_dl_l = StaticTiledMapTile(TextureRegion(undamStoneBaseTileset[1][3]).apply { flip(false, true) })
+    val undamStoneBase_ul_u_ur_dr_d_dl_l =
+            StaticTiledMapTile(TextureRegion(undamStoneBaseTileset[1][2]).apply { flip(true, false) })
+    val undamStoneBase_ul_u_ur_r_dr_dl_l =
+            StaticTiledMapTile(TextureRegion(undamStoneBaseTileset[1][3]).apply { flip(false, true) })
     val undamStoneBase_ul_u_ur = StaticTiledMapTile(undamStoneBaseTileset[2][0])
     val undamStoneBase_ur_r_dr = StaticTiledMapTile(undamStoneBaseTileset[3][0])
     val undamStoneBase_dr_d_dl = StaticTiledMapTile(TextureRegion(undamStoneBaseTileset[2][0]).apply { flip(false, true) })

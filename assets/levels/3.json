@@ -23,81 +23,7 @@
             [
                 1,
                 1,
-                0,
                 1,
-                1
-            ],
-            [
-                1,
-                1,
-                1,
-                1,
-                1
-            ],
-            [
-                1,
-                1,
-                1,
-                1,
-                1
-            ]
-        ],
-        [
-            [
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            [
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            [
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            [
-                0,
-                0,
-                0,
-                0,
-                0
-            ],
-            [
-                0,
-                0,
-                0,
-                0,
-                0
-            ]
-        ],
-        [
-            [
-                1,
-                1,
-                1,
-                1,
-                1
-            ],
-            [
-                1,
-                1,
-                1,
-                1,
-                1
-            ],
-            [
-                1,
-                1,
-                0,
                 1,
                 1
             ],
@@ -134,10 +60,63 @@
             [
                 0,
                 0,
-                0,
+                1,
                 0,
                 0
             ],
+            [
+                0,
+                0,
+                1,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                0,
+                0
+            ]
+        ],
+        [
+            [
+                1,
+                1,
+                1,
+                1,
+                1
+            ],
+            [
+                1,
+                1,
+                1,
+                1,
+                1
+            ],
+            [
+                1,
+                1,
+                0,
+                1,
+                1
+            ],
+            [
+                1,
+                1,
+                0,
+                1,
+                1
+            ],
+            [
+                1,
+                1,
+                0,
+                1,
+                1
+            ]
+        ],
+        [
             [
                 0,
                 0,
@@ -150,6 +129,27 @@
                 0,
                 0,
                 0,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                1,
+                0
+            ],
+            [
+                0,
+                0,
+                0,
+                1,
                 0
             ]
         ],
@@ -342,8 +342,8 @@
     "player": {
         "class" : "com.marcin.panklex.entities.EntityPlayer",
         "position" : {
-            "x" : 2,
-            "y" : 1,
+            "x" : 1,
+            "y" : 4,
             "z" : 0
         }
     },
@@ -443,11 +443,30 @@
                 "y" : 4,
                 "z" : 0
             },
-            "direction" : "Up",
+            "direction" : "Right",
             "upperEnd" : {
+                "x" : 2,
+                "y" : 4,
+                "z" : 1
+            },
+            "lowerEnd" : {
+                "x" : 0,
+                "y" : 0,
+                "z" : 0
+            }
+        },
+        {
+            "class" : "com.marcin.panklex.entities.EntityStairs",
+            "position" : {
                 "x" : 2,
                 "y" : 2,
                 "z" : 1
+            },
+            "direction" : "Left",
+            "upperEnd" : {
+                "x" : 2,
+                "y" : 2,
+                "z" : 2
             },
             "lowerEnd" : {
                 "x" : 0,
@@ -477,6 +496,30 @@
                 "z" : 0
             },
             "isGateVertical" : true,
+            "isGateOpen" : false
+        },
+        {
+            "class" : "com.marcin.panklex.entities.EntityPoweredGate",
+            "firstPartPosition" : {
+                "x" : 2,
+                "y" : 1,
+                "z" : 0
+            },
+            "firstPartDirection" : "Right",
+            "isFirstPartPowered" : false,
+            "secondPartPosition" : {
+                "x" : 4,
+                "y" : 1,
+                "z" : 0
+            },
+            "secondPartDirection" : "Left",
+            "isSecondPartPowered" : false,
+            "gatePosition" : {
+                "x" : 3,
+                "y" : 1,
+                "z" : 0
+            },
+            "isGateVertical" : false,
             "isGateOpen" : false
         }
     ]

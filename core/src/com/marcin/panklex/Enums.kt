@@ -14,3 +14,8 @@ enum class Action
 {
     None, Pickaxe, Bomb, Coin, Cell, Walk
 }
+
+enum class MapLayer
+{
+    Hole, Base, Block, Wall, Entity, Cover, Action
+}
