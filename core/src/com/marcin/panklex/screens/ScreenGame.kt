@@ -10,10 +10,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.scenes.scene2d.InputEvent
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
-import com.badlogic.gdx.scenes.scene2d.ui.Label
-import com.badlogic.gdx.scenes.scene2d.ui.Table
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton
+import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Json
@@ -83,6 +80,12 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
                                 )
     val cancellButton = ImageButton(TextureRegionDrawable(cancelImage))
 
+    val heartImage1 = Image(game.assetManager.get<Texture>("tiles/heart.png"))
+    val heartImage2 = Image(game.assetManager.get<Texture>("tiles/heart.png"))
+    val heartImage3 = Image(game.assetManager.get<Texture>("tiles/heart.png"))
+    val heartImage4 = Image(game.assetManager.get<Texture>("tiles/heart.png"))
+    val heartImage5 = Image(game.assetManager.get<Texture>("tiles/heart.png"))
+
     val pickaxeCountLabel = Label("0", Label.LabelStyle(BitmapFont(), Color.YELLOW))
     val bombCountLabel = Label("0", Label.LabelStyle(BitmapFont(), Color.YELLOW))
     val coinCountLabel = Label("0", Label.LabelStyle(BitmapFont(), Color.YELLOW))
@@ -93,6 +96,7 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
     var currentLevel = 0
     var currentBlockType = Block.UndamagedStone
     var currentAction = Action.None
+    var currentHearts = 5
 
     var pickaxeCount = 3
     var bombCount = 3
@@ -194,6 +198,12 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
         val table = Table()
         table.top()
         table.setFillParent(true)
+        table.add(heartImage1).pad(10f)
+        table.add(heartImage2).pad(10f)
+        table.add(heartImage3).pad(10f)
+        table.add(heartImage4).pad(10f)
+        table.add(heartImage5).pad(10f)
+        table.row()
         table.add(blockTypeLabel).pad(10f)
         table.add(levelLabel).pad(10f)
         table.add(upButton).pad(10f)
@@ -341,7 +351,11 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
                 {
                     positions.add(e.firstPartPosition)
                     positions.add(e.secondPartPosition)
-                    positions.add(e.gatePosition)
+
+                    if (e.isFirstPartPowered || e.isSecondPartPowered)
+                    {
+                        positions.add(e.gatePosition)
+                    }
                 }
             }
 
@@ -365,6 +379,28 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
         cellCountLabel.setText(cellCount)
     }
 
+    fun changeHearts(number: Int)
+    {
+        currentHearts += number
+
+        if (currentHearts < 0)
+        {
+            game.log("hearts", "Dead!")
+            currentHearts = 0
+        }
+        if (currentHearts > 5)
+        {
+            game.log("hearts", "Healthy!")
+            currentHearts = 5
+        }
+
+        heartImage1.isVisible = (currentHearts >= 1)
+        heartImage2.isVisible = (currentHearts >= 2)
+        heartImage3.isVisible = (currentHearts >= 3)
+        heartImage4.isVisible = (currentHearts >= 4)
+        heartImage5.isVisible = (currentHearts >= 5)
+    }
+
     override fun show()
     {
         super.show()
@@ -384,6 +420,9 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
         val is3KeyJustPressed = Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)
         val is4KeyJustPressed = Gdx.input.isKeyJustPressed(Input.Keys.NUM_4)
 
+        val isEqualsKeyJustPressed = Gdx.input.isKeyJustPressed(Input.Keys.EQUALS)
+        val isMinusKeyJustPressed = Gdx.input.isKeyJustPressed(Input.Keys.MINUS)
+
         val isLeftButtonPressed = Gdx.input.isButtonPressed(0)
         val isLeftButtonJustPressed = Gdx.input.isButtonJustPressed(0)
         val isRightButtonPressed = Gdx.input.isButtonPressed(1)
@@ -399,6 +438,11 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
                 (worldMousePosition.x > 0 && worldMousePosition.x < map.width() && worldMousePosition.y > 0 && worldMousePosition.y < map.height())
         val mapMouseBlock =
                 if (isMouseInMap) level.map[currentLevel][mapMousePosition.y.toInt()][mapMousePosition.x.toInt()] else LevelBlock()
+
+        // hearts
+
+        if (isEqualsKeyJustPressed) changeHearts(1)
+        if (isMinusKeyJustPressed) changeHearts(-1)
 
         // block
 
@@ -588,6 +632,8 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
                             changeAction(Action.None)
                         }
                         refreshEquipmentCountLabels()
+
+                        refreshLevel()
                     }
                     Action.Walk    ->
                     {

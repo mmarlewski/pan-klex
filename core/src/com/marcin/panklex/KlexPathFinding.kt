@@ -1,7 +1,5 @@
 package com.marcin.panklex
 
-import com.badlogic.gdx.math.Vector3
-import com.marcin.panklex.entities.EntityPoweredGate
 import kotlin.math.abs
 
 class Node(val x: Int, val y: Int)
@@ -57,22 +55,8 @@ class KlexPathFinding(val level: KlexLevel)
         val x = block.position.x.toInt()
 
         val blockAbove: LevelBlock? = if (z < level.levels - 1) level.map[z + 1][y][x] else null
-        val entity = block.entity
 
-        val isGroundOk = block.rock != Block.Empty
-        val isWallOk = if (blockAbove == null) false else blockAbove.rock == Block.Empty
-        val isEntityOk = when (entity)
-        {
-            null -> true
-            is EntityPoweredGate -> (Vector3(
-                    x.toFloat(),
-                    y.toFloat(),
-                    z.toFloat()
-                                            ) == entity.gatePosition && !entity.isFirstPartPowered && !entity.isSecondPartPowered)
-            else                 -> false
-        }
-
-        return isGroundOk && isWallOk && isEntityOk
+        return block.rock != Block.Empty && block.entity == null && if (blockAbove == null) false else blockAbove.rock == Block.Empty
     }
 
     fun distance(a: Node, b: Node): Int
