@@ -671,12 +671,12 @@ class KlexMapTilesLogic(val tiles: KlexTiles, val map: KlexMap, val level: KlexL
                     else                    -> tiles.emptyTile
                 }
 
-                map.setTile(MapLayer.Hole.name, i, j, holeTile)
-                map.setTile(MapLayer.Base.name, i, j, baseTile)
-                map.setTile(MapLayer.Block.name, i, j, blockTile)
-                map.setTile(MapLayer.Wall.name, i, j, wallTile)
-                map.setTile(MapLayer.Entity.name, i, j, entityTile)
-                map.setTile(MapLayer.Cover.name, i, j, coverTile)
+                map.setTile(MapLayer.Hole, i, j, holeTile)
+                map.setTile(MapLayer.Base, i, j, baseTile)
+                map.setTile(MapLayer.Block, i, j, blockTile)
+                map.setTile(MapLayer.Wall, i, j, wallTile)
+                map.setTile(MapLayer.Entity, i, j, entityTile)
+                map.setTile(MapLayer.Cover, i, j, coverTile)
             }
         }
 

@@ -34,6 +34,7 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
     val map = KlexMap(100, 100, 32, 32)
     val tiles = KlexTiles(game.assetManager)
     val mapTilesLogic = KlexMapTilesLogic(tiles, map, level)
+    val pathFinding = KlexPathFinding(level)
 
     // hud
 
@@ -215,6 +216,7 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
         // init
 
         loadLevelFromJson("levels/3.json")
+        pathFinding.setUpMap()
         changeLevel(0)
         refreshLevel()
         refreshMap()
@@ -424,7 +426,7 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
 
         // action
 
-        map.clearLayer(MapLayer.Action.name)
+        map.clearLayer(MapLayer.Action)
 
         if (isMouseInMap)
         {
@@ -452,7 +454,7 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
                 }
                 Action.Walk    ->
                 {
-                    mapMouseBlock.rock != Block.Empty && mapMouseBlock.entity == null
+                    pathFinding.isBlockTraversable(mapMouseBlock)
                 }
                 else           -> false
             }
@@ -473,7 +475,7 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
 
             refreshMap()
 
-            map.setTile(MapLayer.Action.name, mapMousePosition.x.toInt(), mapMousePosition.y.toInt(), actionTile)
+            map.setTile(MapLayer.Action, mapMousePosition.x.toInt(), mapMousePosition.y.toInt(), actionTile)
 
             if (isLeftButtonJustPressed && isActionPossible)
             {
@@ -589,11 +591,22 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
                     }
                     Action.Walk    ->
                     {
-                        level.player.position.x = mapMousePosition.x
-                        level.player.position.y = mapMousePosition.y
-                        level.player.position.z = currentLevel.toFloat()
+                        val path = pathFinding.findPath(
+                                level.player.position.x.toInt(),
+                                level.player.position.y.toInt(),
+                                mapMousePosition.x.toInt(),
+                                mapMousePosition.y.toInt(),
+                                currentLevel
+                                                       )
 
-                        refreshLevel()
+
+                        if (pathFinding.isTraversable)
+                        {
+                            level.player.position.x = mapMousePosition.x
+                            level.player.position.y = mapMousePosition.y
+                            level.player.position.z = currentLevel.toFloat()
+                            refreshLevel()
+                        }
                     }
                     else           ->
                     {

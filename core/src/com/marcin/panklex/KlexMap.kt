@@ -63,18 +63,18 @@ class KlexMap(val maxMapWidth: Int, val maxMapHeight: Int, val tileWidth: Int, v
         mapHeight = height
     }
 
-    fun setTile(layer: String, x: Int, y: Int, tile: TiledMapTile)
+    fun setTile(layer: MapLayer, x: Int, y: Int, tile: TiledMapTile)
     {
-        (map.layers[layer] as TiledMapTileLayer).getCell(x, y).tile = tile
+        (map.layers[layer.name] as TiledMapTileLayer).getCell(x, y).tile = tile
     }
 
-    fun clearLayer(layer: String)
+    fun clearLayer(layer: MapLayer)
     {
         for (i in 0..maxMapWidth - 1)
         {
             for (j in 0..maxMapHeight - 1)
             {
-                (map.layers[layer] as TiledMapTileLayer).getCell(i, j).tile = null
+                (map.layers[layer.name] as TiledMapTileLayer).getCell(i, j).tile = null
             }
         }
     }
