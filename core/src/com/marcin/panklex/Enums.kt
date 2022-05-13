@@ -17,5 +17,5 @@ enum class Action
 
 enum class MapLayer
 {
-    Hole, Base, Block, Wall, Entity, Cover, Action
+    Pit, Hole, Base, Block, Wall, Entity, Cover, Action
 }

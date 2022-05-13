@@ -18,6 +18,7 @@ class KlexMap(val maxMapWidth: Int, val maxMapHeight: Int, val tileWidth: Int, v
 
     init
     {
+        val pitLayer = TiledMapTileLayer(maxMapWidth, maxMapHeight, tileWidth, tileHeight).apply { name = MapLayer.Pit.name }
         val holeLayer = TiledMapTileLayer(maxMapWidth, maxMapHeight, tileWidth, tileHeight).apply { name = MapLayer.Hole.name }
         val baseLayer = TiledMapTileLayer(maxMapWidth, maxMapHeight, tileWidth, tileHeight).apply { name = MapLayer.Base.name }
         val blockLayer = TiledMapTileLayer(maxMapWidth, maxMapHeight, tileWidth, tileHeight).apply { name = MapLayer.Block.name }
@@ -30,6 +31,7 @@ class KlexMap(val maxMapWidth: Int, val maxMapHeight: Int, val tileWidth: Int, v
         {
             for (j in 0..maxMapHeight - 1)
             {
+                val pitCell = TiledMapTileLayer.Cell()
                 val holeCell = TiledMapTileLayer.Cell()
                 val baseCell = TiledMapTileLayer.Cell()
                 val blockCell = TiledMapTileLayer.Cell()
@@ -38,6 +40,7 @@ class KlexMap(val maxMapWidth: Int, val maxMapHeight: Int, val tileWidth: Int, v
                 val coverCell = TiledMapTileLayer.Cell()
                 val actionCell = TiledMapTileLayer.Cell()
 
+                pitLayer.setCell(i, j, pitCell)
                 holeLayer.setCell(i, j, holeCell)
                 baseLayer.setCell(i, j, baseCell)
                 blockLayer.setCell(i, j, blockCell)
@@ -48,6 +51,7 @@ class KlexMap(val maxMapWidth: Int, val maxMapHeight: Int, val tileWidth: Int, v
             }
         }
 
+        map.layers.add(pitLayer)
         map.layers.add(holeLayer)
         map.layers.add(baseLayer)
         map.layers.add(blockLayer)

@@ -20,7 +20,7 @@ import com.marcin.panklex.*
 import com.marcin.panklex.entities.*
 import kotlin.math.truncate
 
-class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, game)
+class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, game)
 {
     // main
 
@@ -41,50 +41,50 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
     val downButton = TextButton("Down", TextButton.TextButtonStyle(null, null, null, BitmapFont()))
     val endGameButton = TextButton("End Game", TextButton.TextButtonStyle(null, null, null, BitmapFont()))
 
-    val pickaxeUnselected = TextureRegion(game.assetManager.get<Texture>("tiles/actions/pickaxe.png"), 0, 0, 32, 32)
-    val pickaxeSelected = TextureRegion(game.assetManager.get<Texture>("tiles/actions/pickaxe.png"), 32, 0, 32, 32)
-    val bombUnselected = TextureRegion(game.assetManager.get<Texture>("tiles/actions/bomb.png"), 0, 0, 32, 32)
-    val bombSelected = TextureRegion(game.assetManager.get<Texture>("tiles/actions/bomb.png"), 32, 0, 32, 32)
-    val coinUnselected = TextureRegion(game.assetManager.get<Texture>("tiles/actions/coin.png"), 0, 0, 32, 32)
-    val coinSelected = TextureRegion(game.assetManager.get<Texture>("tiles/actions/coin.png"), 32, 0, 32, 32)
-    val cellUnselected = TextureRegion(game.assetManager.get<Texture>("tiles/actions/cell.png"), 0, 0, 32, 32)
-    val cellSelected = TextureRegion(game.assetManager.get<Texture>("tiles/actions/cell.png"), 32, 0, 32, 32)
-    val walkUnselected = TextureRegion(game.assetManager.get<Texture>("tiles/actions/walk.png"), 0, 0, 32, 32)
-    val walkSelected = TextureRegion(game.assetManager.get<Texture>("tiles/actions/walk.png"), 32, 0, 32, 32)
-    val cancelImage = game.assetManager.get<Texture>("tiles/actions/cancel.png")
+    val pickaxeUnselected = TextureRegion(game.assetManager.get<Texture>("graphics/actions/pickaxe.png"), 0, 0, 32, 32)
+    val pickaxeSelected = TextureRegion(game.assetManager.get<Texture>("graphics/actions/pickaxe.png"), 32, 0, 32, 32)
+    val bombUnselected = TextureRegion(game.assetManager.get<Texture>("graphics/actions/bomb.png"), 0, 0, 32, 32)
+    val bombSelected = TextureRegion(game.assetManager.get<Texture>("graphics/actions/bomb.png"), 32, 0, 32, 32)
+    val coinUnselected = TextureRegion(game.assetManager.get<Texture>("graphics/actions/coin.png"), 0, 0, 32, 32)
+    val coinSelected = TextureRegion(game.assetManager.get<Texture>("graphics/actions/coin.png"), 32, 0, 32, 32)
+    val cellUnselected = TextureRegion(game.assetManager.get<Texture>("graphics/actions/cell.png"), 0, 0, 32, 32)
+    val cellSelected = TextureRegion(game.assetManager.get<Texture>("graphics/actions/cell.png"), 32, 0, 32, 32)
+    val walkUnselected = TextureRegion(game.assetManager.get<Texture>("graphics/actions/walk.png"), 0, 0, 32, 32)
+    val walkSelected = TextureRegion(game.assetManager.get<Texture>("graphics/actions/walk.png"), 32, 0, 32, 32)
+    val cancelImage = game.assetManager.get<Texture>("graphics/actions/cancel.png")
 
     val pickaxeButton = ImageButton(
-            TextureRegionDrawable(pickaxeUnselected),
-            TextureRegionDrawable(pickaxeUnselected),
-            TextureRegionDrawable(pickaxeSelected)
-                                   )
+        TextureRegionDrawable(pickaxeUnselected),
+        TextureRegionDrawable(pickaxeUnselected),
+        TextureRegionDrawable(pickaxeSelected)
+    )
     val bombButton = ImageButton(
-            TextureRegionDrawable(bombUnselected),
-            TextureRegionDrawable(bombUnselected),
-            TextureRegionDrawable(bombSelected)
-                                )
+        TextureRegionDrawable(bombUnselected),
+        TextureRegionDrawable(bombUnselected),
+        TextureRegionDrawable(bombSelected)
+    )
     val coinButton = ImageButton(
-            TextureRegionDrawable(coinUnselected),
-            TextureRegionDrawable(coinUnselected),
-            TextureRegionDrawable(coinSelected)
-                                )
+        TextureRegionDrawable(coinUnselected),
+        TextureRegionDrawable(coinUnselected),
+        TextureRegionDrawable(coinSelected)
+    )
     val cellButton = ImageButton(
-            TextureRegionDrawable(cellUnselected),
-            TextureRegionDrawable(cellUnselected),
-            TextureRegionDrawable(cellSelected)
-                                )
+        TextureRegionDrawable(cellUnselected),
+        TextureRegionDrawable(cellUnselected),
+        TextureRegionDrawable(cellSelected)
+    )
     val walkButton = ImageButton(
-            TextureRegionDrawable(walkUnselected),
-            TextureRegionDrawable(walkUnselected),
-            TextureRegionDrawable(walkSelected)
-                                )
+        TextureRegionDrawable(walkUnselected),
+        TextureRegionDrawable(walkUnselected),
+        TextureRegionDrawable(walkSelected)
+    )
     val cancellButton = ImageButton(TextureRegionDrawable(cancelImage))
 
-    val heartImage1 = Image(game.assetManager.get<Texture>("tiles/heart.png"))
-    val heartImage2 = Image(game.assetManager.get<Texture>("tiles/heart.png"))
-    val heartImage3 = Image(game.assetManager.get<Texture>("tiles/heart.png"))
-    val heartImage4 = Image(game.assetManager.get<Texture>("tiles/heart.png"))
-    val heartImage5 = Image(game.assetManager.get<Texture>("tiles/heart.png"))
+    val heartImage1 = Image(game.assetManager.get<Texture>("graphics/hud/heart.png"))
+    val heartImage2 = Image(game.assetManager.get<Texture>("graphics/hud/heart.png"))
+    val heartImage3 = Image(game.assetManager.get<Texture>("graphics/hud/heart.png"))
+    val heartImage4 = Image(game.assetManager.get<Texture>("graphics/hud/heart.png"))
+    val heartImage5 = Image(game.assetManager.get<Texture>("graphics/hud/heart.png"))
 
     val pickaxeCountLabel = Label("0", Label.LabelStyle(BitmapFont(), Color.YELLOW))
     val bombCountLabel = Label("0", Label.LabelStyle(BitmapFont(), Color.YELLOW))
@@ -112,88 +112,88 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
         // hud
 
         upButton.addListener(object : ClickListener()
-                             {
-                                 override fun clicked(event: InputEvent?, x: Float, y: Float)
-                                 {
-                                     if (currentLevel < level.levels - 1)
-                                     {
-                                         changeLevel(currentLevel + 1)
-                                         refreshLevel()
-                                         refreshMap()
-                                         levelLabel.setText("level: $currentLevel")
-                                     }
-                                 }
-                             })
+        {
+            override fun clicked(event : InputEvent?, x : Float, y : Float)
+            {
+                if (currentLevel < level.levels - 1)
+                {
+                    changeLevel(currentLevel + 1)
+                    refreshLevel()
+                    refreshMap()
+                    levelLabel.setText("level: $currentLevel")
+                }
+            }
+        })
 
         downButton.addListener(object : ClickListener()
-                               {
-                                   override fun clicked(event: InputEvent?, x: Float, y: Float)
-                                   {
-                                       if (currentLevel > 0)
-                                       {
-                                           changeLevel(currentLevel - 1)
-                                           refreshLevel()
-                                           refreshMap()
-                                           levelLabel.setText("level: $currentLevel")
-                                       }
-                                   }
-                               })
+        {
+            override fun clicked(event : InputEvent?, x : Float, y : Float)
+            {
+                if (currentLevel > 0)
+                {
+                    changeLevel(currentLevel - 1)
+                    refreshLevel()
+                    refreshMap()
+                    levelLabel.setText("level: $currentLevel")
+                }
+            }
+        })
 
         endGameButton.addListener(object : ClickListener()
-                                  {
-                                      override fun clicked(event: InputEvent?, x: Float, y: Float)
-                                      {
-                                          game.changeScreen(game.screenEndGame)
-                                      }
-                                  })
+        {
+            override fun clicked(event : InputEvent?, x : Float, y : Float)
+            {
+                game.changeScreen(game.screenEndGame)
+            }
+        })
 
         pickaxeButton.addListener(object : ClickListener()
-                                  {
-                                      override fun clicked(event: InputEvent?, x: Float, y: Float)
-                                      {
-                                          if (pickaxeCount > 0) changeAction(Action.Pickaxe)
-                                      }
-                                  })
+        {
+            override fun clicked(event : InputEvent?, x : Float, y : Float)
+            {
+                if (pickaxeCount > 0) changeAction(Action.Pickaxe)
+            }
+        })
 
         bombButton.addListener(object : ClickListener()
-                               {
-                                   override fun clicked(event: InputEvent?, x: Float, y: Float)
-                                   {
-                                       if (bombCount > 0) changeAction(Action.Bomb)
-                                   }
-                               })
+        {
+            override fun clicked(event : InputEvent?, x : Float, y : Float)
+            {
+                if (bombCount > 0) changeAction(Action.Bomb)
+            }
+        })
 
         coinButton.addListener(object : ClickListener()
-                               {
-                                   override fun clicked(event: InputEvent?, x: Float, y: Float)
-                                   {
-                                       if (coinCount > 0) changeAction(Action.Coin)
-                                   }
-                               })
+        {
+            override fun clicked(event : InputEvent?, x : Float, y : Float)
+            {
+                if (coinCount > 0) changeAction(Action.Coin)
+            }
+        })
 
         cellButton.addListener(object : ClickListener()
-                               {
-                                   override fun clicked(event: InputEvent?, x: Float, y: Float)
-                                   {
-                                       if (cellCount > 0) changeAction(Action.Cell)
-                                   }
-                               })
+        {
+            override fun clicked(event : InputEvent?, x : Float, y : Float)
+            {
+                if (cellCount > 0) changeAction(Action.Cell)
+            }
+        })
 
         walkButton.addListener(object : ClickListener()
-                               {
-                                   override fun clicked(event: InputEvent?, x: Float, y: Float)
-                                   {
-                                       changeAction(Action.Walk)
-                                   }
-                               })
+        {
+            override fun clicked(event : InputEvent?, x : Float, y : Float)
+            {
+                changeAction(Action.Walk)
+            }
+        })
 
         cancellButton.addListener(object : ClickListener()
-                                  {
-                                      override fun clicked(event: InputEvent?, x: Float, y: Float)
-                                      {
-                                          changeAction(Action.None)
-                                      }
-                                  })
+        {
+            override fun clicked(event : InputEvent?, x : Float, y : Float)
+            {
+                changeAction(Action.None)
+            }
+        })
 
         val table = Table()
         table.top()
@@ -234,7 +234,7 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
         mapCamera.zoom = 0.5f
     }
 
-    fun changeAction(action: Action)
+    fun changeAction(action : Action)
     {
         currentAction = action
 
@@ -245,7 +245,7 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
         walkButton.isChecked = (currentAction == Action.Walk)
     }
 
-    fun loadLevelFromJson(jsonPath: String)
+    fun loadLevelFromJson(jsonPath : String)
     {
         val jsonFile = Gdx.files.internal(jsonPath)
         val jsonString = jsonFile.readString()
@@ -275,11 +275,11 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
                     levelBlock.position.z = i.toFloat()
                     levelBlock.rock = when (jsonLevel.map[i][j][k])
                     {
-                        0    -> Block.Empty
-                        1    -> Block.UndamagedStone
-                        2    -> Block.DamagedStone
-                        3    -> Block.Brick
-                        4    -> Block.Metal
+                        0 -> Block.Empty
+                        1 -> Block.UndamagedStone
+                        2 -> Block.DamagedStone
+                        3 -> Block.Brick
+                        4 -> Block.Metal
                         else -> Block.Empty
                     }
 
@@ -298,7 +298,7 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
         level.entities.addAll(jsonLevel.entities)
     }
 
-    fun changeLevel(levelNr: Int)
+    fun changeLevel(levelNr : Int)
     {
         currentLevel = levelNr
     }
@@ -318,11 +318,11 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
             val positions = mutableListOf<Vector3>()
             when (e)
             {
-                is EntityPlayer         ->
+                is EntityPlayer ->
                 {
                     positions.add(e.position)
                 }
-                is EntityContainer      ->
+                is EntityContainer ->
                 {
                     positions.add(e.position)
                 }
@@ -330,24 +330,24 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
                 {
                     positions.add(e.position)
                 }
-                is EntityElevator       ->
+                is EntityElevator ->
                 {
                     positions.addAll(e.positions)
                     positions.addAll(e.exitPositions)
                 }
-                is EntityTeleporter     ->
+                is EntityTeleporter ->
                 {
                     positions.add(e.firstTelePosition)
                     positions.add(e.secondTelePosition)
                 }
-                is EntityFlag           -> positions.add(e.position)
-                is EntityStairs         ->
+                is EntityFlag -> positions.add(e.position)
+                is EntityStairs ->
                 {
                     positions.add(e.position)
                     positions.add(e.lowerEnd)
                     positions.add(e.upperEnd)
                 }
-                is EntityPoweredGate    ->
+                is EntityPoweredGate ->
                 {
                     positions.add(e.firstPartPosition)
                     positions.add(e.secondPartPosition)
@@ -379,7 +379,7 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
         cellCountLabel.setText(cellCount)
     }
 
-    fun changeHearts(number: Int)
+    fun changeHearts(number : Int)
     {
         currentHearts += number
 
@@ -409,7 +409,7 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
         mapCamera.position.y = map.height() / 2f
     }
 
-    override fun render(delta: Float)
+    override fun render(delta : Float)
     {
         super.render(delta)
 
@@ -433,11 +433,11 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
         val screenMousePosition = Vector2(Gdx.input.x.toFloat(), Gdx.input.y.toFloat())
         val worldMousePosition = mapViewport.unproject(screenMousePosition)
         val mapMousePosition =
-                Vector2(truncate(worldMousePosition.x / map.tileWidth), truncate(worldMousePosition.y / map.tileHeight))
+            Vector2(truncate(worldMousePosition.x / map.tileWidth), truncate(worldMousePosition.y / map.tileHeight))
         val isMouseInMap =
-                (worldMousePosition.x > 0 && worldMousePosition.x < map.width() && worldMousePosition.y > 0 && worldMousePosition.y < map.height())
+            (worldMousePosition.x > 0 && worldMousePosition.x < map.width() && worldMousePosition.y > 0 && worldMousePosition.y < map.height())
         val mapMouseBlock =
-                if (isMouseInMap) level.map[currentLevel][mapMousePosition.y.toInt()][mapMousePosition.x.toInt()] else LevelBlock()
+            if (isMouseInMap) level.map[currentLevel][mapMousePosition.y.toInt()][mapMousePosition.x.toInt()] else LevelBlock()
 
         // hearts
 
@@ -452,15 +452,15 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
         if (is4KeyJustPressed) currentBlockType = Block.Metal
 
         blockTypeLabel.setText(
-                when (currentBlockType)
-                {
-                    Block.UndamagedStone -> "undam stone"
-                    Block.DamagedStone   -> "dam stone"
-                    Block.Brick          -> "brick"
-                    Block.Metal          -> "metal"
-                    else                 -> "?"
-                }
-                              )
+            when (currentBlockType)
+            {
+                Block.UndamagedStone -> "undam stone"
+                Block.DamagedStone -> "dam stone"
+                Block.Brick -> "brick"
+                Block.Metal -> "metal"
+                else -> "?"
+            }
+        )
 
         if (isMiddleButtonPressed && isMouseInMap)
         {
@@ -481,26 +481,26 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
                     when (mapMouseBlock.rock)
                     {
                         Block.UndamagedStone, Block.DamagedStone, Block.Brick -> true
-                        else                                                  -> false
+                        else -> false
                     }
                 }
-                Action.Bomb    ->
+                Action.Bomb ->
                 {
                     mapMouseBlock.rock != Block.Empty
                 }
-                Action.Coin    ->
+                Action.Coin ->
                 {
                     mapMouseBlock.entity is EntityVendingMachine
                 }
-                Action.Cell    ->
+                Action.Cell ->
                 {
                     mapMouseBlock.entity is EntityPoweredGate
                 }
-                Action.Walk    ->
+                Action.Walk ->
                 {
                     pathFinding.isBlockTraversable(mapMouseBlock)
                 }
-                else           -> false
+                else -> false
             }
 
             val actionTile = if (isActionPossible)
@@ -508,14 +508,14 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
                 when (currentAction)
                 {
                     Action.Pickaxe -> tiles.pickaxe_tile
-                    Action.Bomb    -> tiles.bomb_tile
-                    Action.Coin    -> tiles.coin_tile
-                    Action.Cell    -> tiles.cell_tile
-                    Action.Walk    -> tiles.walk_tile
-                    else           -> tiles.emptyTile
+                    Action.Bomb -> tiles.bomb_tile
+                    Action.Coin -> tiles.coin_tile
+                    Action.Cell -> tiles.cell_tile
+                    Action.Walk -> tiles.walk_tile
+                    else -> tiles.empty
                 }
             }
-            else tiles.emptyTile
+            else tiles.empty
 
             refreshMap()
 
@@ -529,9 +529,9 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
                     {
                         mapMouseBlock.rock = when (mapMouseBlock.rock)
                         {
-                            Block.UndamagedStone            -> Block.DamagedStone
+                            Block.UndamagedStone -> Block.DamagedStone
                             Block.DamagedStone, Block.Brick -> Block.Empty
-                            else                            -> Block.Metal
+                            else -> Block.Metal
                         }
 
                         pickaxeCount--
@@ -541,38 +541,38 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
                         }
                         refreshEquipmentCountLabels()
                     }
-                    Action.Bomb    ->
+                    Action.Bomb ->
                     {
                         val entity = mapMouseBlock.entity
                         val entityPosition = Vector3(mapMousePosition.x, mapMousePosition.y, currentLevel.toFloat())
 
                         when (entity)
                         {
-                            is EntityContainer      -> level.entities.remove(entity)
+                            is EntityContainer -> level.entities.remove(entity)
                             is EntityVendingMachine -> level.entities.remove(entity)
-                            is EntityFlag           -> level.entities.remove(entity)
-                            is EntityTeleporter     ->
+                            is EntityFlag -> level.entities.remove(entity)
+                            is EntityTeleporter ->
                             {
                                 if (entityPosition.equals(entity.firstTelePosition) || entityPosition.equals(entity.secondTelePosition))
                                 {
                                     level.entities.remove(entity)
                                 }
                             }
-                            is EntityStairs         ->
+                            is EntityStairs ->
                             {
                                 if (entityPosition.equals(entity.position))
                                 {
                                     level.entities.remove(entity)
                                 }
                             }
-                            is EntityElevator       ->
+                            is EntityElevator ->
                             {
                                 if (entity.positions.contains(entityPosition))
                                 {
                                     level.entities.remove(entity)
                                 }
                             }
-                            is EntityPoweredGate    ->
+                            is EntityPoweredGate ->
                             {
                                 if (entityPosition.equals(entity.gatePosition))
                                 {
@@ -584,7 +584,7 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
                                     level.entities.remove(entity)
                                 }
                             }
-                            else                    ->
+                            else ->
                             {
                             }
                         }
@@ -598,7 +598,7 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
 
                         refreshLevel()
                     }
-                    Action.Coin    ->
+                    Action.Coin ->
                     {
                         pickaxeCount++
                         bombCount++
@@ -611,7 +611,7 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
                         }
                         refreshEquipmentCountLabels()
                     }
-                    Action.Cell    ->
+                    Action.Cell ->
                     {
                         val entityPosition = Vector3(mapMousePosition.x, mapMousePosition.y, currentLevel.toFloat())
                         val poweredGate = (mapMouseBlock.entity as EntityPoweredGate)
@@ -635,27 +635,26 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
 
                         refreshLevel()
                     }
-                    Action.Walk    ->
+                    Action.Walk ->
                     {
-                        val path = pathFinding.findPath(
+                        if (level.player.position.z.toInt() == currentLevel)
+                        {
+                            val path = pathFinding.findPath(
                                 level.player.position.x.toInt(),
                                 level.player.position.y.toInt(),
                                 mapMousePosition.x.toInt(),
                                 mapMousePosition.y.toInt(),
                                 currentLevel
-                                                       )
+                            )
 
-
-                        if (pathFinding.isTraversable)
-                        {
-                            level.player.position.x = mapMousePosition.x
-                            level.player.position.y = mapMousePosition.y
-                            level.player.position.z = currentLevel.toFloat()
-                            refreshLevel()
+                            if (pathFinding.isTraversable)
+                            {
+                                level.player.position.x = mapMousePosition.x
+                                level.player.position.y = mapMousePosition.y
+                                level.player.position.z = currentLevel.toFloat()
+                                refreshLevel()
+                            }
                         }
-                    }
-                    else           ->
-                    {
                     }
                 }
 
@@ -695,7 +694,7 @@ class ScreenGame(val name: String, val game: PanKlexGame) : BaseScreen(name, gam
         stage.draw()
     }
 
-    override fun resize(width: Int, height: Int)
+    override fun resize(width : Int, height : Int)
     {
         super.resize(width, height)
         mapViewport.update(width, height)
