@@ -2,16 +2,16 @@ package com.marcin.panklex
 
 import kotlin.math.abs
 
-class Node(val x: Int, val y: Int)
+class Node(val x : Int, val y : Int)
 {
-    var parent: Node? = null
+    var parent : Node? = null
     val neighbours = mutableListOf<Node>()
     var gCost = 0
     var hCost = 0
     val fCost get() = gCost + hCost
 }
 
-class KlexPathFinding(val level: KlexLevel)
+class KlexPathFinding(val level : KlexLevel)
 {
     val map = mutableListOf<List<Node>>()
     var isTraversable = false
@@ -20,11 +20,11 @@ class KlexPathFinding(val level: KlexLevel)
     {
         // create
 
-        for (i in 0..level.height - 1)
+        for (i in 0 until level.height)
         {
             val list = mutableListOf<Node>()
 
-            for (j in 0..level.width - 1)
+            for (j in 0 until level.width)
             {
                 list.add(Node(j, i))
             }
@@ -34,9 +34,9 @@ class KlexPathFinding(val level: KlexLevel)
 
         // neighbours
 
-        for (i in 0..level.height - 1)
+        for (i in 0 until level.height)
         {
-            for (j in 0..level.width - 1)
+            for (j in 0 until level.width)
             {
                 val node = map[j][i]
 
@@ -48,31 +48,30 @@ class KlexPathFinding(val level: KlexLevel)
         }
     }
 
-    fun isBlockTraversable(block: LevelBlock): Boolean
+    fun isBlockTraversable(block : LevelBlock) : Boolean
     {
         val z = block.position.z.toInt()
         val y = block.position.y.toInt()
         val x = block.position.x.toInt()
 
-        val blockAbove: LevelBlock? = if (z < level.levels - 1) level.map[z + 1][y][x] else null
+        val blockAbove : LevelBlock? = if (z < level.levels - 1) level.map[z + 1][y][x] else null
 
-        return block.rock != Block.Empty && block.entity == null && if (blockAbove == null) false else blockAbove.rock == Block.Empty
+        val isRockOk = block.isRock()
+        val isEntityOk = if (block.entity == null) true else block.entity!!.isTraversable(block.position)
+        val isWallOk = if (blockAbove == null) false else !blockAbove.isRock()
+
+        return isRockOk && isEntityOk && isWallOk
     }
 
-    fun distance(a: Node, b: Node): Int
+    fun distance(a : Node, b : Node) : Int
     {
-        var distance = 0
-
         val yDistance = abs(a.y - b.y)
         val xDistance = abs(a.x - b.x)
 
-        distance =
-                if (yDistance < xDistance) (14 * yDistance + 10 * (xDistance - yDistance)) else (14 * xDistance + 10 * (yDistance - xDistance))
-
-        return distance
+        return if (yDistance < xDistance) (14 * yDistance + 10 * (xDistance - yDistance)) else (14 * xDistance + 10 * (yDistance - xDistance))
     }
 
-    fun findPath(xStart: Int, yStart: Int, xEnd: Int, yEnd: Int, currentLevel: Int): List<Node>
+    fun findPath(xStart : Int, yStart : Int, xEnd : Int, yEnd : Int, currentLevel : Int) : List<Node>
     {
         isTraversable = false
 
@@ -85,7 +84,9 @@ class KlexPathFinding(val level: KlexLevel)
 
         open.add(start)
 
-        while (open.isNotEmpty())
+        var foundEnd = false
+
+        while (open.isNotEmpty() && !foundEnd)
         {
             current = open.first()
 
@@ -106,15 +107,15 @@ class KlexPathFinding(val level: KlexLevel)
 
             open.remove(current)
             closed.add(current)
-
-            if (current == end)
-            {
-                isTraversable = true
-                break
-            }
-
             for (n in current.neighbours)
             {
+                if (n == end)
+                {
+                    isTraversable = true
+                    foundEnd = true
+                    break
+                }
+
                 if (n !in closed && isBlockTraversable(level.map[currentLevel][n.y][n.x]))
                 {
                     if (current.gCost + distance(current, n) < n.gCost || n !in open)
@@ -129,6 +130,7 @@ class KlexPathFinding(val level: KlexLevel)
                         }
                     }
                 }
+
             }
         }
 

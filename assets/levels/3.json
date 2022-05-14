@@ -53,7 +53,7 @@
             [
                 0,
                 0,
-                0,
+                1,
                 0,
                 0
             ],
@@ -90,7 +90,7 @@
             [
                 1,
                 1,
-                1,
+                0,
                 1,
                 1
             ],
@@ -339,18 +339,10 @@
             ]
         ]
     ],
-    "player": {
-        "class": "com.marcin.panklex.entities.EntityPlayer",
-        "position": {
-            "x": 1,
-            "y": 4,
-            "z": 0
-        }
-    },
     "entities": [
         {
             "class": "com.marcin.panklex.entities.EntityContainer",
-            "position": {
+            "containerPosition": {
                 "x": 0,
                 "y": 1,
                 "z": 0
@@ -362,7 +354,7 @@
         },
         {
             "class": "com.marcin.panklex.entities.EntityVendingMachine",
-            "position": {
+            "vendingMachinePosition": {
                 "x": 0,
                 "y": 2,
                 "z": 0
@@ -374,7 +366,7 @@
         },
         {
             "class": "com.marcin.panklex.entities.EntityElevator",
-            "positions": [
+            "elevatorPositions": [
                 {
                     "x": 0,
                     "y": 3,
@@ -388,14 +380,14 @@
             ],
             "exitPositions": [
                 {
-                    "x": 0,
-                    "y": 0,
+                    "x": 1,
+                    "y": 1,
                     "z": 0
                 },
                 {
-                    "x": 0,
-                    "y": 0,
-                    "z": 0
+                    "x": 1,
+                    "y": 1,
+                    "z": 1
                 }
             ],
             "floorNames": [
@@ -406,39 +398,39 @@
         {
             "class": "com.marcin.panklex.entities.EntityTeleporter",
             "firstTelePosition": {
-                "x": 0,
-                "y": 4,
+                "x": 4,
+                "y": 0,
                 "z": 0
             },
             "firstTeleExitPosition": {
-                "x": 0,
+                "x": 3,
                 "y": 0,
                 "z": 0
             },
             "isFirstTelePowered": false,
             "secondTelePosition": {
-                "x": 1,
+                "x": 0,
                 "y": 4,
                 "z": 2
             },
             "secondTeleExitPosition": {
-                "x": 0,
-                "y": 0,
-                "z": 0
+                "x": 1,
+                "y": 4,
+                "z": 2
             },
             "isSecondTelePowered": false
         },
         {
             "class": "com.marcin.panklex.entities.EntityFlag",
-            "position": {
-                "x": 1,
-                "y": 1,
+            "flagPosition": {
+                "x": 0,
+                "y": 4,
                 "z": 0
             }
         },
         {
             "class": "com.marcin.panklex.entities.EntityStairs",
-            "position": {
+            "stairsPosition": {
                 "x": 2,
                 "y": 4,
                 "z": 0
@@ -450,28 +442,28 @@
                 "z": 1
             },
             "lowerEnd": {
-                "x": 0,
-                "y": 0,
+                "x": 1,
+                "y": 4,
                 "z": 0
             }
         },
         {
             "class": "com.marcin.panklex.entities.EntityStairs",
-            "position": {
+            "stairsPosition": {
                 "x": 2,
-                "y": 2,
+                "y": 1,
                 "z": 1
             },
             "direction": "Left",
             "upperEnd": {
                 "x": 2,
-                "y": 2,
+                "y": 1,
                 "z": 2
             },
             "lowerEnd": {
-                "x": 0,
-                "y": 0,
-                "z": 0
+                "x": 2,
+                "y": 2,
+                "z": 1
             }
         },
         {
@@ -496,30 +488,6 @@
                 "z": 0
             },
             "isGateVertical": true,
-            "isGateOpen": false
-        },
-        {
-            "class": "com.marcin.panklex.entities.EntityPoweredGate",
-            "firstPartPosition": {
-                "x": 2,
-                "y": 1,
-                "z": 0
-            },
-            "firstPartDirection": "Right",
-            "isFirstPartPowered": false,
-            "secondPartPosition": {
-                "x": 4,
-                "y": 1,
-                "z": 0
-            },
-            "secondPartDirection": "Left",
-            "isSecondPartPowered": false,
-            "gatePosition": {
-                "x": 3,
-                "y": 1,
-                "z": 0
-            },
-            "isGateVertical": false,
             "isGateOpen": false
         }
     ]

@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.maps.tiled.TiledMapTile
+import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.scenes.scene2d.InputEvent
@@ -17,7 +19,6 @@ import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.ScreenUtils
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.marcin.panklex.*
-import com.marcin.panklex.entities.*
 import kotlin.math.truncate
 
 class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, game)
@@ -35,11 +36,15 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
 
     // hud
 
-    val blockTypeLabel = Label("undam stone", Label.LabelStyle(BitmapFont(), Color.CYAN))
-    val levelLabel = Label("level: 0", Label.LabelStyle(BitmapFont(), Color.GREEN))
+    val heartImage1 = Image(game.assetManager.get<Texture>("graphics/hud/heart.png"))
+    val heartImage2 = Image(game.assetManager.get<Texture>("graphics/hud/heart.png"))
+    val heartImage3 = Image(game.assetManager.get<Texture>("graphics/hud/heart.png"))
+    val heartImage4 = Image(game.assetManager.get<Texture>("graphics/hud/heart.png"))
+
+    val currentBlockLabel = Label("undam stone", Label.LabelStyle(BitmapFont(), Color.CYAN))
+    val currentLevelLabel = Label("level: 0", Label.LabelStyle(BitmapFont(), Color.GREEN))
     val upButton = TextButton("Up", TextButton.TextButtonStyle(null, null, null, BitmapFont()))
     val downButton = TextButton("Down", TextButton.TextButtonStyle(null, null, null, BitmapFont()))
-    val endGameButton = TextButton("End Game", TextButton.TextButtonStyle(null, null, null, BitmapFont()))
 
     val pickaxeUnselected = TextureRegion(game.assetManager.get<Texture>("graphics/actions/pickaxe.png"), 0, 0, 32, 32)
     val pickaxeSelected = TextureRegion(game.assetManager.get<Texture>("graphics/actions/pickaxe.png"), 32, 0, 32, 32)
@@ -49,6 +54,8 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
     val coinSelected = TextureRegion(game.assetManager.get<Texture>("graphics/actions/coin.png"), 32, 0, 32, 32)
     val cellUnselected = TextureRegion(game.assetManager.get<Texture>("graphics/actions/cell.png"), 0, 0, 32, 32)
     val cellSelected = TextureRegion(game.assetManager.get<Texture>("graphics/actions/cell.png"), 32, 0, 32, 32)
+    val handUnselected = TextureRegion(game.assetManager.get<Texture>("graphics/actions/hand.png"), 0, 0, 32, 32)
+    val handSelected = TextureRegion(game.assetManager.get<Texture>("graphics/actions/hand.png"), 32, 0, 32, 32)
     val walkUnselected = TextureRegion(game.assetManager.get<Texture>("graphics/actions/walk.png"), 0, 0, 32, 32)
     val walkSelected = TextureRegion(game.assetManager.get<Texture>("graphics/actions/walk.png"), 32, 0, 32, 32)
     val cancelImage = game.assetManager.get<Texture>("graphics/actions/cancel.png")
@@ -73,32 +80,33 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
         TextureRegionDrawable(cellUnselected),
         TextureRegionDrawable(cellSelected)
     )
+    val handButton = ImageButton(
+        TextureRegionDrawable(handUnselected),
+        TextureRegionDrawable(handUnselected),
+        TextureRegionDrawable(handSelected)
+    )
     val walkButton = ImageButton(
         TextureRegionDrawable(walkUnselected),
         TextureRegionDrawable(walkUnselected),
         TextureRegionDrawable(walkSelected)
     )
-    val cancellButton = ImageButton(TextureRegionDrawable(cancelImage))
+    val cancelButton = ImageButton(TextureRegionDrawable(cancelImage))
 
-    val heartImage1 = Image(game.assetManager.get<Texture>("graphics/hud/heart.png"))
-    val heartImage2 = Image(game.assetManager.get<Texture>("graphics/hud/heart.png"))
-    val heartImage3 = Image(game.assetManager.get<Texture>("graphics/hud/heart.png"))
-    val heartImage4 = Image(game.assetManager.get<Texture>("graphics/hud/heart.png"))
-    val heartImage5 = Image(game.assetManager.get<Texture>("graphics/hud/heart.png"))
-
-    val pickaxeCountLabel = Label("0", Label.LabelStyle(BitmapFont(), Color.YELLOW))
-    val bombCountLabel = Label("0", Label.LabelStyle(BitmapFont(), Color.YELLOW))
-    val coinCountLabel = Label("0", Label.LabelStyle(BitmapFont(), Color.YELLOW))
-    val cellCountLabel = Label("0", Label.LabelStyle(BitmapFont(), Color.YELLOW))
+    val pickaxeLabel = Label("0", Label.LabelStyle(BitmapFont(), Color.YELLOW))
+    val bombLabel = Label("0", Label.LabelStyle(BitmapFont(), Color.YELLOW))
+    val coinLabel = Label("0", Label.LabelStyle(BitmapFont(), Color.YELLOW))
+    val cellLabel = Label("0", Label.LabelStyle(BitmapFont(), Color.YELLOW))
 
     // other
 
+    var currentHearts = 0
+    var currentBlock = Block.UndamagedStone
     var currentLevel = 0
-    var currentBlockType = Block.UndamagedStone
     var currentAction = Action.None
-    var currentHearts = 5
 
-    var pickaxeCount = 3
+    var playerPosition = Vector3(1f, 3f, 0f)
+
+    var pickaxeCount = 300
     var bombCount = 3
     var coinCount = 3
     var cellCount = 3
@@ -115,83 +123,76 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
         {
             override fun clicked(event : InputEvent?, x : Float, y : Float)
             {
-                if (currentLevel < level.levels - 1)
-                {
-                    changeLevel(currentLevel + 1)
-                    refreshLevel()
-                    refreshMap()
-                    levelLabel.setText("level: $currentLevel")
-                }
+                changeLevel(currentLevel + 1)
+                refreshCurrentLevel()
+                refreshLevel()
+                refreshMap()
             }
         })
-
         downButton.addListener(object : ClickListener()
         {
             override fun clicked(event : InputEvent?, x : Float, y : Float)
             {
-                if (currentLevel > 0)
-                {
-                    changeLevel(currentLevel - 1)
-                    refreshLevel()
-                    refreshMap()
-                    levelLabel.setText("level: $currentLevel")
-                }
+                changeLevel(currentLevel - 1)
+                refreshCurrentLevel()
+                refreshLevel()
+                refreshMap()
             }
         })
-
-        endGameButton.addListener(object : ClickListener()
-        {
-            override fun clicked(event : InputEvent?, x : Float, y : Float)
-            {
-                game.changeScreen(game.screenEndGame)
-            }
-        })
-
         pickaxeButton.addListener(object : ClickListener()
         {
             override fun clicked(event : InputEvent?, x : Float, y : Float)
             {
-                if (pickaxeCount > 0) changeAction(Action.Pickaxe)
+                changeAction(Action.Pickaxe)
+                refreshActions()
             }
         })
-
         bombButton.addListener(object : ClickListener()
         {
             override fun clicked(event : InputEvent?, x : Float, y : Float)
             {
-                if (bombCount > 0) changeAction(Action.Bomb)
+                changeAction(Action.Bomb)
+                refreshActions()
             }
         })
-
         coinButton.addListener(object : ClickListener()
         {
             override fun clicked(event : InputEvent?, x : Float, y : Float)
             {
-                if (coinCount > 0) changeAction(Action.Coin)
+                changeAction(Action.Coin)
+                refreshActions()
             }
         })
-
         cellButton.addListener(object : ClickListener()
         {
             override fun clicked(event : InputEvent?, x : Float, y : Float)
             {
-                if (cellCount > 0) changeAction(Action.Cell)
+                changeAction(Action.Cell)
+                refreshActions()
             }
         })
-
+        handButton.addListener(object : ClickListener()
+        {
+            override fun clicked(event : InputEvent?, x : Float, y : Float)
+            {
+                changeAction(Action.Hand)
+                refreshActions()
+            }
+        })
         walkButton.addListener(object : ClickListener()
         {
             override fun clicked(event : InputEvent?, x : Float, y : Float)
             {
                 changeAction(Action.Walk)
+                refreshActions()
             }
         })
-
-        cancellButton.addListener(object : ClickListener()
+        cancelButton.addListener(object : ClickListener()
         {
             override fun clicked(event : InputEvent?, x : Float, y : Float)
             {
                 changeAction(Action.None)
+                refreshActions()
             }
         })
 
@@ -202,47 +203,279 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
         table.add(heartImage2).pad(10f)
         table.add(heartImage3).pad(10f)
         table.add(heartImage4).pad(10f)
-        table.add(heartImage5).pad(10f)
         table.row()
-        table.add(blockTypeLabel).pad(10f)
-        table.add(levelLabel).pad(10f)
+        table.add(currentBlockLabel).pad(10f)
+        table.add(currentLevelLabel).pad(10f)
         table.add(upButton).pad(10f)
         table.add(downButton).pad(10f)
-        table.add(endGameButton).pad(10f)
         table.row()
         table.add(pickaxeButton).pad(10f)
         table.add(bombButton).pad(10f)
         table.add(coinButton).pad(10f)
         table.add(cellButton).pad(10f)
-        table.add(walkButton).pad(10f)
-        table.add(cancellButton).pad(10f)
         table.row()
-        table.add(pickaxeCountLabel).pad(10f)
-        table.add(bombCountLabel).pad(10f)
-        table.add(coinCountLabel).pad(10f)
-        table.add(cellCountLabel).pad(10f)
+        table.add(pickaxeLabel).pad(10f)
+        table.add(bombLabel).pad(10f)
+        table.add(coinLabel).pad(10f)
+        table.add(cellLabel).pad(10f)
+        table.row()
+        table.add(handButton).pad(10f)
+        table.add(walkButton).pad(10f)
+        table.add(cancelButton).pad(10f)
         stage.addActor(table)
 
-        // init
+        // other
 
         loadLevelFromJson("levels/3.json")
         pathFinding.setUpMap()
+        changeHearts(4)
+        changeBlock(Block.UndamagedStone)
         changeLevel(0)
+        changeAction(Action.None)
         refreshLevel()
         refreshMap()
-        refreshEquipmentCountLabels()
+        refreshHearts()
+        refreshCurrentBlock()
+        refreshCurrentLevel()
+        refreshActions()
+        refreshEquipment()
+        showPlayerOnMap()
         mapCamera.zoom = 0.5f
     }
 
-    fun changeAction(action : Action)
+    fun gameLoop()
     {
-        currentAction = action
+        // input
 
-        pickaxeButton.isChecked = (currentAction == Action.Pickaxe)
-        bombButton.isChecked = (currentAction == Action.Bomb)
-        coinButton.isChecked = (currentAction == Action.Coin)
-        cellButton.isChecked = (currentAction == Action.Cell)
-        walkButton.isChecked = (currentAction == Action.Walk)
+        val is1KeyJustPressed = Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)
+        val is2KeyJustPressed = Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)
+        val is3KeyJustPressed = Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)
+        val is4KeyJustPressed = Gdx.input.isKeyJustPressed(Input.Keys.NUM_4)
+
+        val isEqualsKeyJustPressed = Gdx.input.isKeyJustPressed(Input.Keys.EQUALS)
+        val isMinusKeyJustPressed = Gdx.input.isKeyJustPressed(Input.Keys.MINUS)
+
+        val isLeftButtonPressed = Gdx.input.isButtonPressed(0)
+        val isLeftButtonJustPressed = Gdx.input.isButtonJustPressed(0)
+        val isMiddleButtonPressed = Gdx.input.isButtonPressed(2)
+        val isMiddleButtonJustPressed = Gdx.input.isButtonJustPressed(2)
+
+        val screenMousePosition = Vector2(Gdx.input.x.toFloat(), Gdx.input.y.toFloat())
+        val worldMousePosition = mapViewport.unproject(screenMousePosition)
+        val mapMousePosition =
+            Vector2(truncate(worldMousePosition.x / map.tileWidth), truncate(worldMousePosition.y / map.tileHeight))
+        val isMouseInMap =
+            (worldMousePosition.x > 0 && worldMousePosition.x < map.width && worldMousePosition.y > 0 && worldMousePosition.y < map.height)
+        val levelMousePosition = Vector3(mapMousePosition.x, mapMousePosition.y, currentLevel.toFloat())
+        val mapMouseBlock =
+            if (isMouseInMap) level.map[currentLevel][mapMousePosition.y.toInt()][mapMousePosition.x.toInt()] else LevelBlock()
+        val mapMouseBlockUp =
+            if (isMouseInMap) level.map[currentLevel + 1][mapMousePosition.y.toInt()][mapMousePosition.x.toInt()] else null
+
+        // hearts
+
+        if (isEqualsKeyJustPressed) changeHearts(1)
+        if (isMinusKeyJustPressed) changeHearts(-1)
+
+        refreshHearts()
+
+        // block
+
+        if (is1KeyJustPressed) changeBlock(Block.UndamagedStone)
+        if (is2KeyJustPressed) changeBlock(Block.DamagedStone)
+        if (is3KeyJustPressed) changeBlock(Block.Brick)
+        if (is4KeyJustPressed) changeBlock(Block.Metal)
+
+        refreshCurrentBlock()
+
+        if (isMiddleButtonPressed && isMouseInMap)
+        {
+            mapMouseBlock.rock = currentBlock
+            refreshMap()
+        }
+
+        // action
+
+        if (isMouseInMap)
+        {
+            // is action possible
+
+            val isActionPossible = if (mapMouseBlock.isEntity())
+            {
+                mapMouseBlock.entity!!.isActionPossible(levelMousePosition, currentAction)
+            }
+            else
+            {
+                when (currentAction)
+                {
+                    Action.Pickaxe ->
+                    {
+
+                        if (mapMouseBlockUp!!.isRock())
+                        {
+                            when (mapMouseBlockUp.rock)
+                            {
+                                Block.UndamagedStone, Block.DamagedStone, Block.Brick -> true
+                                else                                                  -> false
+                            }
+                        }
+                        else
+                        {
+                            when (mapMouseBlock.rock)
+                            {
+                                Block.UndamagedStone, Block.DamagedStone, Block.Brick -> true
+                                else                                                  -> false
+                            }
+                        }
+                    }
+                    Action.Walk    ->
+                    {
+                        pathFinding.isBlockTraversable(mapMouseBlock)
+                    }
+                    else           -> false
+                }
+            }
+
+            // action tile
+
+            val actionTile = if (isActionPossible)
+            {
+                when (currentAction)
+                {
+                    Action.Pickaxe -> tiles.pickaxe_tile
+                    Action.Bomb    -> tiles.bomb_tile
+                    Action.Coin    -> tiles.coin_tile
+                    Action.Cell    -> tiles.cell_tile
+                    Action.Hand    -> tiles.hand_tile
+                    Action.Walk    -> tiles.walk_tile
+                    else           -> tiles.empty
+                }
+            }
+            else tiles.empty
+
+            showActionOnMap(mapMousePosition.x.toInt(), mapMousePosition.y.toInt(), actionTile)
+
+            // executing action
+
+            if (isLeftButtonJustPressed && isActionPossible && playerPosition.z.toInt() == currentLevel)
+            {
+                pathFinding.findPath(
+                    playerPosition.x.toInt(),
+                    playerPosition.y.toInt(),
+                    mapMousePosition.x.toInt(),
+                    mapMousePosition.y.toInt(),
+                    currentLevel
+                )
+
+                if (pathFinding.isTraversable)
+                {
+                    if (mapMouseBlock.isEntity())
+                    {
+                        mapMouseBlock.entity?.onAction(levelMousePosition, currentAction, this)
+                    }
+                    else
+                    {
+                        when (currentAction)
+                        {
+                            Action.Pickaxe ->
+                            {
+                                if (mapMouseBlockUp!!.isRock())
+                                {
+                                    mapMouseBlockUp.rock = when (mapMouseBlockUp.rock)
+                                    {
+                                        Block.UndamagedStone            -> Block.DamagedStone
+                                        Block.DamagedStone, Block.Brick -> Block.Empty
+                                        else                            -> Block.Metal
+                                    }
+                                }
+                                else
+                                {
+                                    mapMouseBlock.rock = when (mapMouseBlock.rock)
+                                    {
+                                        Block.UndamagedStone            -> Block.DamagedStone
+                                        Block.DamagedStone, Block.Brick -> Block.Empty
+                                        else                            -> Block.Metal
+                                    }
+                                }
+
+                                pickaxeCount--
+                                if (pickaxeCount <= 0)
+                                {
+                                    changeAction(Action.None)
+                                    refreshActions()
+                                }
+                            }
+                            Action.Walk    ->
+                            {
+                                changePlayerPosition(
+                                    Vector3(
+                                        mapMousePosition.x,
+                                        mapMousePosition.y,
+                                        currentLevel.toFloat()
+                                    )
+                                )
+                            }
+                            else           ->
+                            {
+                            }
+                        }
+                    }
+                }
+
+                refreshLevel()
+                refreshMap()
+                refreshHearts()
+                refreshCurrentBlock()
+                refreshCurrentLevel()
+                refreshActions()
+                refreshEquipment()
+            }
+        }
+
+        // drag
+
+        if (isDragging)
+        {
+            dragDifference.x = worldMousePosition.x - mapCamera.position.x
+            dragDifference.y = worldMousePosition.y - mapCamera.position.y
+            mapCamera.position.x = dragOrigin.x - dragDifference.x
+            mapCamera.position.y = dragOrigin.y - dragDifference.y
+
+            if (!isLeftButtonPressed)
+            {
+                isDragging = false
+            }
+        }
+        else
+        {
+            if (isLeftButtonPressed && currentAction == Action.None)
+            {
+                dragOrigin = worldMousePosition
+                isDragging = true
+            }
+        }
+    }
+
+    fun changePlayerPosition(position : Vector3)
+    {
+        playerPosition = position
+    }
+
+    fun showActionOnMap(x : Int, y : Int, tile : StaticTiledMapTile)
+    {
+
+        map.clearLayer(MapLayer.Action)
+        map.setTile(MapLayer.Action, x, y, tile)
+    }
+
+    fun showPlayerOnMap()
+    {
+        map.clearLayer(MapLayer.Player)
+
+        if (playerPosition.z.toInt() == currentLevel)
+        {
+            map.setTile(MapLayer.Player, playerPosition.x.toInt(), playerPosition.y.toInt(), tiles.player)
+        }
     }
 
     fun loadLevelFromJson(jsonPath : String)
@@ -259,15 +492,15 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
 
         val levelList = mutableListOf<List<List<LevelBlock>>>()
 
-        for (i in 0..level.levels - 1)
+        for (i in 0 until level.levels)
         {
             val columnList = mutableListOf<List<LevelBlock>>()
 
-            for (j in 0..level.height - 1)
+            for (j in 0 until level.height)
             {
                 val rowList = mutableListOf<LevelBlock>()
 
-                for (k in 0..level.width - 1)
+                for (k in 0 until level.width)
                 {
                     val levelBlock = LevelBlock()
                     levelBlock.position.x = k.toFloat()
@@ -275,11 +508,11 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
                     levelBlock.position.z = i.toFloat()
                     levelBlock.rock = when (jsonLevel.map[i][j][k])
                     {
-                        0 -> Block.Empty
-                        1 -> Block.UndamagedStone
-                        2 -> Block.DamagedStone
-                        3 -> Block.Brick
-                        4 -> Block.Metal
+                        0    -> Block.Empty
+                        1    -> Block.UndamagedStone
+                        2    -> Block.DamagedStone
+                        3    -> Block.Brick
+                        4    -> Block.Metal
                         else -> Block.Empty
                     }
 
@@ -293,73 +526,26 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
         }
 
         level.map = levelList
-        level.player = jsonLevel.player
-        level.entities.add(level.player)
         level.entities.addAll(jsonLevel.entities)
-    }
-
-    fun changeLevel(levelNr : Int)
-    {
-        currentLevel = levelNr
     }
 
     fun refreshLevel()
     {
-        for (i in 0..level.width - 1)
+        // clear
+
+        for (i in 0 until level.width)
         {
-            for (j in 0..level.height - 1)
+            for (j in 0 until level.height)
             {
                 level.map[currentLevel][j][i].entity = null
             }
         }
 
+        // new
+
         for (e in level.entities)
         {
-            val positions = mutableListOf<Vector3>()
-            when (e)
-            {
-                is EntityPlayer ->
-                {
-                    positions.add(e.position)
-                }
-                is EntityContainer ->
-                {
-                    positions.add(e.position)
-                }
-                is EntityVendingMachine ->
-                {
-                    positions.add(e.position)
-                }
-                is EntityElevator ->
-                {
-                    positions.addAll(e.positions)
-                    positions.addAll(e.exitPositions)
-                }
-                is EntityTeleporter ->
-                {
-                    positions.add(e.firstTelePosition)
-                    positions.add(e.secondTelePosition)
-                }
-                is EntityFlag -> positions.add(e.position)
-                is EntityStairs ->
-                {
-                    positions.add(e.position)
-                    positions.add(e.lowerEnd)
-                    positions.add(e.upperEnd)
-                }
-                is EntityPoweredGate ->
-                {
-                    positions.add(e.firstPartPosition)
-                    positions.add(e.secondPartPosition)
-
-                    if (e.isFirstPartPowered || e.isSecondPartPowered)
-                    {
-                        positions.add(e.gatePosition)
-                    }
-                }
-            }
-
-            for (p in positions)
+            for (p in e.getPositions())
             {
                 level.map[p.z.toInt()][p.y.toInt()][p.x.toInt()].entity = e
             }
@@ -369,322 +555,118 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
     fun refreshMap()
     {
         mapTilesLogic.setUpMap(currentLevel)
+        showPlayerOnMap()
     }
 
-    fun refreshEquipmentCountLabels()
+    fun changeHearts(by : Int)
     {
-        pickaxeCountLabel.setText(pickaxeCount)
-        bombCountLabel.setText(bombCount)
-        coinCountLabel.setText(coinCount)
-        cellCountLabel.setText(cellCount)
-    }
+        currentHearts += by
 
-    fun changeHearts(number : Int)
-    {
-        currentHearts += number
-
-        if (currentHearts < 0)
+        if (currentHearts < 1)
         {
             game.log("hearts", "Dead!")
-            currentHearts = 0
+            currentHearts = 1
         }
-        if (currentHearts > 5)
+        if (currentHearts > 4)
         {
             game.log("hearts", "Healthy!")
-            currentHearts = 5
+            currentHearts = 4
         }
+    }
 
+    fun changeBlock(block : Block)
+    {
+        currentBlock = block
+    }
+
+    fun changeLevel(levelNr : Int)
+    {
+        currentLevel = levelNr
+
+        if (currentLevel < 0)
+        {
+            game.log("level", "Too deep!")
+            currentLevel = 0
+        }
+        if (currentLevel > level.levels - 1)
+        {
+            game.log("level", "Too high!")
+            currentLevel = level.levels - 1
+        }
+    }
+
+    fun changeAction(action : Action)
+    {
+        when (action)
+        {
+            Action.Pickaxe -> if (pickaxeCount > 0) currentAction = Action.Pickaxe
+            Action.Bomb    -> if (bombCount > 0) currentAction = Action.Bomb
+            Action.Coin    -> if (coinCount > 0) currentAction = Action.Coin
+            Action.Cell    -> if (cellCount > 0) currentAction = Action.Cell
+            Action.Hand    -> currentAction = Action.Hand
+            Action.Walk    -> currentAction = Action.Walk
+            Action.None    -> currentAction = Action.None
+        }
+    }
+
+    fun refreshHearts()
+    {
         heartImage1.isVisible = (currentHearts >= 1)
         heartImage2.isVisible = (currentHearts >= 2)
         heartImage3.isVisible = (currentHearts >= 3)
         heartImage4.isVisible = (currentHearts >= 4)
-        heartImage5.isVisible = (currentHearts >= 5)
+    }
+
+    fun refreshCurrentBlock()
+    {
+        currentBlockLabel.setText(
+            when (currentBlock)
+            {
+                Block.UndamagedStone -> "undam stone"
+                Block.DamagedStone   -> "dam stone"
+                Block.Brick          -> "brick"
+                Block.Metal          -> "metal"
+                else                 -> "?"
+            }
+        )
+    }
+
+    fun refreshCurrentLevel()
+    {
+        currentLevelLabel.setText("Level: $currentLevel")
+    }
+
+    fun refreshActions()
+    {
+        pickaxeButton.isChecked = (currentAction == Action.Pickaxe)
+        bombButton.isChecked = (currentAction == Action.Bomb)
+        coinButton.isChecked = (currentAction == Action.Coin)
+        cellButton.isChecked = (currentAction == Action.Cell)
+        handButton.isChecked = (currentAction == Action.Hand)
+        walkButton.isChecked = (currentAction == Action.Walk)
+    }
+
+    fun refreshEquipment()
+    {
+        pickaxeLabel.setText(pickaxeCount)
+        bombLabel.setText(bombCount)
+        coinLabel.setText(coinCount)
+        cellLabel.setText(cellCount)
     }
 
     override fun show()
     {
         super.show()
 
-        mapCamera.position.x = map.width() / 2f
-        mapCamera.position.y = map.height() / 2f
+        mapCamera.position.x = map.width / 2f
+        mapCamera.position.y = map.height / 2f
     }
 
     override fun render(delta : Float)
     {
         super.render(delta)
 
-        // input
-
-        val is1KeyJustPressed = Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)
-        val is2KeyJustPressed = Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)
-        val is3KeyJustPressed = Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)
-        val is4KeyJustPressed = Gdx.input.isKeyJustPressed(Input.Keys.NUM_4)
-
-        val isEqualsKeyJustPressed = Gdx.input.isKeyJustPressed(Input.Keys.EQUALS)
-        val isMinusKeyJustPressed = Gdx.input.isKeyJustPressed(Input.Keys.MINUS)
-
-        val isLeftButtonPressed = Gdx.input.isButtonPressed(0)
-        val isLeftButtonJustPressed = Gdx.input.isButtonJustPressed(0)
-        val isRightButtonPressed = Gdx.input.isButtonPressed(1)
-        val isRightButtonJustPressed = Gdx.input.isButtonJustPressed(1)
-        val isMiddleButtonPressed = Gdx.input.isButtonPressed(2)
-        val isMiddleButtonJustPressed = Gdx.input.isButtonJustPressed(2)
-
-        val screenMousePosition = Vector2(Gdx.input.x.toFloat(), Gdx.input.y.toFloat())
-        val worldMousePosition = mapViewport.unproject(screenMousePosition)
-        val mapMousePosition =
-            Vector2(truncate(worldMousePosition.x / map.tileWidth), truncate(worldMousePosition.y / map.tileHeight))
-        val isMouseInMap =
-            (worldMousePosition.x > 0 && worldMousePosition.x < map.width() && worldMousePosition.y > 0 && worldMousePosition.y < map.height())
-        val mapMouseBlock =
-            if (isMouseInMap) level.map[currentLevel][mapMousePosition.y.toInt()][mapMousePosition.x.toInt()] else LevelBlock()
-
-        // hearts
-
-        if (isEqualsKeyJustPressed) changeHearts(1)
-        if (isMinusKeyJustPressed) changeHearts(-1)
-
-        // block
-
-        if (is1KeyJustPressed) currentBlockType = Block.UndamagedStone
-        if (is2KeyJustPressed) currentBlockType = Block.DamagedStone
-        if (is3KeyJustPressed) currentBlockType = Block.Brick
-        if (is4KeyJustPressed) currentBlockType = Block.Metal
-
-        blockTypeLabel.setText(
-            when (currentBlockType)
-            {
-                Block.UndamagedStone -> "undam stone"
-                Block.DamagedStone -> "dam stone"
-                Block.Brick -> "brick"
-                Block.Metal -> "metal"
-                else -> "?"
-            }
-        )
-
-        if (isMiddleButtonPressed && isMouseInMap)
-        {
-            mapMouseBlock.rock = currentBlockType
-            refreshMap()
-        }
-
-        // action
-
-        map.clearLayer(MapLayer.Action)
-
-        if (isMouseInMap)
-        {
-            val isActionPossible = when (currentAction)
-            {
-                Action.Pickaxe ->
-                {
-                    when (mapMouseBlock.rock)
-                    {
-                        Block.UndamagedStone, Block.DamagedStone, Block.Brick -> true
-                        else -> false
-                    }
-                }
-                Action.Bomb ->
-                {
-                    mapMouseBlock.rock != Block.Empty
-                }
-                Action.Coin ->
-                {
-                    mapMouseBlock.entity is EntityVendingMachine
-                }
-                Action.Cell ->
-                {
-                    mapMouseBlock.entity is EntityPoweredGate
-                }
-                Action.Walk ->
-                {
-                    pathFinding.isBlockTraversable(mapMouseBlock)
-                }
-                else -> false
-            }
-
-            val actionTile = if (isActionPossible)
-            {
-                when (currentAction)
-                {
-                    Action.Pickaxe -> tiles.pickaxe_tile
-                    Action.Bomb -> tiles.bomb_tile
-                    Action.Coin -> tiles.coin_tile
-                    Action.Cell -> tiles.cell_tile
-                    Action.Walk -> tiles.walk_tile
-                    else -> tiles.empty
-                }
-            }
-            else tiles.empty
-
-            refreshMap()
-
-            map.setTile(MapLayer.Action, mapMousePosition.x.toInt(), mapMousePosition.y.toInt(), actionTile)
-
-            if (isLeftButtonJustPressed && isActionPossible)
-            {
-                when (currentAction)
-                {
-                    Action.Pickaxe ->
-                    {
-                        mapMouseBlock.rock = when (mapMouseBlock.rock)
-                        {
-                            Block.UndamagedStone -> Block.DamagedStone
-                            Block.DamagedStone, Block.Brick -> Block.Empty
-                            else -> Block.Metal
-                        }
-
-                        pickaxeCount--
-                        if (pickaxeCount <= 0)
-                        {
-                            changeAction(Action.None)
-                        }
-                        refreshEquipmentCountLabels()
-                    }
-                    Action.Bomb ->
-                    {
-                        val entity = mapMouseBlock.entity
-                        val entityPosition = Vector3(mapMousePosition.x, mapMousePosition.y, currentLevel.toFloat())
-
-                        when (entity)
-                        {
-                            is EntityContainer -> level.entities.remove(entity)
-                            is EntityVendingMachine -> level.entities.remove(entity)
-                            is EntityFlag -> level.entities.remove(entity)
-                            is EntityTeleporter ->
-                            {
-                                if (entityPosition.equals(entity.firstTelePosition) || entityPosition.equals(entity.secondTelePosition))
-                                {
-                                    level.entities.remove(entity)
-                                }
-                            }
-                            is EntityStairs ->
-                            {
-                                if (entityPosition.equals(entity.position))
-                                {
-                                    level.entities.remove(entity)
-                                }
-                            }
-                            is EntityElevator ->
-                            {
-                                if (entity.positions.contains(entityPosition))
-                                {
-                                    level.entities.remove(entity)
-                                }
-                            }
-                            is EntityPoweredGate ->
-                            {
-                                if (entityPosition.equals(entity.gatePosition))
-                                {
-                                    entity.isFirstPartPowered = false
-                                    entity.isSecondPartPowered = false
-                                }
-                                else if (entityPosition.equals(entity.firstPartPosition) || entityPosition.equals(entity.secondPartPosition))
-                                {
-                                    level.entities.remove(entity)
-                                }
-                            }
-                            else ->
-                            {
-                            }
-                        }
-
-                        bombCount--
-                        if (bombCount <= 0)
-                        {
-                            changeAction(Action.None)
-                        }
-                        refreshEquipmentCountLabels()
-
-                        refreshLevel()
-                    }
-                    Action.Coin ->
-                    {
-                        pickaxeCount++
-                        bombCount++
-                        cellCount++
-
-                        coinCount--
-                        if (coinCount <= 0)
-                        {
-                            changeAction(Action.None)
-                        }
-                        refreshEquipmentCountLabels()
-                    }
-                    Action.Cell ->
-                    {
-                        val entityPosition = Vector3(mapMousePosition.x, mapMousePosition.y, currentLevel.toFloat())
-                        val poweredGate = (mapMouseBlock.entity as EntityPoweredGate)
-
-                        if (entityPosition.equals(poweredGate.firstPartPosition))
-                        {
-                            poweredGate.isFirstPartPowered = true
-                        }
-
-                        if (entityPosition.equals(poweredGate.secondPartPosition))
-                        {
-                            poweredGate.isSecondPartPowered = true
-                        }
-
-                        cellCount--
-                        if (cellCount <= 0)
-                        {
-                            changeAction(Action.None)
-                        }
-                        refreshEquipmentCountLabels()
-
-                        refreshLevel()
-                    }
-                    Action.Walk ->
-                    {
-                        if (level.player.position.z.toInt() == currentLevel)
-                        {
-                            val path = pathFinding.findPath(
-                                level.player.position.x.toInt(),
-                                level.player.position.y.toInt(),
-                                mapMousePosition.x.toInt(),
-                                mapMousePosition.y.toInt(),
-                                currentLevel
-                            )
-
-                            if (pathFinding.isTraversable)
-                            {
-                                level.player.position.x = mapMousePosition.x
-                                level.player.position.y = mapMousePosition.y
-                                level.player.position.z = currentLevel.toFloat()
-                                refreshLevel()
-                            }
-                        }
-                    }
-                }
-
-            }
-        }
-
-        // drag
-
-        if (isDragging)
-        {
-            dragDifference.x = worldMousePosition.x - mapCamera.position.x
-            dragDifference.y = worldMousePosition.y - mapCamera.position.y
-            mapCamera.position.x = dragOrigin.x - dragDifference.x
-            mapCamera.position.y = dragOrigin.y - dragDifference.y
-
-            if (!isRightButtonPressed)
-            {
-                isDragging = false
-            }
-        }
-        else
-        {
-            if (isRightButtonPressed)
-            {
-                dragOrigin = worldMousePosition
-                isDragging = true
-            }
-        }
-
-        // draw
+        gameLoop()
 
         ScreenUtils.clear(0f, 0f, 0f, 1f)
         camera.update()

@@ -12,10 +12,10 @@ enum class Block
 
 enum class Action
 {
-    None, Pickaxe, Bomb, Coin, Cell, Walk
+    None, Pickaxe, Bomb, Coin, Cell, Hand, Walk
 }
 
 enum class MapLayer
 {
-    Pit, Hole, Base, Block, Wall, Entity, Cover, Action
+    Pit, Hole, Base, Block, Wall, Entity, Cover, Player, Action
 }

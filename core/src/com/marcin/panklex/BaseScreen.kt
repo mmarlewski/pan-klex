@@ -1,13 +1,11 @@
 package com.marcin.panklex
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 
-abstract class BaseScreen(val baseName: String, val baseGame: PanKlexGame) : Screen
+abstract class BaseScreen(val baseName : String, val baseGame : PanKlexGame) : Screen
 {
     val camera = OrthographicCamera()
     val viewport = ScreenViewport(camera)
@@ -15,37 +13,37 @@ abstract class BaseScreen(val baseName: String, val baseGame: PanKlexGame) : Scr
 
     override fun show()
     {
-        Gdx.app.log("show", baseName)
+        baseGame.log(baseName, "show")
     }
 
-    override fun render(delta: Float)
+    override fun render(delta : Float)
     {
     }
 
-    override fun resize(width: Int, height: Int)
+    override fun resize(width : Int, height : Int)
     {
-        Gdx.app.log("resize", baseName)
-        viewport.update(width, height,true)
+        baseGame.log(baseName, "resize")
+        viewport.update(width, height, true)
     }
 
     override fun pause()
     {
-        Gdx.app.log("pause", baseName)
+        baseGame.log(baseName, "pause")
     }
 
     override fun resume()
     {
-        Gdx.app.log("resume", baseName)
+        baseGame.log(baseName, "resume")
     }
 
     override fun hide()
     {
-        Gdx.app.log("hide", baseName)
+        baseGame.log(baseName, "hide")
     }
 
     override fun dispose()
     {
-        Gdx.app.log("dispose", baseName)
+        baseGame.log(baseName, "dispose")
         stage.dispose()
     }
 }

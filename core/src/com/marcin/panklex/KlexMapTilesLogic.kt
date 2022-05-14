@@ -3,47 +3,51 @@ package com.marcin.panklex
 import com.badlogic.gdx.math.Vector3
 import com.marcin.panklex.entities.*
 
-class KlexMapTilesLogic(val tiles: KlexTiles, val map: KlexMap, val level: KlexLevel)
+class KlexMapTilesLogic(val tiles : KlexTiles, val map : KlexMap, val level : KlexLevel)
 {
-    fun setUpMap(currentLevel: Int)
+    fun setUpMap(currentLevel : Int)
     {
-        for (i in 0..level.width - 1)
+        for (i in 0 until level.width)
         {
-            for (j in 0..level.height - 1)
+            for (j in 0 until level.height)
             {
                 val blockType =
-                        if (level.map[currentLevel][j][i].rock != Block.Empty) level.map[currentLevel][j][i].rock else Block.Metal
+                    if (level.map[currentLevel][j][i].rock != Block.Empty) level.map[currentLevel][j][i].rock else Block.Metal
                 val upBlockType = if (j < level.height - 1) level.map[currentLevel][j + 1][i].rock else Block.Metal
-                val aboveBlockType = if (currentLevel < level.levels - 1) level.map[currentLevel + 1][j][i].rock else Block.Metal
+                val aboveBlockType =
+                    if (currentLevel < level.levels - 1) level.map[currentLevel + 1][j][i].rock else Block.Metal
 
                 val isRock = level.map[currentLevel][j][i].rock != Block.Empty
-                val isUpLeftRock = !(j < level.height - 1 && i > 0 && level.map[currentLevel][j + 1][i - 1].rock == Block.Empty)
+                val isUpLeftRock =
+                    !(j < level.height - 1 && i > 0 && level.map[currentLevel][j + 1][i - 1].rock == Block.Empty)
                 val isUpRock = !(j < level.height - 1 && level.map[currentLevel][j + 1][i].rock == Block.Empty)
                 val isUpRightRock =
-                        !(j < level.height - 1 && i < level.width - 1 && level.map[currentLevel][j + 1][i + 1].rock == Block.Empty)
+                    !(j < level.height - 1 && i < level.width - 1 && level.map[currentLevel][j + 1][i + 1].rock == Block.Empty)
                 val isRightRock = !(i < level.width - 1 && level.map[currentLevel][j][i + 1].rock == Block.Empty)
-                val isDownRightRock = !(j > 0 && i < level.width - 1 && level.map[currentLevel][j - 1][i + 1].rock == Block.Empty)
+                val isDownRightRock =
+                    !(j > 0 && i < level.width - 1 && level.map[currentLevel][j - 1][i + 1].rock == Block.Empty)
                 val isDownRock = !(j > 0 && level.map[currentLevel][j - 1][i].rock == Block.Empty)
                 val isDownLeftRock = !(j > 0 && i > 0 && level.map[currentLevel][j - 1][i - 1].rock == Block.Empty)
                 val isLeftRock = !(i > 0 && level.map[currentLevel][j][i - 1].rock == Block.Empty)
 
-                val isAboveRock = !(currentLevel < level.levels - 1 && level.map[currentLevel + 1][j][i].rock == Block.Empty)
+                val isAboveRock =
+                    !(currentLevel < level.levels - 1 && level.map[currentLevel + 1][j][i].rock == Block.Empty)
                 val isAboveUpLeftRock =
-                        !(currentLevel < level.levels - 1 && j < level.height - 1 && i > 0 && level.map[currentLevel + 1][j + 1][i - 1].rock == Block.Empty)
+                    !(currentLevel < level.levels - 1 && j < level.height - 1 && i > 0 && level.map[currentLevel + 1][j + 1][i - 1].rock == Block.Empty)
                 val isAboveUpRock =
-                        !(currentLevel < level.levels - 1 && j < level.height - 1 && level.map[currentLevel + 1][j + 1][i].rock == Block.Empty)
+                    !(currentLevel < level.levels - 1 && j < level.height - 1 && level.map[currentLevel + 1][j + 1][i].rock == Block.Empty)
                 val isAboveUpRightRock =
-                        !(currentLevel < level.levels - 1 && j < level.height - 1 && i < level.width - 1 && level.map[currentLevel + 1][j + 1][i + 1].rock == Block.Empty)
+                    !(currentLevel < level.levels - 1 && j < level.height - 1 && i < level.width - 1 && level.map[currentLevel + 1][j + 1][i + 1].rock == Block.Empty)
                 val isAboveRightRock =
-                        !(currentLevel < level.levels - 1 && i < level.width - 1 && level.map[currentLevel + 1][j][i + 1].rock == Block.Empty)
+                    !(currentLevel < level.levels - 1 && i < level.width - 1 && level.map[currentLevel + 1][j][i + 1].rock == Block.Empty)
                 val isAboveDownRightRock =
-                        !(currentLevel < level.levels - 1 && j > 0 && i < level.width - 1 && level.map[currentLevel + 1][j - 1][i + 1].rock == Block.Empty)
+                    !(currentLevel < level.levels - 1 && j > 0 && i < level.width - 1 && level.map[currentLevel + 1][j - 1][i + 1].rock == Block.Empty)
                 val isAboveDownRock =
-                        !(currentLevel < level.levels - 1 && j > 0 && level.map[currentLevel + 1][j - 1][i].rock == Block.Empty)
+                    !(currentLevel < level.levels - 1 && j > 0 && level.map[currentLevel + 1][j - 1][i].rock == Block.Empty)
                 val isAboveDownLeftRock =
-                        !(currentLevel < level.levels - 1 && j > 0 && i > 0 && level.map[currentLevel + 1][j - 1][i - 1].rock == Block.Empty)
+                    !(currentLevel < level.levels - 1 && j > 0 && i > 0 && level.map[currentLevel + 1][j - 1][i - 1].rock == Block.Empty)
                 val isAboveLeftRock =
-                        !(currentLevel < level.levels - 1 && i > 0 && level.map[currentLevel + 1][j][i - 1].rock == Block.Empty)
+                    !(currentLevel < level.levels - 1 && i > 0 && level.map[currentLevel + 1][j][i - 1].rock == Block.Empty)
 
                 val pitTile = when
                 {
@@ -537,19 +541,40 @@ class KlexMapTilesLogic(val tiles: KlexTiles, val map: KlexMap, val level: KlexL
                 val entityTile = when (entity)
                 {
                     null                    -> tiles.empty
-                    is EntityPlayer         -> tiles.player
                     is EntityContainer      -> tiles.container
                     is EntityVendingMachine -> tiles.vendingMachine
-                    is EntityTeleporter     -> tiles.teleporter
                     is EntityFlag           -> tiles.flag
+                    is EntityTeleporter     -> when (entityPosition)
+                    {
+                        entity.firstTelePosition  -> when
+                        {
+
+                            (!entity.isFirstTelePowered && !entity.isSecondTelePowered) -> tiles.teleporter_unpow_unpow
+                            (entity.isFirstTelePowered && !entity.isSecondTelePowered)  -> tiles.teleporter_pow_unpow
+                            (!entity.isFirstTelePowered && entity.isSecondTelePowered)  -> tiles.teleporter_unpow_pow
+                            (entity.isFirstTelePowered && entity.isSecondTelePowered)   -> tiles.teleporter_pow_pow
+                            else                                                        -> tiles.empty
+
+                        }
+                        entity.secondTelePosition -> when
+                        {
+                            (!entity.isSecondTelePowered && !entity.isFirstTelePowered) -> tiles.teleporter_unpow_unpow
+                            (entity.isSecondTelePowered && !entity.isFirstTelePowered)  -> tiles.teleporter_pow_unpow
+                            (!entity.isSecondTelePowered && entity.isFirstTelePowered)  -> tiles.teleporter_unpow_pow
+                            (entity.isSecondTelePowered && entity.isFirstTelePowered)   -> tiles.teleporter_pow_pow
+                            else                                                        -> tiles.empty
+                        }
+                        else                      -> tiles.empty
+                    }
+
                     is EntityElevator       ->
                     {
-                        if (entity.positions.contains(entityPosition)) tiles.elevator
+                        if (entity.elevatorPositions.contains(entityPosition)) tiles.elevator
                         else tiles.empty
                     }
                     is EntityStairs         -> when
                     {
-                        entityPosition.equals(entity.position) -> when (entity.direction)
+                        entityPosition.equals(entity.stairsPosition) -> when (entity.direction)
                         {
                             Direction.Up    -> tiles.stairs_a_u
                             Direction.Right -> tiles.stairs_a_r
@@ -558,7 +583,7 @@ class KlexMapTilesLogic(val tiles: KlexTiles, val map: KlexMap, val level: KlexL
                             else            -> tiles.empty
                         }
 
-                        entityPosition.equals(entity.upperEnd) -> when (entity.direction)
+                        entityPosition.equals(entity.upperEnd)       -> when (entity.direction)
                         {
                             Direction.Up    -> tiles.stairs_b_u
                             Direction.Right -> tiles.stairs_b_r
@@ -566,7 +591,7 @@ class KlexMapTilesLogic(val tiles: KlexTiles, val map: KlexMap, val level: KlexL
                             Direction.Left  -> tiles.stairs_b_l
                             else            -> tiles.empty
                         }
-                        else                                   -> tiles.empty
+                        else                                         -> tiles.empty
                     }
                     is EntityPoweredGate    -> when
                     {
@@ -621,50 +646,10 @@ class KlexMapTilesLogic(val tiles: KlexTiles, val map: KlexMap, val level: KlexL
                             }
                         }
 
-                        entityPosition.equals(entity.firstPartPosition)  -> if (entity.isFirstPartPowered)
-                        {
-                            when (entity.firstPartDirection)
-                            {
-                                Direction.Up    -> tiles.poweredGate_part_pow_l_r
-                                Direction.Right -> tiles.poweredGate_part_pow_r
-                                Direction.Down  -> tiles.poweredGate_part_pow_l_r
-                                Direction.Left  -> tiles.poweredGate_part_pow_l
-                                else            -> tiles.empty
-                            }
-                        }
-                        else
-                        {
-                            when (entity.firstPartDirection)
-                            {
-                                Direction.Up    -> tiles.poweredGate_part_unp_l_r
-                                Direction.Right -> tiles.poweredGate_part_unp_r
-                                Direction.Down  -> tiles.poweredGate_part_unp_l_r
-                                Direction.Left  -> tiles.poweredGate_part_unp_l
-                                else            -> tiles.empty
-                            }
-                        }
-                        entityPosition.equals(entity.secondPartPosition) -> if (entity.isSecondPartPowered)
-                        {
-                            when (entity.secondPartDirection)
-                            {
-                                Direction.Up    -> tiles.poweredGate_part_pow_l_r
-                                Direction.Right -> tiles.poweredGate_part_pow_r
-                                Direction.Down  -> tiles.poweredGate_part_pow_l_r
-                                Direction.Left  -> tiles.poweredGate_part_pow_l
-                                else            -> tiles.empty
-                            }
-                        }
-                        else
-                        {
-                            when (entity.secondPartDirection)
-                            {
-                                Direction.Up    -> tiles.poweredGate_part_unp_l_r
-                                Direction.Right -> tiles.poweredGate_part_unp_r
-                                Direction.Down  -> tiles.poweredGate_part_unp_l_r
-                                Direction.Left  -> tiles.poweredGate_part_unp_l
-                                else            -> tiles.empty
-                            }
-                        }
+                        entityPosition.equals(entity.firstPartPosition)  -> if (entity.isFirstPartPowered) tiles.poweredGate_part_pow
+                        else tiles.poweredGate_part_unp
+                        entityPosition.equals(entity.secondPartPosition) -> if (entity.isSecondPartPowered) tiles.poweredGate_part_pow
+                        else tiles.poweredGate_part_unp
                         else                                             -> tiles.empty
                     }
                     else                    -> tiles.empty

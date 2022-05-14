@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile
 
-class KlexTiles(val assetManager: AssetManager)
+class KlexTiles(assetManager : AssetManager)
 {
     // action
 
@@ -29,6 +29,11 @@ class KlexTiles(val assetManager: AssetManager)
     val cell_sel = StaticTiledMapTile(cell[0][1])
     val cell_tile = StaticTiledMapTile(cell[0][2])
 
+    val hand = TextureRegion(assetManager.get<Texture>("graphics/actions/hand.png")).split(32, 32)
+    val hand_unsel = StaticTiledMapTile(hand[0][0])
+    val hand_sel = StaticTiledMapTile(hand[0][1])
+    val hand_tile = StaticTiledMapTile(hand[0][2])
+
     val walk = TextureRegion(assetManager.get<Texture>("graphics/actions/walk.png")).split(32, 32)
     val walk_unsel = StaticTiledMapTile(walk[0][0])
     val walk_sel = StaticTiledMapTile(walk[0][1])
@@ -40,10 +45,16 @@ class KlexTiles(val assetManager: AssetManager)
 
     val player = StaticTiledMapTile(TextureRegion(assetManager.get<Texture>("graphics/entities/player.png")))
     val container = StaticTiledMapTile(TextureRegion(assetManager.get<Texture>("graphics/entities/container.png")))
-    val vendingMachine = StaticTiledMapTile(TextureRegion(assetManager.get<Texture>("graphics/entities/vendingMachine.png")))
+    val vendingMachine =
+        StaticTiledMapTile(TextureRegion(assetManager.get<Texture>("graphics/entities/vendingMachine.png")))
     val elevator = StaticTiledMapTile(TextureRegion(assetManager.get<Texture>("graphics/entities/elevator.png")))
-    val teleporter = StaticTiledMapTile(TextureRegion(assetManager.get<Texture>("graphics/entities/teleporter.png")))
     val flag = StaticTiledMapTile(TextureRegion(assetManager.get<Texture>("graphics/entities/flag.png")))
+
+    val teleporter = TextureRegion(assetManager.get<Texture>("graphics/entities/teleporter.png")).split(32, 64)
+    val teleporter_unpow_unpow = StaticTiledMapTile(teleporter[0][0])
+    val teleporter_pow_unpow = StaticTiledMapTile(teleporter[0][1])
+    val teleporter_unpow_pow = StaticTiledMapTile(teleporter[0][2])
+    val teleporter_pow_pow = StaticTiledMapTile(teleporter[0][3])
 
     val stairs = TextureRegion(assetManager.get<Texture>("graphics/entities/stairs.png")).split(32, 64)
     val stairs_b_r = StaticTiledMapTile(stairs[0][0])
@@ -56,20 +67,14 @@ class KlexTiles(val assetManager: AssetManager)
     val stairs_a_d = StaticTiledMapTile(stairs[0][5])
 
     val poweredGate = TextureRegion(assetManager.get<Texture>("graphics/entities/poweredGate.png")).split(32, 64)
-    val poweredGate_part_unp_none = StaticTiledMapTile(poweredGate[0][0])
-    val poweredGate_part_unp_l = StaticTiledMapTile(poweredGate[0][1])
-    val poweredGate_part_unp_r = StaticTiledMapTile(TextureRegion(poweredGate[0][1]).apply { flip(true, false) })
-    val poweredGate_part_unp_l_r = StaticTiledMapTile(poweredGate[0][2])
-    val poweredGate_part_pow_none = StaticTiledMapTile(poweredGate[0][3])
-    val poweredGate_part_pow_l = StaticTiledMapTile(poweredGate[0][4])
-    val poweredGate_part_pow_r = StaticTiledMapTile(TextureRegion(poweredGate[0][4]).apply { flip(true, false) })
-    val poweredGate_part_pow_l_r = StaticTiledMapTile(poweredGate[0][5])
-    val poweredGate_gate_hor_l = StaticTiledMapTile(poweredGate[0][6])
-    val poweredGate_gate_hor_r = StaticTiledMapTile(TextureRegion(poweredGate[0][6]).apply { flip(true, false) })
-    val poweredGate_gate_hor_l_r = StaticTiledMapTile(poweredGate[0][7])
-    val poweredGate_gate_ver_u_d = StaticTiledMapTile(poweredGate[0][8])
-    val poweredGate_gate_ver_d = StaticTiledMapTile(poweredGate[0][9])
-    val poweredGate_gate_ver_u = StaticTiledMapTile(poweredGate[0][10])
+    val poweredGate_part_unp = StaticTiledMapTile(poweredGate[0][0])
+    val poweredGate_part_pow = StaticTiledMapTile(poweredGate[0][1])
+    val poweredGate_gate_hor_l = StaticTiledMapTile(poweredGate[0][2])
+    val poweredGate_gate_hor_r = StaticTiledMapTile(TextureRegion(poweredGate[0][2]).apply { flip(true, false) })
+    val poweredGate_gate_hor_l_r = StaticTiledMapTile(poweredGate[0][3])
+    val poweredGate_gate_ver_u_d = StaticTiledMapTile(poweredGate[0][4])
+    val poweredGate_gate_ver_d = StaticTiledMapTile(poweredGate[0][5])
+    val poweredGate_gate_ver_u = StaticTiledMapTile(poweredGate[0][6])
 
     // special
 

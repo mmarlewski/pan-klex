@@ -14,7 +14,7 @@ import com.badlogic.gdx.utils.ScreenUtils
 import com.marcin.panklex.BaseScreen
 import com.marcin.panklex.PanKlexGame
 
-class ScreenEndGame(val name: String, val game: PanKlexGame) : BaseScreen(name, game)
+class ScreenEndGame(val name : String, val game : PanKlexGame) : BaseScreen(name, game)
 {
     init
     {
@@ -24,12 +24,12 @@ class ScreenEndGame(val name: String, val game: PanKlexGame) : BaseScreen(name, 
 
         mainMenuButton.addListener(object : ClickListener()
         {
-            override fun clicked(event: InputEvent?, x: Float, y: Float) = game.changeScreen(game.screenMainMenu)
+            override fun clicked(event : InputEvent?, x : Float, y : Float) = game.changeScreen(game.screenMainMenu)
         })
 
         exitButton.addListener(object : ClickListener()
         {
-            override fun clicked(event: InputEvent?, x: Float, y: Float) = game.exit()
+            override fun clicked(event : InputEvent?, x : Float, y : Float) = game.exit()
         })
 
         val table = Table()
@@ -40,7 +40,7 @@ class ScreenEndGame(val name: String, val game: PanKlexGame) : BaseScreen(name, 
         stage.addActor(table)
     }
 
-    override fun render(delta: Float)
+    override fun render(delta : Float)
     {
         super.render(delta)
 
