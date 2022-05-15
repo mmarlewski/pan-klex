@@ -10,7 +10,7 @@ class EntityContainer : BaseEntity("entity Container")
     var containerPosition = Vector3()
     var pickaxes = 0
     var bombs = 0
-    var energyCells = 0
+    var cells = 0
     var coins = 0
 
     override fun getPositions() : List<Vector3>
@@ -46,7 +46,8 @@ class EntityContainer : BaseEntity("entity Container")
             }
             Action.Hand ->
             {
-                screenGame.coinCount++
+                screenGame.game.containerScreen.containerEntity = this
+                screenGame.game.changeScreen(screenGame.game.containerScreen)
             }
             else        ->
             {

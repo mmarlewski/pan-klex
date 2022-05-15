@@ -21,7 +21,7 @@ class EntityElevator : BaseEntity("entity Elevator")
         return when (position)
         {
             in elevatorPositions -> false
-            else -> true
+            else                 -> true
         }
     }
 
@@ -29,8 +29,8 @@ class EntityElevator : BaseEntity("entity Elevator")
     {
         return when (action)
         {
-            Action.Bomb -> true
-            else -> false
+            Action.Bomb, Action.Hand -> true
+            else                     -> false
         }
     }
 
@@ -53,7 +53,12 @@ class EntityElevator : BaseEntity("entity Elevator")
                 exitPositions.removeAt(index)
                 floorNames.removeAt(index)
             }
-            else ->
+            Action.Hand ->
+            {
+                screenGame.game.elevatorScreen.elevatorEntity = this
+                screenGame.game.changeScreen(screenGame.game.elevatorScreen)
+            }
+            else        ->
             {
             }
         }

@@ -11,7 +11,7 @@ class EntityVendingMachine : BaseEntity("entity VendingMachine")
     var isBroken = false
     var pickaxes = 0
     var bombs = 0
-    var energyCells = 0
+    var cells = 0
 
     override fun getPositions() : List<Vector3>
     {
@@ -31,9 +31,8 @@ class EntityVendingMachine : BaseEntity("entity VendingMachine")
     {
         return when (action)
         {
-            Action.Bomb              -> true
-            Action.Coin, Action.Cell -> !isBroken
-            Action.Hand              -> isBroken
+            Action.Bomb, Action.Hand -> true
+            Action.Cell              -> !isBroken
             else                     -> false
         }
     }
@@ -46,32 +45,14 @@ class EntityVendingMachine : BaseEntity("entity VendingMachine")
             {
                 screenGame.level.entities.remove(this)
             }
-            Action.Coin ->
-            {
-                if (!isBroken)
-                {
-                    if (screenGame.coinCount > 0)
-                    {
-                        screenGame.coinCount--
-
-                        screenGame.pickaxeCount++
-                        screenGame.bombCount++
-                        screenGame.cellCount++
-                    }
-                }
-            }
             Action.Cell ->
             {
                 isBroken = true
             }
             Action.Hand ->
             {
-                if (isBroken)
-                {
-                    screenGame.pickaxeCount++
-                    screenGame.bombCount++
-                    screenGame.cellCount++
-                }
+                screenGame.game.vendingMachineScreen.vendingMachineEntity = this
+                screenGame.game.changeScreen(screenGame.game.vendingMachineScreen)
             }
             else        ->
             {

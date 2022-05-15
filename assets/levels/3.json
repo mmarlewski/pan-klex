@@ -347,10 +347,10 @@
                 "y": 1,
                 "z": 0
             },
-            "pickaxes": 0,
-            "bombs": 0,
-            "energyCells": 0,
-            "coins": 0
+            "pickaxes": 5,
+            "bombs": 5,
+            "cells": 5,
+            "coins": 5
         },
         {
             "class": "com.marcin.panklex.entities.EntityVendingMachine",
@@ -360,9 +360,9 @@
                 "z": 0
             },
             "isBroken": false,
-            "pickaxes": 0,
-            "bombs": 0,
-            "energyCells": 0
+            "pickaxes": 3,
+            "bombs": 3,
+            "cells": 3
         },
         {
             "class": "com.marcin.panklex.entities.EntityElevator",
@@ -376,6 +376,11 @@
                     "x": 0,
                     "y": 2,
                     "z": 2
+                },
+                {
+                    "x": 0,
+                    "y": 2,
+                    "z": 4
                 }
             ],
             "exitPositions": [
@@ -387,12 +392,18 @@
                 {
                     "x": 1,
                     "y": 1,
-                    "z": 1
+                    "z": 2
+                },
+                {
+                    "x": 1,
+                    "y": 1,
+                    "z": 4
                 }
             ],
             "floorNames": [
-                "level zero",
-                "level one"
+                "first level",
+                "medium level",
+                "hight level"
             ]
         },
         {

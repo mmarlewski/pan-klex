@@ -1,10 +1,7 @@
 package com.marcin.panklex.screens
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
-import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
@@ -43,16 +40,6 @@ class ScreenEndGame(val name : String, val game : PanKlexGame) : BaseScreen(name
     override fun render(delta : Float)
     {
         super.render(delta)
-
-        // input
-
-        val screenMousePos = Vector2(Gdx.input.x.toFloat(), Gdx.input.y.toFloat())
-        val isLeftButtonPressed = Gdx.input.isButtonPressed(0)
-        val isRightButtonPressed = Gdx.input.isButtonPressed(1)
-        val isLeftButtonJustPressed = Gdx.input.isButtonJustPressed(0)
-        val isRightButtonJustPressed = Gdx.input.isButtonJustPressed(1)
-
-        // draw
 
         ScreenUtils.clear(0f, 0f, 0f, 1f)
         camera.update()

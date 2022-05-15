@@ -5,30 +5,31 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.marcin.panklex.screens.ScreenEndGame
-import com.marcin.panklex.screens.ScreenGame
-import com.marcin.panklex.screens.ScreenMainMenu
+import com.marcin.panklex.screens.*
 
 class PanKlexGame : Game()
 {
-    lateinit var batch: SpriteBatch
+    lateinit var batch : SpriteBatch
     val assetManager = AssetManager()
 
-    lateinit var screenMainMenu: ScreenMainMenu
-    lateinit var screenGame: ScreenGame
-    lateinit var screenEndGame: ScreenEndGame
+    lateinit var screenMainMenu : ScreenMainMenu
+    lateinit var screenGame : ScreenGame
+    lateinit var containerScreen : ContainerScreen
+    lateinit var vendingMachineScreen : VendingMachineScreen
+    lateinit var elevatorScreen : ElevatorScreen
+    lateinit var screenEndGame : ScreenEndGame
 
     fun exit()
     {
         Gdx.app.exit()
     }
 
-    fun log(tag: String, message: String)
+    fun log(tag : String, message : String)
     {
         Gdx.app.log(tag, message)
     }
 
-    fun changeScreen(screen: BaseScreen)
+    fun changeScreen(screen : BaseScreen)
     {
         Gdx.input.inputProcessor = screen.stage
         setScreen(screen)
@@ -71,6 +72,9 @@ class PanKlexGame : Game()
         batch = SpriteBatch()
         screenMainMenu = ScreenMainMenu("screen MainMenu", this)
         screenGame = ScreenGame("screen Game", this)
+        containerScreen = ContainerScreen("screen Container", this)
+        vendingMachineScreen = VendingMachineScreen("screen VendingMachine", this)
+        elevatorScreen = ElevatorScreen("screen Elevator", this)
         screenEndGame = ScreenEndGame("screen EndGame", this)
         changeScreen(screenMainMenu)
     }
@@ -81,6 +85,9 @@ class PanKlexGame : Game()
         assetManager.dispose()
         screenMainMenu.dispose()
         screenGame.dispose()
+        containerScreen.dispose()
+        vendingMachineScreen.dispose()
+        elevatorScreen.dispose()
         screenEndGame.dispose()
     }
 }
