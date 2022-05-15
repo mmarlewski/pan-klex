@@ -542,8 +542,8 @@ class KlexMapTilesLogic(val tiles : KlexTiles, val map : KlexMap, val level : Kl
                 {
                     null                    -> tiles.empty
                     is EntityContainer      -> tiles.container
-                    is EntityVendingMachine -> tiles.vendingMachine
                     is EntityFlag           -> tiles.flag
+                    is EntityVendingMachine -> if (entity.isBroken) tiles.vendingMachine_broken else tiles.vendingMachine_unbroken
                     is EntityTeleporter     -> when (entityPosition)
                     {
                         entity.firstTelePosition  -> when

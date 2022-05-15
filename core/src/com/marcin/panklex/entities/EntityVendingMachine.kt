@@ -8,7 +8,7 @@ import com.marcin.panklex.screens.ScreenGame
 class EntityVendingMachine : BaseEntity("entity VendingMachine")
 {
     var vendingMachinePosition = Vector3()
-    var isBroken = true
+    var isBroken = false
     var pickaxes = 0
     var bombs = 0
     var energyCells = 0
@@ -31,7 +31,9 @@ class EntityVendingMachine : BaseEntity("entity VendingMachine")
     {
         return when (action)
         {
-            Action.Bomb, Action.Coin -> true
+            Action.Bomb              -> true
+            Action.Coin, Action.Cell -> !isBroken
+            Action.Hand              -> isBroken
             else                     -> false
         }
     }
@@ -46,10 +48,26 @@ class EntityVendingMachine : BaseEntity("entity VendingMachine")
             }
             Action.Coin ->
             {
-                if (screenGame.coinCount > 0)
+                if (!isBroken)
                 {
-                    screenGame.coinCount--
+                    if (screenGame.coinCount > 0)
+                    {
+                        screenGame.coinCount--
 
+                        screenGame.pickaxeCount++
+                        screenGame.bombCount++
+                        screenGame.cellCount++
+                    }
+                }
+            }
+            Action.Cell ->
+            {
+                isBroken = true
+            }
+            Action.Hand ->
+            {
+                if (isBroken)
+                {
                     screenGame.pickaxeCount++
                     screenGame.bombCount++
                     screenGame.cellCount++

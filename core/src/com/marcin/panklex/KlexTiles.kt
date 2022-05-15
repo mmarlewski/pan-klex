@@ -45,10 +45,12 @@ class KlexTiles(assetManager : AssetManager)
 
     val player = StaticTiledMapTile(TextureRegion(assetManager.get<Texture>("graphics/entities/player.png")))
     val container = StaticTiledMapTile(TextureRegion(assetManager.get<Texture>("graphics/entities/container.png")))
-    val vendingMachine =
-        StaticTiledMapTile(TextureRegion(assetManager.get<Texture>("graphics/entities/vendingMachine.png")))
     val elevator = StaticTiledMapTile(TextureRegion(assetManager.get<Texture>("graphics/entities/elevator.png")))
     val flag = StaticTiledMapTile(TextureRegion(assetManager.get<Texture>("graphics/entities/flag.png")))
+
+    val vendingMachine = TextureRegion(assetManager.get<Texture>("graphics/entities/vendingMachine.png")).split(32, 64)
+    val vendingMachine_unbroken = StaticTiledMapTile(vendingMachine[0][0])
+    val vendingMachine_broken = StaticTiledMapTile(vendingMachine[0][1])
 
     val teleporter = TextureRegion(assetManager.get<Texture>("graphics/entities/teleporter.png")).split(32, 64)
     val teleporter_unpow_unpow = StaticTiledMapTile(teleporter[0][0])

@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.maps.tiled.TiledMapTile
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
@@ -15,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
+import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.ScreenUtils
 import com.badlogic.gdx.utils.viewport.ScreenViewport
@@ -41,8 +41,10 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
     val heartImage3 = Image(game.assetManager.get<Texture>("graphics/hud/heart.png"))
     val heartImage4 = Image(game.assetManager.get<Texture>("graphics/hud/heart.png"))
 
-    val currentBlockLabel = Label("undam stone", Label.LabelStyle(BitmapFont(), Color.CYAN))
-    val currentLevelLabel = Label("level: 0", Label.LabelStyle(BitmapFont(), Color.GREEN))
+    val currentBlockLabel =
+        Label("undam stone", Label.LabelStyle(BitmapFont(), Color.CYAN)).apply { setAlignment(Align.center) }
+    val currentLevelLabel =
+        Label("level: 0", Label.LabelStyle(BitmapFont(), Color.GREEN)).apply { setAlignment(Align.center) }
     val upButton = TextButton("Up", TextButton.TextButtonStyle(null, null, null, BitmapFont()))
     val downButton = TextButton("Down", TextButton.TextButtonStyle(null, null, null, BitmapFont()))
 
@@ -92,10 +94,10 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
     )
     val cancelButton = ImageButton(TextureRegionDrawable(cancelImage))
 
-    val pickaxeLabel = Label("0", Label.LabelStyle(BitmapFont(), Color.YELLOW))
-    val bombLabel = Label("0", Label.LabelStyle(BitmapFont(), Color.YELLOW))
-    val coinLabel = Label("0", Label.LabelStyle(BitmapFont(), Color.YELLOW))
-    val cellLabel = Label("0", Label.LabelStyle(BitmapFont(), Color.YELLOW))
+    val pickaxeLabel = Label("0", Label.LabelStyle(BitmapFont(), Color.YELLOW)).apply { setAlignment(Align.center) }
+    val bombLabel = Label("0", Label.LabelStyle(BitmapFont(), Color.YELLOW)).apply { setAlignment(Align.center) }
+    val coinLabel = Label("0", Label.LabelStyle(BitmapFont(), Color.YELLOW)).apply { setAlignment(Align.center) }
+    val cellLabel = Label("0", Label.LabelStyle(BitmapFont(), Color.YELLOW)).apply { setAlignment(Align.center) }
 
     // other
 
@@ -125,7 +127,6 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
             {
                 changeLevel(currentLevel + 1)
                 refreshCurrentLevel()
-                refreshLevel()
                 refreshMap()
             }
         })
@@ -135,7 +136,6 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
             {
                 changeLevel(currentLevel - 1)
                 refreshCurrentLevel()
-                refreshLevel()
                 refreshMap()
             }
         })
@@ -199,29 +199,30 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
         val table = Table()
         table.top()
         table.setFillParent(true)
-        table.add(heartImage1).pad(10f)
-        table.add(heartImage2).pad(10f)
-        table.add(heartImage3).pad(10f)
-        table.add(heartImage4).pad(10f)
+        table.defaults().width(64f).pad(10f)
+        table.add(heartImage1).width(32f)
+        table.add(heartImage2).width(32f)
+        table.add(heartImage3).width(32f)
+        table.add(heartImage4).width(32f)
         table.row()
-        table.add(currentBlockLabel).pad(10f)
-        table.add(currentLevelLabel).pad(10f)
-        table.add(upButton).pad(10f)
-        table.add(downButton).pad(10f)
+        table.add(currentBlockLabel)
+        table.add(currentLevelLabel)
+        table.add(upButton)
+        table.add(downButton)
         table.row()
-        table.add(pickaxeButton).pad(10f)
-        table.add(bombButton).pad(10f)
-        table.add(coinButton).pad(10f)
-        table.add(cellButton).pad(10f)
+        table.add(pickaxeButton)
+        table.add(bombButton)
+        table.add(coinButton)
+        table.add(cellButton)
         table.row()
-        table.add(pickaxeLabel).pad(10f)
-        table.add(bombLabel).pad(10f)
-        table.add(coinLabel).pad(10f)
-        table.add(cellLabel).pad(10f)
+        table.add(pickaxeLabel)
+        table.add(bombLabel)
+        table.add(coinLabel)
+        table.add(cellLabel)
         table.row()
-        table.add(handButton).pad(10f)
-        table.add(walkButton).pad(10f)
-        table.add(cancelButton).pad(10f)
+        table.add(handButton)
+        table.add(walkButton)
+        table.add(cancelButton)
         stage.addActor(table)
 
         // other
@@ -232,7 +233,8 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
         changeBlock(Block.UndamagedStone)
         changeLevel(0)
         changeAction(Action.None)
-        refreshLevel()
+        refreshEntities()
+        refreshDepths()
         refreshMap()
         refreshHearts()
         refreshCurrentBlock()
@@ -241,6 +243,8 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
         refreshEquipment()
         showPlayerOnMap()
         mapCamera.zoom = 0.5f
+        mapCamera.position.x = map.width / 2f
+        mapCamera.position.y = map.height / 2f
     }
 
     fun gameLoop()
@@ -328,10 +332,7 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
                             }
                         }
                     }
-                    Action.Walk    ->
-                    {
-                        pathFinding.isBlockTraversable(mapMouseBlock)
-                    }
+                    Action.Walk    -> !mapMouseBlockUp!!.isRock()
                     else           -> false
                 }
             }
@@ -404,16 +405,48 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
                                     changeAction(Action.None)
                                     refreshActions()
                                 }
+
+                                refreshDepths()
+
+                                if (mapMousePosition.x == playerPosition.x && mapMousePosition.y == playerPosition.y && !mapMouseBlock.isRock())
+                                {
+                                    changePlayerPosition(
+                                        Vector3(
+                                            mapMousePosition.x,
+                                            mapMousePosition.y,
+                                            (currentLevel - mapMouseBlock.depth).toFloat()
+                                        )
+                                    )
+
+                                    changeLevel(currentLevel - mapMouseBlock.depth)
+                                    changeHearts(-mapMouseBlock.depth)
+                                }
                             }
                             Action.Walk    ->
                             {
-                                changePlayerPosition(
-                                    Vector3(
-                                        mapMousePosition.x,
-                                        mapMousePosition.y,
-                                        currentLevel.toFloat()
+                                if (mapMouseBlock.isRock())
+                                {
+                                    changePlayerPosition(
+                                        Vector3(
+                                            mapMousePosition.x,
+                                            mapMousePosition.y,
+                                            currentLevel.toFloat()
+                                        )
                                     )
-                                )
+                                }
+                                else
+                                {
+                                    changePlayerPosition(
+                                        Vector3(
+                                            mapMousePosition.x,
+                                            mapMousePosition.y,
+                                            (currentLevel - mapMouseBlock.depth).toFloat()
+                                        )
+                                    )
+
+                                    changeLevel(currentLevel - mapMouseBlock.depth)
+                                    changeHearts(-mapMouseBlock.depth)
+                                }
                             }
                             else           ->
                             {
@@ -422,7 +455,8 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
                     }
                 }
 
-                refreshLevel()
+                refreshEntities()
+                refreshDepths()
                 refreshMap()
                 refreshHearts()
                 refreshCurrentBlock()
@@ -529,10 +563,8 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
         level.entities.addAll(jsonLevel.entities)
     }
 
-    fun refreshLevel()
+    fun refreshEntities()
     {
-        // clear
-
         for (i in 0 until level.width)
         {
             for (j in 0 until level.height)
@@ -541,13 +573,29 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
             }
         }
 
-        // new
-
         for (e in level.entities)
         {
             for (p in e.getPositions())
             {
                 level.map[p.z.toInt()][p.y.toInt()][p.x.toInt()].entity = e
+            }
+        }
+    }
+
+    fun refreshDepths()
+    {
+        for (i in 0 until level.width)
+        {
+            for (j in 0 until level.height)
+            {
+                var depth = 0
+
+                for (k in currentLevel - 1 downTo 0)
+                {
+                    if (!level.map[currentLevel][j][i].isRock()) depth++
+                }
+
+                level.map[currentLevel][j][i].depth = depth
             }
         }
     }
@@ -657,9 +705,6 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
     override fun show()
     {
         super.show()
-
-        mapCamera.position.x = map.width / 2f
-        mapCamera.position.y = map.height / 2f
     }
 
     override fun render(delta : Float)
