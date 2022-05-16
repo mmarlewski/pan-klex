@@ -324,15 +324,15 @@ class KlexTiles(assetManager : AssetManager)
     val brickBase_ul_u_ur_r_dr_d_dl_l = StaticTiledMapTile(brick[3][10])
     val brickBase_none = StaticTiledMapTile(brick[2][11])
 
-    val brickWall_l_m_r = StaticTiledMapTile(brick[4][2])
-    val brickWall_l_m = StaticTiledMapTile(brick[4][3])
-    val brickWall_m = StaticTiledMapTile(brick[4][0])
-    val brickWall_m_r = StaticTiledMapTile(brick[4][1])
+    val brickWall_l_m_r = StaticTiledMapTile(brick[4][0])
+    val brickWall_l_m = StaticTiledMapTile(brick[4][1])
+    val brickWall_m = StaticTiledMapTile(brick[4][2])
+    val brickWall_m_r = StaticTiledMapTile(brick[4][3])
 
-    val brickHole_l_m_r = StaticTiledMapTile(brick[4][6])
-    val brickHole_l_m = StaticTiledMapTile(brick[4][7])
-    val brickHole_m = StaticTiledMapTile(brick[4][4])
-    val brickHole_m_r = StaticTiledMapTile(brick[4][5])
+    val brickHole_l_m_r = StaticTiledMapTile(brick[4][4])
+    val brickHole_l_m = StaticTiledMapTile(brick[4][5])
+    val brickHole_m = StaticTiledMapTile(brick[4][6])
+    val brickHole_m_r = StaticTiledMapTile(brick[4][7])
 
     // metal
 

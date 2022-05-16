@@ -22,6 +22,7 @@ class JsonLevel
     var width = 0
     var height = 0
     var map = arrayOf<Array<Array<Int>>>()
+    var playerPosition = Vector3()
     var entities = listOf<BaseEntity>()
 }
 

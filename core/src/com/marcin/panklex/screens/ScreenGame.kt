@@ -106,12 +106,12 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
     var currentLevel = 0
     var currentAction = Action.None
 
-    var playerPosition = Vector3(1f, 3f, 0f)
+    var playerPosition = Vector3()
 
-    var pickaxeCount = 300
-    var bombCount = 3
-    var coinCount = 3
-    var cellCount = 3
+    var pickaxeCount = 0
+    var bombCount = 0
+    var coinCount = 0
+    var cellCount = 0
 
     var isDragging = false
     var dragOrigin = Vector2()
@@ -227,11 +227,11 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
 
         // other
 
-        loadLevelFromJson("levels/3.json")
+        loadLevelFromJson("levels/2.json")
         pathFinding.setUpMap()
         changeHearts(4)
         changeBlock(Block.UndamagedStone)
-        changeLevel(0)
+        changeLevel(playerPosition.z.toInt())
         changeAction(Action.None)
         refreshEntities()
         refreshDepths()
@@ -524,6 +524,8 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
         level.width = jsonLevel.width
         level.height = jsonLevel.height
 
+        playerPosition = jsonLevel.playerPosition
+
         val levelList = mutableListOf<List<List<LevelBlock>>>()
 
         for (i in 0 until level.levels)
@@ -540,7 +542,7 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
                     levelBlock.position.x = k.toFloat()
                     levelBlock.position.y = j.toFloat()
                     levelBlock.position.z = i.toFloat()
-                    levelBlock.rock = when (jsonLevel.map[i][j][k])
+                    levelBlock.rock = when (jsonLevel.map[i][level.height - j - 1][k])
                     {
                         0    -> Block.Empty
                         1    -> Block.UndamagedStone
@@ -584,18 +586,21 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
 
     fun refreshDepths()
     {
-        for (i in 0 until level.width)
+        for (i in 0 until level.levels)
         {
             for (j in 0 until level.height)
             {
-                var depth = 0
-
-                for (k in currentLevel - 1 downTo 0)
+                for (k in 0 until level.width)
                 {
-                    if (!level.map[currentLevel][j][i].isRock()) depth++
-                }
+                    var depth = 0
 
-                level.map[currentLevel][j][i].depth = depth
+                    for (l in i - 1 downTo 0)
+                    {
+                        if (!level.map[i-l][j][k].isRock()) depth++
+                    }
+
+                    level.map[i][j][k].depth = depth
+                }
             }
         }
     }

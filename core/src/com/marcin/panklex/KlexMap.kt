@@ -30,10 +30,10 @@ class KlexMap(val maxMapWidth : Int, val maxMapHeight : Int, val tileWidth : Int
             TiledMapTileLayer(maxMapWidth, maxMapHeight, tileWidth, tileHeight).apply { name = MapLayer.Wall.name }
         val entityLayer =
             TiledMapTileLayer(maxMapWidth, maxMapHeight, tileWidth, tileHeight).apply { name = MapLayer.Entity.name }
-        val coverLayer =
-            TiledMapTileLayer(maxMapWidth, maxMapHeight, tileWidth, tileHeight).apply { name = MapLayer.Cover.name }
         val playerLayer =
             TiledMapTileLayer(maxMapWidth, maxMapHeight, tileWidth, tileHeight).apply { name = MapLayer.Player.name }
+        val coverLayer =
+            TiledMapTileLayer(maxMapWidth, maxMapHeight, tileWidth, tileHeight).apply { name = MapLayer.Cover.name }
         val actionLayer =
             TiledMapTileLayer(maxMapWidth, maxMapHeight, tileWidth, tileHeight).apply { name = MapLayer.Action.name }
 
@@ -47,8 +47,8 @@ class KlexMap(val maxMapWidth : Int, val maxMapHeight : Int, val tileWidth : Int
                 val blockCell = TiledMapTileLayer.Cell()
                 val wallCell = TiledMapTileLayer.Cell()
                 val entityCell = TiledMapTileLayer.Cell()
-                val coverCell = TiledMapTileLayer.Cell()
                 val playerCell = TiledMapTileLayer.Cell()
+                val coverCell = TiledMapTileLayer.Cell()
                 val actionCell = TiledMapTileLayer.Cell()
 
                 pitLayer.setCell(i, j, pitCell)
@@ -57,8 +57,8 @@ class KlexMap(val maxMapWidth : Int, val maxMapHeight : Int, val tileWidth : Int
                 blockLayer.setCell(i, j, blockCell)
                 wallLayer.setCell(i, j, wallCell)
                 entityLayer.setCell(i, j, entityCell)
-                coverLayer.setCell(i, j, coverCell)
                 playerLayer.setCell(i, j, playerCell)
+                coverLayer.setCell(i, j, coverCell)
                 actionLayer.setCell(i, j, actionCell)
             }
         }
@@ -69,8 +69,8 @@ class KlexMap(val maxMapWidth : Int, val maxMapHeight : Int, val tileWidth : Int
         map.layers.add(blockLayer)
         map.layers.add(wallLayer)
         map.layers.add(entityLayer)
-        map.layers.add(coverLayer)
         map.layers.add(playerLayer)
+        map.layers.add(coverLayer)
         map.layers.add(actionLayer)
     }
 
