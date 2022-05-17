@@ -44,6 +44,7 @@ class EntityVendingMachine : BaseEntity("entity VendingMachine")
             Action.Bomb ->
             {
                 screenGame.level.entities.remove(this)
+                screenGame.bombCount--
             }
             Action.Cell ->
             {

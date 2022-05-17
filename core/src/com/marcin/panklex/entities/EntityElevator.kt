@@ -52,6 +52,8 @@ class EntityElevator : BaseEntity("entity Elevator")
                 elevatorPositions.removeAt(index)
                 exitPositions.removeAt(index)
                 floorNames.removeAt(index)
+
+                screenGame.bombCount--
             }
             Action.Hand ->
             {

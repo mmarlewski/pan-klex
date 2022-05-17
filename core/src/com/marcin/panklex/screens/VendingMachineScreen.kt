@@ -126,21 +126,22 @@ class VendingMachineScreen(val name : String, val game : PanKlexGame) : BaseScre
 
         val table = Table()
         table.center().setFillParent(true)
-        table.add(containerLabel).pad(10f)
-        table.add(coinLabel).pad(10f)
-        table.add(cancelButton).pad(10f)
+        table.defaults().pad(10f)
+        table.add(containerLabel)
+        table.add(coinLabel)
+        table.add(cancelButton)
         table.row()
-        table.add(pickaxeImage).pad(10f)
-        table.add(pickaxeLabel).pad(10f)
-        table.add(pickaxeButton).pad(10f)
+        table.add(pickaxeImage)
+        table.add(pickaxeLabel)
+        table.add(pickaxeButton)
         table.row()
-        table.add(bombImage).pad(10f)
-        table.add(bombLabel).pad(10f)
-        table.add(bombButton).pad(10f)
+        table.add(bombImage)
+        table.add(bombLabel)
+        table.add(bombButton)
         table.row()
-        table.add(cellImage).pad(10f)
-        table.add(cellLabel).pad(10f)
-        table.add(cellButton).pad(10f)
+        table.add(cellImage)
+        table.add(cellLabel)
+        table.add(cellButton)
         table.row()
         stage.addActor(table)
     }
@@ -148,6 +149,8 @@ class VendingMachineScreen(val name : String, val game : PanKlexGame) : BaseScre
     override fun show()
     {
         super.show()
+
+        game.changeInputProcessor(stage)
 
         containerLabel.setText(
             if (vendingMachineEntity!!.isBroken)

@@ -39,6 +39,13 @@ class ScreenMainMenu(val name : String, val game : PanKlexGame) : BaseScreen(nam
         stage.addActor(table)
     }
 
+    override fun show()
+    {
+        super.show()
+
+        game.changeInputProcessor(stage)
+    }
+
     override fun render(delta : Float)
     {
         super.render(delta)

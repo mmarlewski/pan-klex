@@ -3,12 +3,13 @@ package com.marcin.panklex
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 
 abstract class BaseScreen(val baseName : String, val baseGame : PanKlexGame) : Screen
 {
     val camera = OrthographicCamera()
-    val viewport = ScreenViewport(camera)
+    val viewport = FitViewport(1080f, 720f, camera)
     val stage by lazy { Stage(viewport, baseGame.batch) }
 
     override fun show()

@@ -43,6 +43,7 @@ class EntityContainer : BaseEntity("entity Container")
             Action.Bomb ->
             {
                 screenGame.level.entities.remove(this)
+                screenGame.bombCount--
             }
             Action.Hand ->
             {

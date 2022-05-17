@@ -242,14 +242,14 @@
                 "y": 4,
                 "z": 5
             },
-            "firstPartDirection": "Up",
+            "firstPartDirection": "Right",
             "isFirstPartPowered": true,
             "secondPartPosition": {
                 "x": 8,
                 "y": 4,
                 "z": 5
             },
-            "secondPartDirection": "Down",
+            "secondPartDirection": "Left",
             "isSecondPartPowered": true,
             "gatePosition": {
                 "x": 7,
@@ -361,7 +361,7 @@
                 "z": 1
             },
             "pickaxes": 1,
-            "bombs": 0,
+            "bombs": 1,
             "cells": 1,
             "coins": 5
         },
@@ -374,8 +374,8 @@
             },
             "isBroken": false,
             "pickaxes": 5,
-            "bombs": 0,
-            "cells": 0
+            "bombs": 1,
+            "cells": 1
         }
 	]
 }

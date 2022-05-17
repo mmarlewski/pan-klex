@@ -45,6 +45,7 @@ class EntityTeleporter : BaseEntity("entity Teleporter")
             Action.Bomb ->
             {
                 screenGame.level.entities.remove(this)
+                screenGame.bombCount--
             }
             Action.Cell ->
             {

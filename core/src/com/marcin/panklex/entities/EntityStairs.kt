@@ -45,6 +45,7 @@ class EntityStairs : BaseEntity("entity Stairs")
                 if (position == stairsPosition)
                 {
                     screenGame.level.entities.remove(this)
+                    screenGame.bombCount--
                 }
             }
             Action.Walk ->

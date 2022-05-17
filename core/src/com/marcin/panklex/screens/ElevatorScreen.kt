@@ -93,29 +93,32 @@ class ElevatorScreen(val name : String, val game : PanKlexGame) : BaseScreen(nam
 
         val table = Table()
         table.center().setFillParent(true)
-        table.add(elevatorLabel).pad(10f)
-        table.add(cancelButton).pad(10f)
+        table.defaults().pad(10f)
+        table.add(elevatorLabel)
+        table.add(cancelButton)
         table.row()
-        table.add(floor1Label).pad(10f)
-        table.add(floor1button).pad(10f)
+        table.add(floor1Label)
+        table.add(floor1button)
         table.row()
-        table.add(floor2Label).pad(10f)
-        table.add(floor2button).pad(10f)
+        table.add(floor2Label)
+        table.add(floor2button)
         table.row()
-        table.add(floor3Label).pad(10f)
-        table.add(floor3button).pad(10f)
+        table.add(floor3Label)
+        table.add(floor3button)
         table.row()
-        table.add(floor4Label).pad(10f)
-        table.add(floor4button).pad(10f)
+        table.add(floor4Label)
+        table.add(floor4button)
         table.row()
-        table.add(floor5Label).pad(10f)
-        table.add(floor5button).pad(10f)
+        table.add(floor5Label)
+        table.add(floor5button)
         stage.addActor(table)
     }
 
     override fun show()
     {
         super.show()
+
+        game.changeInputProcessor(stage)
 
         floor1Label.isVisible = false
         floor1button.isVisible = false

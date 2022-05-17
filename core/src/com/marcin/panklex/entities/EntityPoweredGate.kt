@@ -74,10 +74,12 @@ class EntityPoweredGate : BaseEntity("entity PoweredGate")
                     {
                         isFirstPartPowered = false
                         isSecondPartPowered = false
+                        screenGame.bombCount--
                     }
                     else         ->
                     {
                         screenGame.level.entities.remove(this)
+                        screenGame.bombCount--
                     }
                 }
             }

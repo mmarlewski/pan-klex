@@ -37,6 +37,13 @@ class ScreenEndGame(val name : String, val game : PanKlexGame) : BaseScreen(name
         stage.addActor(table)
     }
 
+    override fun show()
+    {
+        super.show()
+
+        game.changeInputProcessor(stage)
+    }
+
     override fun render(delta : Float)
     {
         super.render(delta)

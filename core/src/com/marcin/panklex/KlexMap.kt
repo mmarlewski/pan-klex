@@ -4,8 +4,9 @@ import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TiledMapTile
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
+import com.badlogic.gdx.utils.Disposable
 
-class KlexMap(val maxMapWidth : Int, val maxMapHeight : Int, val tileWidth : Int, val tileHeight : Int)
+class KlexMap(val maxMapWidth : Int, val maxMapHeight : Int, val tileWidth : Int, val tileHeight : Int) : Disposable
 {
     val map = TiledMap()
     val renderer = OrthogonalTiledMapRenderer(map, 1f)
@@ -34,8 +35,6 @@ class KlexMap(val maxMapWidth : Int, val maxMapHeight : Int, val tileWidth : Int
             TiledMapTileLayer(maxMapWidth, maxMapHeight, tileWidth, tileHeight).apply { name = MapLayer.Player.name }
         val coverLayer =
             TiledMapTileLayer(maxMapWidth, maxMapHeight, tileWidth, tileHeight).apply { name = MapLayer.Cover.name }
-        val actionLayer =
-            TiledMapTileLayer(maxMapWidth, maxMapHeight, tileWidth, tileHeight).apply { name = MapLayer.Action.name }
 
         for (i in 0 until maxMapWidth)
         {
@@ -49,7 +48,6 @@ class KlexMap(val maxMapWidth : Int, val maxMapHeight : Int, val tileWidth : Int
                 val entityCell = TiledMapTileLayer.Cell()
                 val playerCell = TiledMapTileLayer.Cell()
                 val coverCell = TiledMapTileLayer.Cell()
-                val actionCell = TiledMapTileLayer.Cell()
 
                 pitLayer.setCell(i, j, pitCell)
                 holeLayer.setCell(i, j, holeCell)
@@ -59,7 +57,6 @@ class KlexMap(val maxMapWidth : Int, val maxMapHeight : Int, val tileWidth : Int
                 entityLayer.setCell(i, j, entityCell)
                 playerLayer.setCell(i, j, playerCell)
                 coverLayer.setCell(i, j, coverCell)
-                actionLayer.setCell(i, j, actionCell)
             }
         }
 
@@ -71,7 +68,6 @@ class KlexMap(val maxMapWidth : Int, val maxMapHeight : Int, val tileWidth : Int
         map.layers.add(entityLayer)
         map.layers.add(playerLayer)
         map.layers.add(coverLayer)
-        map.layers.add(actionLayer)
     }
 
     fun setDimensions(width : Int, height : Int)
@@ -94,5 +90,11 @@ class KlexMap(val maxMapWidth : Int, val maxMapHeight : Int, val tileWidth : Int
                 (map.layers[layer.name] as TiledMapTileLayer).getCell(i, j).tile = null
             }
         }
+    }
+
+    override fun dispose()
+    {
+        map.dispose()
+        renderer.dispose()
     }
 }

@@ -2,6 +2,7 @@ package com.marcin.panklex
 
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -29,9 +30,13 @@ class PanKlexGame : Game()
         Gdx.app.log(tag, message)
     }
 
+    fun changeInputProcessor(inputProcessor : InputProcessor)
+    {
+        Gdx.input.inputProcessor = inputProcessor
+    }
+
     fun changeScreen(screen : BaseScreen)
     {
-        Gdx.input.inputProcessor = screen.stage
         setScreen(screen)
     }
 

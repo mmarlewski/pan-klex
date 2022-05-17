@@ -39,6 +39,7 @@ class EntityFlag : BaseEntity("entity Flag")
             Action.Bomb ->
             {
                 screenGame.level.entities.remove(this)
+                screenGame.bombCount--
             }
             Action.Walk ->
             {
