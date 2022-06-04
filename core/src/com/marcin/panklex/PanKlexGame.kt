@@ -37,7 +37,7 @@ class PanKlexGame : Game()
 
     fun loadAssets()
     {
-        //assetManager.load("graphics/hud/heart.png", Texture::class.java)
+        assetManager.load("iso.png", Texture::class.java)
 
         assetManager.finishLoading()
     }
