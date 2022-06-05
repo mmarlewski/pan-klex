@@ -5,7 +5,7 @@ enum class MapDirection
     Up, Right, Down, Left
 }
 
-enum class Block
+enum class BlockType
 {
     Empty, UndamagedStone, DamagedStone, Brick, Metal
 }
