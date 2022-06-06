@@ -40,13 +40,13 @@ class KlexLevel
         {
             val floor = mutableListOf<List<KlexBlock>>()
 
-            for (j in jsonLevel.height - 1 downTo 0)
+            for (j in height - 1 downTo 0)
             {
                 val row = mutableListOf<KlexBlock>()
 
                 for (i in 0 until width)
                 {
-                    val block = KlexBlock(i, j, k)
+                    val block = KlexBlock(Vector3(i.toFloat(), (height - j - 1).toFloat(), k.toFloat()))
 
                     block.type = if (jsonLevel.blocks[k][j][i] == 1) BlockType.Brick
                     else BlockType.Empty
@@ -66,5 +66,40 @@ class KlexLevel
         return if (xLevel in 0 until width && yLevel in 0 until height && zLevel in 0 until floors)
             blocks[zLevel][yLevel][xLevel]
         else null
+    }
+
+    fun getBlock(levelPosition : Vector3) : KlexBlock?
+    {
+        return getBlock(levelPosition.x.toInt(), levelPosition.y.toInt(), levelPosition.z.toInt())
+    }
+
+    fun getBlockRight(levelPosition : Vector3) : KlexBlock?
+    {
+        return getBlock(levelPosition.x.toInt() + 1, levelPosition.y.toInt(), levelPosition.z.toInt())
+    }
+
+    fun getBlockLeft(levelPosition : Vector3) : KlexBlock?
+    {
+        return getBlock(levelPosition.x.toInt() - 1, levelPosition.y.toInt(), levelPosition.z.toInt())
+    }
+
+    fun getBlockUp(levelPosition : Vector3) : KlexBlock?
+    {
+        return getBlock(levelPosition.x.toInt(), levelPosition.y.toInt() + 1, levelPosition.z.toInt())
+    }
+
+    fun getBlockDown(levelPosition : Vector3) : KlexBlock?
+    {
+        return getBlock(levelPosition.x.toInt(), levelPosition.y.toInt() - 1, levelPosition.z.toInt())
+    }
+
+    fun getBlockAbove(levelPosition : Vector3) : KlexBlock?
+    {
+        return getBlock(levelPosition.x.toInt(), levelPosition.y.toInt(), levelPosition.z.toInt() + 1)
+    }
+
+    fun getBlockBelow(levelPosition : Vector3) : KlexBlock?
+    {
+        return getBlock(levelPosition.x.toInt(), levelPosition.y.toInt(), levelPosition.z.toInt() - 1)
     }
 }

@@ -77,8 +77,8 @@ class KlexMap(val room : KlexRoom, val tiles : KlexTiles)
 
                     cell.tile = if (block != null)
                     {
-                        if (block.type != BlockType.Empty) tiles.blockUnselected
-                        else null
+                        if (block.isBorder) tiles.emptyUnselected
+                        else tiles.blockUnselected
                     }
                     else null
                 }
@@ -154,12 +154,14 @@ class KlexMap(val room : KlexRoom, val tiles : KlexTiles)
 
         getRoomPosition(selectMapPosition, selectRoomPosition)
 
+        //Gdx.app.log("map", "x ${selectMapPosition.x} y ${selectMapPosition.y} z ${selectMapPosition.z}")
+
         val block = room.getBlock(selectRoomPosition)
 
         cell.tile = if (block != null)
         {
-            if (block.type != BlockType.Empty) tiles.blockSelected
-            else null
+            if (block.isBorder) tiles.emptySelected
+            else tiles.blockSelected
         }
         else null
     }

@@ -1,6 +1,8 @@
 package com.marcin.panklex
 
-class KlexBlock(val x : Int, val y : Int, val z : Int)
+import com.badlogic.gdx.math.Vector3
+
+class KlexBlock(val position : Vector3)
 {
     var type = BlockType.Empty
 

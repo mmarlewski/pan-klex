@@ -1,13 +1,11 @@
 package com.marcin.panklex.screens
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.BitmapFont
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.scenes.scene2d.InputEvent
@@ -88,7 +86,7 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
         // init
 
         level.createLevel("level.json")
-        room.updateRoom(level.positions[0])
+        room.updateRoom(level.positions[1])
         map.createMap()
         map.updateMap()
         changeFloor(9)

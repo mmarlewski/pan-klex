@@ -4,66 +4,136 @@ import com.badlogic.gdx.math.Vector3
 
 class KlexRoom(val level : KlexLevel)
 {
+    var isRoom = false
     var xStart = 0
+    var xEnd = 0
     var width = 0
     var yStart = 0
+    var yEnd = 0
     var height = 0
     var zStart = 0
+    var zEnd = 0
     var floors = 0
     var blocks = mutableListOf<List<List<KlexBlock?>>>()
 
+    fun checkCoordinates(position : Vector3)
+    {
+        if (position.x < xStart) xStart = position.x.toInt()
+        if (position.x > xEnd) xEnd = position.x.toInt()
+        if (position.y < yStart) yStart = position.y.toInt()
+        if (position.y > yEnd) yEnd = position.y.toInt()
+        if (position.z < zStart) zStart = position.z.toInt()
+        if (position.z > zEnd) zEnd = position.z.toInt()
+    }
+
+    fun checkBlock(block : KlexBlock, queue : MutableList<KlexBlock>, checked : MutableSet<KlexBlock>)
+    {
+        if (block !in queue && block !in checked) queue.add(block)
+    }
+
     fun updateRoom(levelPosition : Vector3)
     {
-        xStart = 1
-        width = 8
-        yStart = 2
-        height = 7
-        zStart = 1
-        floors = 5
-
+        xStart = 0
+        xEnd = 0
+        width = 0
+        yStart = 0
+        yEnd = 0
+        height = 0
+        zStart = 0
+        zEnd = 0
+        floors = 0
         blocks.clear()
 
-        for (k in zStart..2)
+        val firstBlock = level.getBlock(levelPosition)
+
+        if (firstBlock == null || firstBlock.type != BlockType.Empty) isRoom = false
+        else
         {
-            val floor = mutableListOf<List<KlexBlock?>>()
+            isRoom = true
 
-            for (j in yStart until yStart + height)
+            xStart = firstBlock.position.x.toInt()
+            xEnd = firstBlock.position.x.toInt()
+            width = 0
+            yStart = firstBlock.position.y.toInt()
+            yEnd = firstBlock.position.y.toInt()
+            height = 0
+            zStart = firstBlock.position.z.toInt()
+            zEnd = firstBlock.position.z.toInt()
+            floors = 0
+
+            // gather all the blocks
+
+            val queue = mutableListOf<KlexBlock>()
+            val checked = mutableSetOf<KlexBlock>()
+
+            queue.add(firstBlock)
+
+            while (queue.isNotEmpty())
             {
-                val row = mutableListOf<KlexBlock?>()
+                val current = queue.last()
+                queue.remove(current)
+                checkCoordinates(current.position)
 
-                for (i in xStart..4)
+                if (current.type != BlockType.Empty) current.isBorder = true
+                else
                 {
-                    row.add(null)
+                    val blockRight = level.getBlockRight(current.position)
+                    val blockLeft = level.getBlockLeft(current.position)
+                    val blockUp = level.getBlockUp(current.position)
+                    val blockDown = level.getBlockDown(current.position)
+                    val blockAbove = level.getBlockAbove(current.position)
+                    val blockBelow = level.getBlockBelow(current.position)
+
+                    current.isBorder =
+                        blockRight == null || blockLeft == null || blockUp == null || blockDown == null || blockAbove == null || blockBelow == null
+
+                    if (blockRight != null) checkBlock(blockRight, queue, checked)
+                    if (blockLeft != null) checkBlock(blockLeft, queue, checked)
+                    if (blockUp != null) checkBlock(blockUp, queue, checked)
+                    if (blockDown != null) checkBlock(blockDown, queue, checked)
+                    if (blockAbove != null) checkBlock(blockAbove, queue, checked)
+                    if (blockBelow != null) checkBlock(blockBelow, queue, checked)
                 }
 
-                for (i in 5 until xStart + width)
-                {
-                    row.add(level.getBlock(i, j, k))
-                }
-
-                floor.add(row)
+                checked.add(current)
             }
 
-            blocks.add(floor)
-        }
+            // build room from the blocks
 
-        for (k in 3 until zStart + floors)
-        {
-            val floor = mutableListOf<List<KlexBlock?>>()
+            width = xEnd - xStart + 1
+            height = yEnd - yStart + 1
+            floors = zEnd - zStart + 1
 
-            for (j in yStart until yStart + height)
+            for (k in zStart..zEnd)
             {
-                val row = mutableListOf<KlexBlock?>()
+                val floor = mutableListOf<List<KlexBlock?>>()
 
-                for (i in xStart until xStart + width)
+                for (j in yStart..yEnd)
                 {
-                    row.add(level.getBlock(i, j, k))
+                    val row = mutableListOf<KlexBlock?>()
+
+                    for (i in xStart..xEnd)
+                    {
+                        var block : KlexBlock? = null
+
+                        for (b in checked)
+                        {
+                            if (b.position.x.toInt() == i && b.position.y.toInt() == j && b.position.z.toInt() == k)
+                            {
+                                block = b
+                                checked.remove(b)
+                                break
+                            }
+                        }
+
+                        row.add(block)
+                    }
+
+                    floor.add(row)
                 }
 
-                floor.add(row)
+                blocks.add(floor)
             }
-
-            blocks.add(floor)
         }
     }
 
