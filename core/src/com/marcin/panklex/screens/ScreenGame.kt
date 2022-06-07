@@ -52,9 +52,10 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
 
     // hud
 
-    val leftArrowButton = TextButton("<--", TextButton.TextButtonStyle(null, null, null, BitmapFont()))
+    val leftArrowButton = TextButton("<----", TextButton.TextButtonStyle(null, null, null, BitmapFont()))
+    val currentDirectionLabel = Label("Up", Label.LabelStyle(BitmapFont(), Color.CYAN))
     val currentFloorLabel = Label("floor", Label.LabelStyle(BitmapFont(), Color.GREEN))
-    val rightArrowButton = TextButton("-->", TextButton.TextButtonStyle(null, null, null, BitmapFont()))
+    val rightArrowButton = TextButton("---->", TextButton.TextButtonStyle(null, null, null, BitmapFont()))
 
     init
     {
@@ -65,6 +66,7 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
             override fun clicked(event : InputEvent?, x : Float, y : Float)
             {
                 map.changeMapDirectionLeft()
+                currentDirectionLabel.setText(map.direction.toString())
             }
         })
         rightArrowButton.addListener(object : ClickListener()
@@ -72,6 +74,7 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
             override fun clicked(event : InputEvent?, x : Float, y : Float)
             {
                 map.changeMapDirectionRight()
+                currentDirectionLabel.setText(map.direction.toString())
             }
         })
 
@@ -79,6 +82,7 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
         table.top().setFillParent(true)
         table.defaults().pad(10f)
         table.add(leftArrowButton)
+        table.add(currentDirectionLabel)
         table.add(currentFloorLabel)
         table.add(rightArrowButton)
         stage.addActor(table)

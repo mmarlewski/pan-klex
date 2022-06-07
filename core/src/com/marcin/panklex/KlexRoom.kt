@@ -16,21 +16,6 @@ class KlexRoom(val level : KlexLevel)
     var floors = 0
     var blocks = mutableListOf<List<List<KlexBlock?>>>()
 
-    fun checkCoordinates(position : Vector3)
-    {
-        if (position.x < xStart) xStart = position.x.toInt()
-        if (position.x > xEnd) xEnd = position.x.toInt()
-        if (position.y < yStart) yStart = position.y.toInt()
-        if (position.y > yEnd) yEnd = position.y.toInt()
-        if (position.z < zStart) zStart = position.z.toInt()
-        if (position.z > zEnd) zEnd = position.z.toInt()
-    }
-
-    fun checkBlock(block : KlexBlock, queue : MutableList<KlexBlock>, checked : MutableSet<KlexBlock>)
-    {
-        if (block !in queue && block !in checked) queue.add(block)
-    }
-
     fun updateRoom(levelPosition : Vector3)
     {
         xStart = 0
@@ -61,6 +46,8 @@ class KlexRoom(val level : KlexLevel)
             zEnd = firstBlock.position.z.toInt()
             floors = 0
 
+            level.clearBorders()
+
             // gather all the blocks
 
             val queue = mutableListOf<KlexBlock>()
@@ -72,9 +59,15 @@ class KlexRoom(val level : KlexLevel)
             {
                 val current = queue.last()
                 queue.remove(current)
-                checkCoordinates(current.position)
 
-                if (current.type != BlockType.Empty) current.isBorder = true
+                if (current.position.x < xStart) xStart = current.position.x.toInt()
+                if (current.position.x > xEnd) xEnd = current.position.x.toInt()
+                if (current.position.y < yStart) yStart = current.position.y.toInt()
+                if (current.position.y > yEnd) yEnd = current.position.y.toInt()
+                if (current.position.z < zStart) zStart = current.position.z.toInt()
+                if (current.position.z > zEnd) zEnd = current.position.z.toInt()
+
+                if (current.isNotEmpty()) current.isBorder = true
                 else
                 {
                     val blockRight = level.getBlockRight(current.position)
@@ -87,12 +80,54 @@ class KlexRoom(val level : KlexLevel)
                     current.isBorder =
                         blockRight == null || blockLeft == null || blockUp == null || blockDown == null || blockAbove == null || blockBelow == null
 
-                    if (blockRight != null) checkBlock(blockRight, queue, checked)
-                    if (blockLeft != null) checkBlock(blockLeft, queue, checked)
-                    if (blockUp != null) checkBlock(blockUp, queue, checked)
-                    if (blockDown != null) checkBlock(blockDown, queue, checked)
-                    if (blockAbove != null) checkBlock(blockAbove, queue, checked)
-                    if (blockBelow != null) checkBlock(blockBelow, queue, checked)
+                    if (blockRight == null) current.isBorderRight = true
+                    if (blockLeft == null) current.isBorderLeft = true
+                    if (blockUp == null) current.isBorderUp = true
+                    if (blockDown == null) current.isBorderDown = true
+                    if (blockAbove == null) current.isBorderAbove = true
+                    if (blockDown == null) current.isBorderDown = true
+
+                    if (blockRight != null)
+                    {
+                        if (blockRight.isNotEmpty()) blockRight.isBorderLeft = true
+
+                        if (blockRight !in queue && blockRight !in checked) queue.add(blockRight)
+                    }
+
+                    if (blockLeft != null)
+                    {
+                        if (blockLeft.isNotEmpty()) blockLeft.isBorderRight = true
+
+                        if (blockLeft !in queue && blockLeft !in checked) queue.add(blockLeft)
+                    }
+
+                    if (blockUp != null)
+                    {
+                        if (blockUp.isNotEmpty()) blockUp.isBorderDown = true
+
+                        if (blockUp !in queue && blockUp !in checked) queue.add(blockUp)
+                    }
+
+                    if (blockDown != null)
+                    {
+                        if (blockDown.isNotEmpty()) blockDown.isBorderUp = true
+
+                        if (blockDown !in queue && blockDown !in checked) queue.add(blockDown)
+                    }
+
+                    if (blockAbove != null)
+                    {
+                        if (blockAbove.isNotEmpty()) blockAbove.isBorderBelow = true
+
+                        if (blockAbove !in queue && blockAbove !in checked) queue.add(blockAbove)
+                    }
+
+                    if (blockBelow != null)
+                    {
+                        if (blockBelow.isNotEmpty()) blockBelow.isBorderAbove = true
+
+                        if (blockBelow !in queue && blockBelow !in checked) queue.add(blockBelow)
+                    }
                 }
 
                 checked.add(current)

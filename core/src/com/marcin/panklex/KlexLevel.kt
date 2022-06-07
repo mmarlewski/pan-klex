@@ -68,6 +68,20 @@ class KlexLevel
         else null
     }
 
+    fun clearBorders()
+    {
+        for (k in 0 until floors)
+        {
+            for (j in 0 until height)
+            {
+                for (i in 0 until width)
+                {
+                    getBlock(i, j, k)?.clearBorders()
+                }
+            }
+        }
+    }
+
     fun getBlock(levelPosition : Vector3) : KlexBlock?
     {
         return getBlock(levelPosition.x.toInt(), levelPosition.y.toInt(), levelPosition.z.toInt())

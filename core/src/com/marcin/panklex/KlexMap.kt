@@ -1,5 +1,6 @@
 package com.marcin.panklex
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.math.Vector3
@@ -77,8 +78,61 @@ class KlexMap(val room : KlexRoom, val tiles : KlexTiles)
 
                     cell.tile = if (block != null)
                     {
-                        if (block.isBorder) tiles.emptyUnselected
-                        else tiles.blockUnselected
+                        if (block.isNotEmpty())
+                        {
+                            if (block.isBorder)
+                            {
+                                when (direction)
+                                {
+                                    MapDirection.Up    -> when
+                                    {
+                                        block.isBorderAbove && block.isBorderDown && block.isBorderRight   -> tiles.borderAboveLeftRight
+                                        !block.isBorderAbove && block.isBorderDown && block.isBorderRight  -> tiles.borderLeftRight
+                                        block.isBorderAbove && !block.isBorderDown && block.isBorderRight  -> tiles.borderAboveRight
+                                        block.isBorderAbove && block.isBorderDown && !block.isBorderRight  -> tiles.borderAboveLeft
+                                        !block.isBorderAbove && !block.isBorderDown && block.isBorderRight -> tiles.borderRight
+                                        block.isBorderAbove && !block.isBorderDown && !block.isBorderRight -> tiles.borderAbove
+                                        !block.isBorderAbove && block.isBorderDown && !block.isBorderRight -> tiles.borderLeft
+                                        else                                                               -> null
+                                    }
+                                    MapDirection.Right -> when
+                                    {
+                                        block.isBorderAbove && block.isBorderRight && block.isBorderUp   -> tiles.borderAboveLeftRight
+                                        !block.isBorderAbove && block.isBorderRight && block.isBorderUp  -> tiles.borderLeftRight
+                                        block.isBorderAbove && !block.isBorderRight && block.isBorderUp  -> tiles.borderAboveRight
+                                        block.isBorderAbove && block.isBorderRight && !block.isBorderUp  -> tiles.borderAboveLeft
+                                        !block.isBorderAbove && !block.isBorderRight && block.isBorderUp -> tiles.borderRight
+                                        block.isBorderAbove && !block.isBorderRight && !block.isBorderUp -> tiles.borderAbove
+                                        !block.isBorderAbove && block.isBorderRight && !block.isBorderUp -> tiles.borderLeft
+                                        else                                                             -> null
+                                    }
+                                    MapDirection.Down  -> when
+                                    {
+                                        block.isBorderAbove && block.isBorderUp && block.isBorderLeft   -> tiles.borderAboveLeftRight
+                                        !block.isBorderAbove && block.isBorderUp && block.isBorderLeft  -> tiles.borderLeftRight
+                                        block.isBorderAbove && !block.isBorderUp && block.isBorderLeft  -> tiles.borderAboveRight
+                                        block.isBorderAbove && block.isBorderUp && !block.isBorderLeft  -> tiles.borderAboveLeft
+                                        !block.isBorderAbove && !block.isBorderUp && block.isBorderLeft -> tiles.borderRight
+                                        block.isBorderAbove && !block.isBorderUp && !block.isBorderLeft -> tiles.borderAbove
+                                        !block.isBorderAbove && block.isBorderUp && !block.isBorderLeft -> tiles.borderLeft
+                                        else                                                            -> null
+                                    }
+                                    MapDirection.Left  -> when
+                                    {
+                                        block.isBorderAbove && block.isBorderLeft && block.isBorderDown   -> tiles.borderAboveLeftRight
+                                        !block.isBorderAbove && block.isBorderLeft && block.isBorderDown  -> tiles.borderLeftRight
+                                        block.isBorderAbove && !block.isBorderLeft && block.isBorderDown  -> tiles.borderAboveRight
+                                        block.isBorderAbove && block.isBorderLeft && !block.isBorderDown  -> tiles.borderAboveLeft
+                                        !block.isBorderAbove && !block.isBorderLeft && block.isBorderDown -> tiles.borderRight
+                                        block.isBorderAbove && !block.isBorderLeft && !block.isBorderDown -> tiles.borderAbove
+                                        !block.isBorderAbove && block.isBorderLeft && !block.isBorderDown -> tiles.borderLeft
+                                        else                                                              -> null
+                                    }
+                                }
+                            }
+                            else tiles.blockUnselected
+                        }
+                        else null
                     }
                     else null
                 }
@@ -160,8 +214,8 @@ class KlexMap(val room : KlexRoom, val tiles : KlexTiles)
 
         cell.tile = if (block != null)
         {
-            if (block.isBorder) tiles.emptySelected
-            else tiles.blockSelected
+            if (block.isNotEmpty()) tiles.blockSelected
+            else null
         }
         else null
     }
