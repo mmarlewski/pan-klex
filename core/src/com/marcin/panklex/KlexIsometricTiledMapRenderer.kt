@@ -11,7 +11,8 @@ import com.badlogic.gdx.math.Vector3
 import kotlin.math.sqrt
 
 // i have no idea what im doing
-class KlexIsometricTiledMapRenderer(map : TiledMap, unitScale : Float) : BatchTiledMapRenderer(map, unitScale)
+class KlexIsometricTiledMapRenderer(map : TiledMap, unitScale : Float, val floor : Int) :
+    BatchTiledMapRenderer(map, unitScale)
 {
     private var isoTransform : Matrix4? = null
     private var invIsotransform : Matrix4? = null
@@ -62,16 +63,13 @@ class KlexIsometricTiledMapRenderer(map : TiledMap, unitScale : Float) : BatchTi
         val col1 = (translateScreenToIso(bottomLeft).x / tileWidth).toInt() - 2
         val col2 = (translateScreenToIso(topRight).x / tileWidth).toInt() + 2
 
-        // added by me
-        val layerIndex = layer.name.toInt()
-
         for (row in row2 downTo row1)
         {
             for (col in col1..col2)
             {
                 val x = col * halfTileWidth + row * halfTileWidth
-                // edited by me
-                val y = row * halfTileHeight - col * halfTileHeight + layerIndex * tileHeight
+                // changed by me
+                val y = row * halfTileHeight - col * halfTileHeight + floor * tileHeight
                 val cell = layer.getCell(col, row) ?: continue
                 val tile = cell.tile
                 if (tile != null)
@@ -173,7 +171,7 @@ class KlexIsometricTiledMapRenderer(map : TiledMap, unitScale : Float) : BatchTi
                             }
                         }
                     }
-                    batch.draw(region.texture, vertices, 0, BatchTiledMapRenderer.NUM_VERTICES)
+                    batch.draw(region.texture, vertices, 0, NUM_VERTICES)
                 }
             }
         }

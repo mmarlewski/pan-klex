@@ -61,13 +61,6 @@ class KlexLevel
         }
     }
 
-    fun getBlock(xLevel : Int, yLevel : Int, zLevel : Int) : KlexBlock?
-    {
-        return if (xLevel in 0 until width && yLevel in 0 until height && zLevel in 0 until floors)
-            blocks[zLevel][yLevel][xLevel]
-        else null
-    }
-
     fun clearBorders()
     {
         for (k in 0 until floors)
@@ -82,38 +75,28 @@ class KlexLevel
         }
     }
 
+    fun getBlock(xLevel : Int, yLevel : Int, zLevel : Int) : KlexBlock?
+    {
+        return if (xLevel in 0 until width && yLevel in 0 until height && zLevel in 0 until floors)
+            blocks[zLevel][yLevel][xLevel]
+        else null
+    }
+
     fun getBlock(levelPosition : Vector3) : KlexBlock?
     {
         return getBlock(levelPosition.x.toInt(), levelPosition.y.toInt(), levelPosition.z.toInt())
     }
 
-    fun getBlockRight(levelPosition : Vector3) : KlexBlock?
+    fun getBlock(levelPosition : Vector3, direction : BlockSide) : KlexBlock?
     {
-        return getBlock(levelPosition.x.toInt() + 1, levelPosition.y.toInt(), levelPosition.z.toInt())
-    }
-
-    fun getBlockLeft(levelPosition : Vector3) : KlexBlock?
-    {
-        return getBlock(levelPosition.x.toInt() - 1, levelPosition.y.toInt(), levelPosition.z.toInt())
-    }
-
-    fun getBlockUp(levelPosition : Vector3) : KlexBlock?
-    {
-        return getBlock(levelPosition.x.toInt(), levelPosition.y.toInt() + 1, levelPosition.z.toInt())
-    }
-
-    fun getBlockDown(levelPosition : Vector3) : KlexBlock?
-    {
-        return getBlock(levelPosition.x.toInt(), levelPosition.y.toInt() - 1, levelPosition.z.toInt())
-    }
-
-    fun getBlockAbove(levelPosition : Vector3) : KlexBlock?
-    {
-        return getBlock(levelPosition.x.toInt(), levelPosition.y.toInt(), levelPosition.z.toInt() + 1)
-    }
-
-    fun getBlockBelow(levelPosition : Vector3) : KlexBlock?
-    {
-        return getBlock(levelPosition.x.toInt(), levelPosition.y.toInt(), levelPosition.z.toInt() - 1)
+        return when (direction)
+        {
+            BlockSide.Right -> getBlock(levelPosition.x.toInt() + 1, levelPosition.y.toInt(), levelPosition.z.toInt())
+            BlockSide.Left  -> getBlock(levelPosition.x.toInt() - 1, levelPosition.y.toInt(), levelPosition.z.toInt())
+            BlockSide.Up    -> getBlock(levelPosition.x.toInt(), levelPosition.y.toInt() + 1, levelPosition.z.toInt())
+            BlockSide.Down  -> getBlock(levelPosition.x.toInt(), levelPosition.y.toInt() - 1, levelPosition.z.toInt())
+            BlockSide.Above -> getBlock(levelPosition.x.toInt(), levelPosition.y.toInt(), levelPosition.z.toInt() + 1)
+            BlockSide.Below -> getBlock(levelPosition.x.toInt(), levelPosition.y.toInt(), levelPosition.z.toInt() - 1)
+        }
     }
 }

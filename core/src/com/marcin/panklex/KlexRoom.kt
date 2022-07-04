@@ -70,63 +70,172 @@ class KlexRoom(val level : KlexLevel)
                 if (current.isNotEmpty()) current.isBorder = true
                 else
                 {
-                    val blockRight = level.getBlockRight(current.position)
-                    val blockLeft = level.getBlockLeft(current.position)
-                    val blockUp = level.getBlockUp(current.position)
-                    val blockDown = level.getBlockDown(current.position)
-                    val blockAbove = level.getBlockAbove(current.position)
-                    val blockBelow = level.getBlockBelow(current.position)
+                    val rightBlock = level.getBlock(current.position, BlockSide.Right)
+                    val downBlock = level.getBlock(current.position, BlockSide.Down)
+                    val aboveBlock = level.getBlock(current.position, BlockSide.Above)
+                    val leftBlock = level.getBlock(current.position, BlockSide.Left)
+                    val upBlock = level.getBlock(current.position, BlockSide.Up)
+                    val belowBlock = level.getBlock(current.position, BlockSide.Below)
+
+                    val rightBlockAbove =
+                        if (rightBlock != null) level.getBlock(rightBlock.position, BlockSide.Above) else null
+                    val rightBlockUp =
+                        if (rightBlock != null) level.getBlock(rightBlock.position, BlockSide.Up) else null
+                    val rightBlockBelow =
+                        if (rightBlock != null) level.getBlock(rightBlock.position, BlockSide.Below) else null
+                    val rightBlockDown =
+                        if (rightBlock != null) level.getBlock(rightBlock.position, BlockSide.Down) else null
+
+                    val leftBlockAbove =
+                        if (leftBlock != null) level.getBlock(leftBlock.position, BlockSide.Above) else null
+                    val leftBlockUp =
+                        if (leftBlock != null) level.getBlock(leftBlock.position, BlockSide.Up) else null
+                    val leftBlockBelow =
+                        if (leftBlock != null) level.getBlock(leftBlock.position, BlockSide.Below) else null
+                    val leftBlockDown =
+                        if (leftBlock != null) level.getBlock(leftBlock.position, BlockSide.Down) else null
+
+                    val upBlockAbove = if (upBlock != null) level.getBlock(upBlock.position, BlockSide.Above) else null
+                    val upBlockRight = if (upBlock != null) level.getBlock(upBlock.position, BlockSide.Right) else null
+                    val upBlockBelow = if (upBlock != null) level.getBlock(upBlock.position, BlockSide.Below) else null
+                    val upBlockLeft = if (upBlock != null) level.getBlock(upBlock.position, BlockSide.Left) else null
+
+                    val downBlockAbove =
+                        if (downBlock != null) level.getBlock(downBlock.position, BlockSide.Above) else null
+                    val downBlockRight =
+                        if (downBlock != null) level.getBlock(downBlock.position, BlockSide.Right) else null
+                    val downBlockBelow =
+                        if (downBlock != null) level.getBlock(downBlock.position, BlockSide.Below) else null
+                    val downBlockLeft =
+                        if (downBlock != null) level.getBlock(downBlock.position, BlockSide.Left) else null
+
+                    val aboveBlockUp =
+                        if (aboveBlock != null) level.getBlock(aboveBlock.position, BlockSide.Up) else null
+                    val aboveBlockRight =
+                        if (aboveBlock != null) level.getBlock(aboveBlock.position, BlockSide.Right) else null
+                    val aboveBlockDown =
+                        if (aboveBlock != null) level.getBlock(aboveBlock.position, BlockSide.Down) else null
+                    val aboveBlockLeft =
+                        if (aboveBlock != null) level.getBlock(aboveBlock.position, BlockSide.Left) else null
+
+                    val belowBlockUp =
+                        if (belowBlock != null) level.getBlock(belowBlock.position, BlockSide.Up) else null
+                    val belowBlockRight =
+                        if (belowBlock != null) level.getBlock(belowBlock.position, BlockSide.Right) else null
+                    val belowBlockDown =
+                        if (belowBlock != null) level.getBlock(belowBlock.position, BlockSide.Down) else null
+                    val belowBlockLeft =
+                        if (belowBlock != null) level.getBlock(belowBlock.position, BlockSide.Left) else null
+
+                    /////
 
                     current.isBorder =
-                        blockRight == null || blockLeft == null || blockUp == null || blockDown == null || blockAbove == null || blockBelow == null
+                        rightBlock == null || leftBlock == null || upBlock == null || downBlock == null || aboveBlock == null || belowBlock == null
 
-                    if (blockRight == null) current.isBorderRight = true
-                    if (blockLeft == null) current.isBorderLeft = true
-                    if (blockUp == null) current.isBorderUp = true
-                    if (blockDown == null) current.isBorderDown = true
-                    if (blockAbove == null) current.isBorderAbove = true
-                    if (blockDown == null) current.isBorderDown = true
+                    if (rightBlock == null) current.isRightBorder = true
+                    if (leftBlock == null) current.isLeftBorder = true
+                    if (upBlock == null) current.isUpBorder = true
+                    if (downBlock == null) current.isDownBorder = true
+                    if (aboveBlock == null) current.isAboveBorder = true
+                    if (belowBlock == null) current.isBelowBorder = true
 
-                    if (blockRight != null)
+                    /////
+
+                    if (rightBlock != null)
                     {
-                        if (blockRight.isNotEmpty()) blockRight.isBorderLeft = true
+                        rightBlock.isLeftBorder = rightBlock.isNotEmpty()
 
-                        if (blockRight !in queue && blockRight !in checked) queue.add(blockRight)
+                        rightBlock.isLeftBorderAbove =
+                            aboveBlock?.isNotEmpty() ?: true || (aboveBlock?.isEmpty() ?: true && aboveBlockRight?.isEmpty() ?: true)
+                        rightBlock.isLeftBorderUp =
+                            upBlock?.isNotEmpty() ?: true || (upBlock?.isEmpty() ?: true && upBlockRight?.isEmpty() ?: true)
+                        rightBlock.isLeftBorderBelow =
+                            belowBlock?.isNotEmpty() ?: true || (belowBlock?.isEmpty() ?: true && belowBlockRight?.isEmpty() ?: true)
+                        rightBlock.isLeftBorderDown =
+                            downBlock?.isNotEmpty() ?: true || (downBlock?.isEmpty() ?: true && downBlockRight?.isEmpty() ?: true)
+
+                        if (rightBlock !in queue && rightBlock !in checked) queue.add(rightBlock)
                     }
 
-                    if (blockLeft != null)
+                    if (leftBlock != null)
                     {
-                        if (blockLeft.isNotEmpty()) blockLeft.isBorderRight = true
+                        leftBlock.isRightBorder = leftBlock.isNotEmpty()
 
-                        if (blockLeft !in queue && blockLeft !in checked) queue.add(blockLeft)
+                        leftBlock.isRightBorderAbove =
+                            aboveBlock?.isNotEmpty() ?: true || (aboveBlock?.isEmpty() ?: true && aboveBlockLeft?.isEmpty() ?: true)
+                        leftBlock.isRightBorderUp =
+                            upBlock?.isNotEmpty() ?: true || (upBlock?.isEmpty() ?: true && upBlockLeft?.isEmpty() ?: true)
+                        leftBlock.isRightBorderBelow =
+                            belowBlock?.isNotEmpty() ?: true || (belowBlock?.isEmpty() ?: true && belowBlockLeft?.isEmpty() ?: true)
+                        leftBlock.isRightBorderDown =
+                            downBlock?.isNotEmpty() ?: true || (downBlock?.isEmpty() ?: true && downBlockLeft?.isEmpty() ?: true)
+
+
+                        if (leftBlock !in queue && leftBlock !in checked) queue.add(leftBlock)
                     }
 
-                    if (blockUp != null)
+                    if (upBlock != null)
                     {
-                        if (blockUp.isNotEmpty()) blockUp.isBorderDown = true
+                        upBlock.isDownBorder = upBlock.isNotEmpty()
 
-                        if (blockUp !in queue && blockUp !in checked) queue.add(blockUp)
+                        upBlock.isDownBorderAbove =
+                            aboveBlock?.isNotEmpty() ?: true || (aboveBlock?.isEmpty() ?: true && aboveBlockUp?.isEmpty() ?: true)
+                        upBlock.isDownBorderRight =
+                            rightBlock?.isNotEmpty() ?: true || (rightBlock?.isEmpty() ?: true && rightBlockUp?.isEmpty() ?: true)
+                        upBlock.isDownBorderBelow =
+                            belowBlock?.isNotEmpty() ?: true || (belowBlock?.isEmpty() ?: true && belowBlockUp?.isEmpty() ?: true)
+                        upBlock.isDownBorderLeft =
+                            leftBlock?.isNotEmpty() ?: true || (leftBlock?.isEmpty() ?: true && leftBlockUp?.isEmpty() ?: true)
+
+                        if (upBlock !in queue && upBlock !in checked) queue.add(upBlock)
                     }
 
-                    if (blockDown != null)
+                    if (downBlock != null)
                     {
-                        if (blockDown.isNotEmpty()) blockDown.isBorderUp = true
+                        downBlock.isUpBorder = downBlock.isNotEmpty()
 
-                        if (blockDown !in queue && blockDown !in checked) queue.add(blockDown)
+                        downBlock.isUpBorderAbove =
+                            aboveBlock?.isNotEmpty() ?: true || (aboveBlock?.isEmpty() ?: true && aboveBlockDown?.isEmpty() ?: true)
+                        downBlock.isUpBorderRight =
+                            rightBlock?.isNotEmpty() ?: true || (rightBlock?.isEmpty() ?: true && rightBlockDown?.isEmpty() ?: true)
+                        downBlock.isUpBorderBelow =
+                            belowBlock?.isNotEmpty() ?: true || (belowBlock?.isEmpty() ?: true && belowBlockDown?.isEmpty() ?: true)
+                        downBlock.isUpBorderLeft =
+                            leftBlock?.isNotEmpty() ?: true || (leftBlock?.isEmpty() ?: true && leftBlockDown?.isEmpty() ?: true)
+
+                        if (downBlock !in queue && downBlock !in checked) queue.add(downBlock)
                     }
 
-                    if (blockAbove != null)
+                    if (aboveBlock != null)
                     {
-                        if (blockAbove.isNotEmpty()) blockAbove.isBorderBelow = true
+                        aboveBlock.isBelowBorder = aboveBlock.isNotEmpty()
 
-                        if (blockAbove !in queue && blockAbove !in checked) queue.add(blockAbove)
+                        aboveBlock.isBelowBorderUp =
+                            upBlock?.isNotEmpty() ?: true || (upBlock?.isEmpty() ?: true && upBlockAbove?.isEmpty() ?: true)
+                        aboveBlock.isBelowBorderRight =
+                            rightBlock?.isNotEmpty() ?: true || (rightBlock?.isEmpty() ?: true && rightBlockAbove?.isEmpty() ?: true)
+                        aboveBlock.isBelowBorderDown =
+                            downBlock?.isNotEmpty() ?: true || (downBlock?.isEmpty() ?: true && downBlockAbove?.isEmpty() ?: true)
+                        aboveBlock.isBelowBorderLeft =
+                            leftBlock?.isNotEmpty() ?: true || (leftBlock?.isEmpty() ?: true && leftBlockAbove?.isEmpty() ?: true)
+
+                        if (aboveBlock !in queue && aboveBlock !in checked) queue.add(aboveBlock)
                     }
 
-                    if (blockBelow != null)
+                    if (belowBlock != null)
                     {
-                        if (blockBelow.isNotEmpty()) blockBelow.isBorderAbove = true
+                        belowBlock.isAboveBorder = belowBlock.isNotEmpty()
 
-                        if (blockBelow !in queue && blockBelow !in checked) queue.add(blockBelow)
+                        belowBlock.isAboveBorderUp =
+                            upBlock?.isNotEmpty() ?: true || (upBlock?.isEmpty() ?: true && upBlockBelow?.isEmpty() ?: true)
+                        belowBlock.isAboveBorderRight =
+                            rightBlock?.isNotEmpty() ?: true || (rightBlock?.isEmpty() ?: true && rightBlockBelow?.isEmpty() ?: true)
+                        belowBlock.isAboveBorderDown =
+                            downBlock?.isNotEmpty() ?: true || (downBlock?.isEmpty() ?: true && downBlockBelow?.isEmpty() ?: true)
+                        belowBlock.isAboveBorderLeft =
+                            leftBlock?.isNotEmpty() ?: true || (leftBlock?.isEmpty() ?: true && leftBlockBelow?.isEmpty() ?: true)
+
+                        if (belowBlock !in queue && belowBlock !in checked) queue.add(belowBlock)
                     }
                 }
 
@@ -182,5 +291,18 @@ class KlexRoom(val level : KlexLevel)
     fun getBlock(roomPosition : Vector3) : KlexBlock?
     {
         return getBlock(roomPosition.x.toInt(), roomPosition.y.toInt(), roomPosition.z.toInt())
+    }
+
+    fun getBlock(roomPosition : Vector3, direction : BlockSide) : KlexBlock?
+    {
+        return when (direction)
+        {
+            BlockSide.Right -> getBlock(roomPosition.x.toInt() + 1, roomPosition.y.toInt(), roomPosition.z.toInt())
+            BlockSide.Left  -> getBlock(roomPosition.x.toInt() - 1, roomPosition.y.toInt(), roomPosition.z.toInt())
+            BlockSide.Up    -> getBlock(roomPosition.x.toInt(), roomPosition.y.toInt() + 1, roomPosition.z.toInt())
+            BlockSide.Down  -> getBlock(roomPosition.x.toInt(), roomPosition.y.toInt() - 1, roomPosition.z.toInt())
+            BlockSide.Above -> getBlock(roomPosition.x.toInt(), roomPosition.y.toInt(), roomPosition.z.toInt() + 1)
+            BlockSide.Below -> getBlock(roomPosition.x.toInt(), roomPosition.y.toInt(), roomPosition.z.toInt() - 1)
+        }
     }
 }

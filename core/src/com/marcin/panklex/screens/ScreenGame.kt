@@ -18,7 +18,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport
 import com.marcin.panklex.*
 import kotlin.math.floor
 
-class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, game), InputProcessor
+class ScreenGame(name : String, val game : PanKlexGame) : BaseScreen(name, game), InputProcessor
 {
     // main
 
@@ -110,7 +110,14 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
 
     fun screenLoop()
     {
-        //
+        if (isTouchInMap)
+        {
+            map.getRoomPosition(mapTouchPosition, roomTouchPosition)
+            map.clearMap()
+            map.updateMap()
+            map.changeSelection(mapTouchPosition)
+            //game.log("map pos", "x ${mapTouchPosition.x} y ${mapTouchPosition.y} z ${mapTouchPosition.z}")
+        }
     }
 
     override fun show()
@@ -128,8 +135,11 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
         ScreenUtils.clear(0f, 0f, 0f, 1f)
         camera.update()
         gameCamera.update()
-        map.renderer.setView(gameCamera)
-        map.renderer.render()
+        for (r in map.renderers)
+        {
+            r.setView(gameCamera)
+            r.render()
+        }
         stage.draw()
     }
 
@@ -177,6 +187,16 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
     {
         isTouch = true
 
+        screenTouchPosition.set(screenX.toFloat(), screenY.toFloat())
+        worldTouchPosition = gameViewport.unproject(screenTouchPosition)
+        mapTouchPosition.x =
+            floor((0.5f * worldTouchPosition.x - worldTouchPosition.y + 8) / 16) + (currentFloor + 1)
+        mapTouchPosition.y =
+            floor((0.5f * worldTouchPosition.x + worldTouchPosition.y - 8) / 16) - (currentFloor + 1)
+        mapTouchPosition.z = currentFloor.toFloat()
+        isTouchInMap =
+            (mapTouchPosition.x >= 0 && mapTouchPosition.y >= 0 && mapTouchPosition.x < level.width && mapTouchPosition.y < level.height)
+
         return true
     }
 
@@ -222,14 +242,6 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
         mapTouchPosition.z = currentFloor.toFloat()
         isTouchInMap =
             (mapTouchPosition.x >= 0 && mapTouchPosition.y >= 0 && mapTouchPosition.x < level.width && mapTouchPosition.y < level.height)
-
-        if (isTouchInMap)
-        {
-            map.getRoomPosition(mapTouchPosition, roomTouchPosition)
-            map.clearMap()
-            map.updateMap()
-            map.changeSelection(mapTouchPosition)
-        }
 
         return true
     }
