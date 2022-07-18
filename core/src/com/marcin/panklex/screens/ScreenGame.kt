@@ -49,63 +49,132 @@ class ScreenGame(name : String, val game : PanKlexGame) : BaseScreen(name, game)
     // other
 
     var currentFloor = 0
+    var currentPosition = 0
 
     // hud
 
-    val leftArrowButton = TextButton("<----", TextButton.TextButtonStyle(null, null, null, BitmapFont()))
-    val currentDirectionLabel = Label("Up", Label.LabelStyle(BitmapFont(), Color.CYAN))
+    val leftArrowDirectionButton = TextButton("<---", TextButton.TextButtonStyle(null, null, null, BitmapFont()))
+    val currentDirectionLabel = Label("direction", Label.LabelStyle(BitmapFont(), Color.CYAN))
+    val rightArrowDirectionButton = TextButton("--->", TextButton.TextButtonStyle(null, null, null, BitmapFont()))
     val currentFloorLabel = Label("floor", Label.LabelStyle(BitmapFont(), Color.GREEN))
-    val rightArrowButton = TextButton("---->", TextButton.TextButtonStyle(null, null, null, BitmapFont()))
+    val leftArrowPositionButton = TextButton("<---", TextButton.TextButtonStyle(null, null, null, BitmapFont()))
+    val currentPositionLabel = Label("position", Label.LabelStyle(BitmapFont(), Color.ORANGE))
+    val rightArrowPositionButton = TextButton("--->", TextButton.TextButtonStyle(null, null, null, BitmapFont()))
 
     init
     {
         // hud
 
-        leftArrowButton.addListener(object : ClickListener()
+        leftArrowDirectionButton.addListener(object : ClickListener()
         {
             override fun clicked(event : InputEvent?, x : Float, y : Float)
             {
-                map.changeMapDirectionLeft()
-                currentDirectionLabel.setText(map.direction.toString())
+                val direction = when (map.direction)
+                {
+                    MapDirection.Up    -> MapDirection.Left
+                    MapDirection.Left  -> MapDirection.Down
+                    MapDirection.Down  -> MapDirection.Right
+                    MapDirection.Right -> MapDirection.Up
+                }
+                changeDirection(direction)
             }
         })
-        rightArrowButton.addListener(object : ClickListener()
+        rightArrowDirectionButton.addListener(object : ClickListener()
         {
             override fun clicked(event : InputEvent?, x : Float, y : Float)
             {
-                map.changeMapDirectionRight()
-                currentDirectionLabel.setText(map.direction.toString())
+                val direction = when (map.direction)
+                {
+                    MapDirection.Up    -> MapDirection.Right
+                    MapDirection.Right -> MapDirection.Down
+                    MapDirection.Down  -> MapDirection.Left
+                    MapDirection.Left  -> MapDirection.Up
+                }
+                changeDirection(direction)
+            }
+        })
+
+        leftArrowPositionButton.addListener(object : ClickListener()
+        {
+            override fun clicked(event : InputEvent?, x : Float, y : Float)
+            {
+                changePosition(currentPosition - 1)
+            }
+        })
+        rightArrowPositionButton.addListener(object : ClickListener()
+        {
+            override fun clicked(event : InputEvent?, x : Float, y : Float)
+            {
+                changePosition(currentPosition + 1)
             }
         })
 
         val table = Table()
         table.top().setFillParent(true)
         table.defaults().pad(10f)
-        table.add(leftArrowButton)
+        table.add(leftArrowDirectionButton)
         table.add(currentDirectionLabel)
+        table.add(rightArrowDirectionButton)
         table.add(currentFloorLabel)
-        table.add(rightArrowButton)
+        table.add(leftArrowPositionButton)
+        table.add(currentPositionLabel)
+        table.add(rightArrowPositionButton)
         stage.addActor(table)
 
         // init
 
-        level.createLevel("level.json")
-        room.updateRoom(level.positions[1])
+        level.createLevel("level1.json")
         map.createMap()
-        map.updateMap()
-        changeFloor(9)
+        changeDirection(map.direction)
+        changeFloor(0)
+        changePosition(0)
 
-        gameCamera.position.set(160f, 80f, 0f)
+        gameCamera.position.set(
+            (map.tileLengthHalf * map.width).toFloat(),
+            (map.tileLengthQuarter * map.height).toFloat(),
+            0f
+        )
         gameCamera.zoom = 0.5f
+    }
+
+    fun changeDirection(direction : MapDirection)
+    {
+        currentDirectionLabel.setText(direction.toString())
+        map.changeMapDirection(direction)
+        map.updateMap()
     }
 
     fun changeFloor(floor : Int)
     {
-        if (floor >= 0 && floor < level.floors)
+        if (floor in 0 until level.floors)
         {
             currentFloor = floor
             currentFloorLabel.setText("floor: $floor")
         }
+    }
+
+    fun changePosition(position : Int)
+    {
+        if (position in 0 until level.positions.size)
+        {
+            currentPosition = position
+            currentPositionLabel.setText("position: $position")
+            room.updateRoom(level.positions[position])
+            map.updateMap()
+        }
+    }
+
+    fun updateTouch(screenX : Int, screenY : Int)
+    {
+        screenTouchPosition.set(screenX.toFloat(), screenY.toFloat())
+        worldTouchPosition = gameViewport.unproject(screenTouchPosition)
+        mapTouchPosition.x =
+            floor((0.5f * worldTouchPosition.x - worldTouchPosition.y + map.tileLengthQuarter) / map.tileLengthHalf) + (currentFloor + 1)
+        mapTouchPosition.y =
+            floor((0.5f * worldTouchPosition.x + worldTouchPosition.y - map.tileLengthQuarter) / map.tileLengthHalf) - (currentFloor + 1)
+        mapTouchPosition.z = currentFloor.toFloat()
+        isTouchInMap =
+            (mapTouchPosition.x.toInt() in 0 until level.width && mapTouchPosition.y.toInt() in 0 until level.height)
     }
 
     fun screenLoop()
@@ -113,7 +182,6 @@ class ScreenGame(name : String, val game : PanKlexGame) : BaseScreen(name, game)
         if (isTouchInMap)
         {
             map.getRoomPosition(mapTouchPosition, roomTouchPosition)
-            map.clearMap()
             map.updateMap()
             map.changeSelection(mapTouchPosition)
             //game.log("map pos", "x ${mapTouchPosition.x} y ${mapTouchPosition.y} z ${mapTouchPosition.z}")
@@ -187,15 +255,9 @@ class ScreenGame(name : String, val game : PanKlexGame) : BaseScreen(name, game)
     {
         isTouch = true
 
-        screenTouchPosition.set(screenX.toFloat(), screenY.toFloat())
-        worldTouchPosition = gameViewport.unproject(screenTouchPosition)
-        mapTouchPosition.x =
-            floor((0.5f * worldTouchPosition.x - worldTouchPosition.y + 8) / 16) + (currentFloor + 1)
-        mapTouchPosition.y =
-            floor((0.5f * worldTouchPosition.x + worldTouchPosition.y - 8) / 16) - (currentFloor + 1)
-        mapTouchPosition.z = currentFloor.toFloat()
-        isTouchInMap =
-            (mapTouchPosition.x >= 0 && mapTouchPosition.y >= 0 && mapTouchPosition.x < level.width && mapTouchPosition.y < level.height)
+        updateTouch(screenX, screenY)
+
+        //map.info(mapTouchPosition)
 
         return true
     }
@@ -233,15 +295,7 @@ class ScreenGame(name : String, val game : PanKlexGame) : BaseScreen(name, game)
 
     override fun mouseMoved(screenX : Int, screenY : Int) : Boolean
     {
-        screenTouchPosition.set(screenX.toFloat(), screenY.toFloat())
-        worldTouchPosition = gameViewport.unproject(screenTouchPosition)
-        mapTouchPosition.x =
-            floor((0.5f * worldTouchPosition.x - worldTouchPosition.y + 8) / 16) + (currentFloor + 1)
-        mapTouchPosition.y =
-            floor((0.5f * worldTouchPosition.x + worldTouchPosition.y - 8) / 16) - (currentFloor + 1)
-        mapTouchPosition.z = currentFloor.toFloat()
-        isTouchInMap =
-            (mapTouchPosition.x >= 0 && mapTouchPosition.y >= 0 && mapTouchPosition.x < level.width && mapTouchPosition.y < level.height)
+        updateTouch(screenX, screenY)
 
         return true
     }

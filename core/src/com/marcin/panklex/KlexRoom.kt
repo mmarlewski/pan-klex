@@ -70,6 +70,8 @@ class KlexRoom(val level : KlexLevel)
                 if (current.isNotEmpty()) current.isBorder = true
                 else
                 {
+                    /////
+
                     val rightBlock = level.getBlock(current.position, BlockSide.Right)
                     val downBlock = level.getBlock(current.position, BlockSide.Down)
                     val aboveBlock = level.getBlock(current.position, BlockSide.Above)
@@ -129,8 +131,10 @@ class KlexRoom(val level : KlexLevel)
 
                     /////
 
-                    current.isBorder =
-                        rightBlock == null || leftBlock == null || upBlock == null || downBlock == null || aboveBlock == null || belowBlock == null
+                    if (rightBlock == null || leftBlock == null || upBlock == null || downBlock == null || aboveBlock == null || belowBlock == null)
+                    {
+                        current.isBorder = true
+                    }
 
                     if (rightBlock == null) current.isRightBorder = true
                     if (leftBlock == null) current.isLeftBorder = true
@@ -237,6 +241,8 @@ class KlexRoom(val level : KlexLevel)
 
                         if (belowBlock !in queue && belowBlock !in checked) queue.add(belowBlock)
                     }
+
+                    /////
                 }
 
                 checked.add(current)
