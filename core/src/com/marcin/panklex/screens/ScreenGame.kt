@@ -1,9 +1,11 @@
 package com.marcin.panklex.screens
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.math.Vector2
@@ -134,12 +136,12 @@ class ScreenGame(name : String, val game : PanKlexGame) : BaseScreen(name, game)
             (map.tileLengthQuarter * map.height).toFloat(),
             0f
         )
-        gameCamera.zoom = 0.5f
+        gameCamera.zoom = 0.25f
     }
 
     fun changeDirection(direction : MapDirection)
     {
-        currentDirectionLabel.setText(direction.toString())
+        currentDirectionLabel.setText("$direction")
         map.changeMapDirection(direction)
         map.updateMap()
     }
@@ -148,8 +150,8 @@ class ScreenGame(name : String, val game : PanKlexGame) : BaseScreen(name, game)
     {
         if (floor in 0 until level.floors)
         {
-            currentFloor = floor
             currentFloorLabel.setText("floor: $floor")
+            currentFloor = floor
         }
     }
 
@@ -157,8 +159,8 @@ class ScreenGame(name : String, val game : PanKlexGame) : BaseScreen(name, game)
     {
         if (position in 0 until level.positions.size)
         {
-            currentPosition = position
             currentPositionLabel.setText("position: $position")
+            currentPosition = position
             room.updateRoom(level.positions[position])
             map.updateMap()
         }
@@ -200,14 +202,12 @@ class ScreenGame(name : String, val game : PanKlexGame) : BaseScreen(name, game)
 
         screenLoop()
 
-        ScreenUtils.clear(0f, 0f, 0f, 1f)
+        Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         camera.update()
         gameCamera.update()
-        for (r in map.renderers)
-        {
-            r.setView(gameCamera)
-            r.render()
-        }
+        map.renderer.setView(gameCamera)
+        map.renderer.render()
         stage.draw()
     }
 

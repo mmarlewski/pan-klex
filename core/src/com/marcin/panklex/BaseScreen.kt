@@ -24,7 +24,7 @@ abstract class BaseScreen(val baseName : String, val baseGame : PanKlexGame) : S
     override fun resize(width : Int, height : Int)
     {
         baseGame.log(baseName, "resize")
-        viewport.update(width, height, true)
+        //viewport.update(width, height, true)
     }
 
     override fun pause()

@@ -1,9 +1,17 @@
 package com.marcin.panklex
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
+import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile
 import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.utils.ScreenUtils
 
 class KlexMap(val room : KlexRoom, val tiles : KlexTiles)
 {
@@ -13,10 +21,14 @@ class KlexMap(val room : KlexRoom, val tiles : KlexTiles)
     val tileLengthHalf = tileLength / 2
     val tileLengthQuarter = tileLengthHalf / 2
 
-    // maps
+    //important
 
-    val maps = mutableListOf<TiledMap>()
-    val renderers = mutableListOf<KlexIsometricTiledMapRenderer>()
+    val map = TiledMap()
+    val renderer = KlexIsometricTiledMapRenderer(map, 1f)
+    val frameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, Gdx.graphics.width, Gdx.graphics.height, false)
+
+    //val frameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, tileLength, tileLength, false)
+    val spriteBatch = SpriteBatch()
 
     // dimensions
 
@@ -33,47 +45,20 @@ class KlexMap(val room : KlexRoom, val tiles : KlexTiles)
 
     fun createMap()
     {
-        for (f in 0 until maxFloors)
+        for (k in 0 until maxFloors)
         {
-            maps.add(TiledMap())
-            renderers.add(KlexIsometricTiledMapRenderer(maps[f], 1f, f))
+            val layer = TiledMapTileLayer(maxWidth, maxHeight, tileLength, tileLengthHalf).apply { name=k.toString() }
 
-            val layers = mutableListOf<TiledMapTileLayer>()
-            layers.add(TiledMapTileLayer(maxWidth, maxHeight, tileLength, tileLengthHalf).apply {
-                name = BlockSide.Below.name
-            })
-            layers.add(TiledMapTileLayer(maxWidth, maxHeight, tileLength, tileLengthHalf).apply {
-                name = BlockSide.Left.name
-            })
-            layers.add(TiledMapTileLayer(maxWidth, maxHeight, tileLength, tileLengthHalf).apply {
-                name = BlockSide.Up.name
-            })
-            layers.add(TiledMapTileLayer(maxWidth, maxHeight, tileLength, tileLengthHalf).apply {
-                name = BlockSide.Down.name
-            })
-            layers.add(TiledMapTileLayer(maxWidth, maxHeight, tileLength, tileLengthHalf).apply {
-                name = BlockSide.Right.name
-            })
-            layers.add(TiledMapTileLayer(maxWidth, maxHeight, tileLength, tileLengthHalf).apply {
-                name = BlockSide.Above.name
-            })
-
-            for (l in 0 until layers.size)
+            for (j in 0 until maxHeight)
             {
-                for (j in 0 until maxHeight)
+                for (i in 0 until maxWidth)
                 {
-                    for (i in 0 until maxWidth)
-                    {
-                        val cell = TiledMapTileLayer.Cell()
-                        layers[l].setCell(i, j, cell)
-                    }
+                    val cell = TiledMapTileLayer.Cell()
+                    layer.setCell(i, j, cell)
                 }
             }
 
-            for (l in 0 until layers.size)
-            {
-                maps[f].layers.add(layers[l])
-            }
+            map.layers.add(layer)
         }
     }
 
@@ -81,16 +66,13 @@ class KlexMap(val room : KlexRoom, val tiles : KlexTiles)
     {
         // clear
 
-        for (m in maps)
+        for (k in 0 until maxFloors)
         {
-            for (l in m.layers)
+            for (j in 0 until maxHeight)
             {
-                for (j in 0 until maxHeight)
+                for (i in 0 until maxWidth)
                 {
-                    for (i in 0 until maxWidth)
-                    {
-                        (l as TiledMapTileLayer).getCell(i, j).tile = null
-                    }
+                    (map.layers[k] as TiledMapTileLayer).getCell(i, j).tile = null
                 }
             }
         }
@@ -111,13 +93,15 @@ class KlexMap(val room : KlexRoom, val tiles : KlexTiles)
 
         // new tiles
 
-        for (f in 0 until maxFloors)
+        for (k in 0 until maxFloors)
         {
+            val layer = (map.layers[k] as TiledMapTileLayer)
+
             for (j in 0 until room.height)
             {
                 for (i in 0 until room.width)
                 {
-                    val block = room.getBlock(i, j, f)
+                    val block = room.getBlock(i, j, k)
 
                     if (block != null)
                     {
@@ -249,99 +233,65 @@ class KlexMap(val room : KlexRoom, val tiles : KlexTiles)
 
                         /////
 
-                        val leftBorderTile = when
+                        frameBuffer.begin()
+                        spriteBatch.enableBlending()
+                        Gdx.gl.glBlendFuncSeparate(
+                            GL20.GL_SRC_ALPHA,
+                            GL20.GL_ONE_MINUS_SRC_ALPHA,
+                            GL20.GL_ONE,
+                            GL20.GL_ONE_MINUS_SRC_ALPHA
+                        )
+                        Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
+                        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+                        spriteBatch.begin()
+
+                        if (isBelowBorder)
                         {
-                            isLeftBorderAbove && isLeftBorderUp && isLeftBorderBelow && isLeftBorderDown     -> tiles.leftBorderAboveUpBelowDown
-                            isLeftBorderAbove && isLeftBorderUp && isLeftBorderBelow && isLeftBorderDown     -> tiles.leftBorderAboveUpBelow
-                            isLeftBorderAbove && isLeftBorderUp && !isLeftBorderBelow && isLeftBorderDown    -> tiles.leftBorderAboveUpDown
-                            isLeftBorderAbove && isLeftBorderUp && !isLeftBorderBelow && !isLeftBorderDown   -> tiles.leftBorderAboveUp
-                            isLeftBorderAbove && !isLeftBorderUp && isLeftBorderBelow && isLeftBorderDown    -> tiles.leftBorderAboveBelowDown
-                            isLeftBorderAbove && !isLeftBorderUp && isLeftBorderBelow && !isLeftBorderDown   -> tiles.leftBorderAboveBelow
-                            isLeftBorderAbove && !isLeftBorderUp && !isLeftBorderBelow && isLeftBorderDown   -> tiles.leftBorderAboveDown
-                            isLeftBorderAbove && !isLeftBorderUp && !isLeftBorderBelow && !isLeftBorderDown  -> tiles.leftBorderAbove
-                            !isLeftBorderAbove && isLeftBorderUp && isLeftBorderBelow && isLeftBorderDown    -> tiles.leftBorderUpBelowDown
-                            !isLeftBorderAbove && isLeftBorderUp && isLeftBorderBelow && !isLeftBorderDown   -> tiles.leftBorderUpBelow
-                            !isLeftBorderAbove && isLeftBorderUp && !isLeftBorderBelow && isLeftBorderDown   -> tiles.leftBorderUpDown
-                            !isLeftBorderAbove && isLeftBorderUp && !isLeftBorderBelow && !isLeftBorderDown  -> tiles.leftBorderUp
-                            !isLeftBorderAbove && !isLeftBorderUp && isLeftBorderBelow && isLeftBorderDown   -> tiles.leftBorderBelowDown
-                            !isLeftBorderAbove && !isLeftBorderUp && isLeftBorderBelow && !isLeftBorderDown  -> tiles.leftBorderBelow
-                            !isLeftBorderAbove && !isLeftBorderUp && !isLeftBorderBelow && isLeftBorderDown  -> tiles.leftBorderDown
-                            !isLeftBorderAbove && !isLeftBorderUp && !isLeftBorderBelow && !isLeftBorderDown -> tiles.leftBorder
-                            else                                                                             -> null
+                            if (isBelowBorderUp) spriteBatch.draw(tiles.belowBorderUp, 0f, 0f)
+                            if (isBelowBorderRight) spriteBatch.draw(tiles.belowBorderRight, 0f, 0f)
+                            if (isBelowBorderDown) spriteBatch.draw(tiles.belowBorderDown, 0f, 0f)
+                            if (isBelowBorderLeft) spriteBatch.draw(tiles.belowBorderLeft, 0f, 0f)
                         }
+
+                        if (isLeftBorder)
+                        {
+                            if (isLeftBorderAbove) spriteBatch.draw(tiles.leftBorderAbove, 0f, 0f)
+                            if (isLeftBorderUp) spriteBatch.draw(tiles.leftBorderUp, 0f, 0f)
+                            if (isLeftBorderBelow) spriteBatch.draw(tiles.leftBorderBelow, 0f, 0f)
+                            if (isLeftBorderDown) spriteBatch.draw(tiles.leftBorderDown, 0f, 0f)
+                        }
+
+                        if (isUpBorder)
+                        {
+                            if (isUpBorderAbove) spriteBatch.draw(tiles.upBorderAbove, 0f, 0f)
+                            if (isUpBorderRight) spriteBatch.draw(tiles.upBorderRight, 0f, 0f)
+                            if (isUpBorderBelow) spriteBatch.draw(tiles.upBorderBelow, 0f, 0f)
+                            if (isUpBorderLeft) spriteBatch.draw(tiles.upBorderLeft, 0f, 0f)
+                        }
+
+                        if (isRightBorder) spriteBatch.draw(tiles.rightBorder, 0f, 0f)
+                        if (isDownBorder) spriteBatch.draw(tiles.downBorder, 0f, 0f)
+                        if (isAboveBorder) spriteBatch.draw(tiles.aboveBorder, 0f, 0f)
+
+                        spriteBatch.end()
+                        val textureRegion = ScreenUtils.getFrameBufferTexture()
+                        frameBuffer.end()
+
+                        //TextureRegion(TextureRegion(frameBuffer.colorBufferTexture).apply { flip(false, true) })
+
+                        val tile = StaticTiledMapTile(textureRegion)
 
                         /////
 
-                        val upBorderTile = when
+                        val cell = when (direction)
                         {
-                            isUpBorderAbove && isUpBorderRight && isUpBorderBelow && isUpBorderLeft     -> tiles.upBorderAboveRightBelowLeft
-                            isUpBorderAbove && isUpBorderRight && isUpBorderBelow && !isUpBorderLeft    -> tiles.upBorderAboveRightBelow
-                            isUpBorderAbove && isUpBorderRight && !isUpBorderBelow && isUpBorderLeft    -> tiles.upBorderAboveRightLeft
-                            isUpBorderAbove && isUpBorderRight && !isUpBorderBelow && !isUpBorderLeft   -> tiles.upBorderAboveRight
-                            isUpBorderAbove && !isUpBorderRight && isUpBorderBelow && isUpBorderLeft    -> tiles.upBorderAboveBelowLeft
-                            isUpBorderAbove && !isUpBorderRight && isUpBorderBelow && !isUpBorderLeft   -> tiles.upBorderAboveBelow
-                            isUpBorderAbove && !isUpBorderRight && !isUpBorderBelow && isUpBorderLeft   -> tiles.upBorderAboveLeft
-                            isUpBorderAbove && !isUpBorderRight && !isUpBorderBelow && !isUpBorderLeft  -> tiles.upBorderAbove
-                            !isUpBorderAbove && isUpBorderRight && isUpBorderBelow && isUpBorderLeft    -> tiles.upBorderRightBelowLeft
-                            !isUpBorderAbove && isUpBorderRight && isUpBorderBelow && !isUpBorderLeft   -> tiles.upBorderRightBelow
-                            !isUpBorderAbove && isUpBorderRight && !isUpBorderBelow && isUpBorderLeft   -> tiles.upBorderRightLeft
-                            !isUpBorderAbove && isUpBorderRight && !isUpBorderBelow && !isUpBorderLeft  -> tiles.upBorderRight
-                            !isUpBorderAbove && !isUpBorderRight && isUpBorderBelow && isUpBorderLeft   -> tiles.upBorderBelowLeft
-                            !isUpBorderAbove && !isUpBorderRight && isUpBorderBelow && !isUpBorderLeft  -> tiles.upBorderBelow
-                            !isUpBorderAbove && !isUpBorderRight && !isUpBorderBelow && isUpBorderLeft  -> tiles.upBorderLeft
-                            !isUpBorderAbove && !isUpBorderRight && !isUpBorderBelow && !isUpBorderLeft -> tiles.upBorder
-                            else                                                                        -> null
+                            MapDirection.Up    -> layer.getCell(i, j)
+                            MapDirection.Right -> layer.getCell(j, room.width - 1 - i)
+                            MapDirection.Down  -> layer.getCell(room.width - 1 - i, room.height - 1 - j)
+                            MapDirection.Left  -> layer.getCell(room.height - 1 - j, i)
                         }
 
-                        /////
-
-                        val belowBorderTile = when
-                        {
-                            isBelowBorderUp && isBelowBorderRight && isBelowBorderDown && isBelowBorderLeft     -> tiles.belowBorderUpRightDownLeft
-                            isBelowBorderUp && isBelowBorderRight && isBelowBorderDown && !isBelowBorderLeft    -> tiles.belowBorderUpRightDown
-                            isBelowBorderUp && isBelowBorderRight && !isBelowBorderDown && isBelowBorderLeft    -> tiles.belowBorderUpRightLeft
-                            isBelowBorderUp && isBelowBorderRight && !isBelowBorderDown && !isBelowBorderLeft   -> tiles.belowBorderUpRight
-                            isBelowBorderUp && !isBelowBorderRight && isBelowBorderDown && isBelowBorderLeft    -> tiles.belowBorderUpDownLeft
-                            isBelowBorderUp && !isBelowBorderRight && isBelowBorderDown && !isBelowBorderLeft   -> tiles.belowBorderUpDown
-                            isBelowBorderUp && !isBelowBorderRight && !isBelowBorderDown && isBelowBorderLeft   -> tiles.belowBorderUpLeft
-                            isBelowBorderUp && !isBelowBorderRight && !isBelowBorderDown && !isBelowBorderLeft  -> tiles.belowBorderUp
-                            !isBelowBorderUp && isBelowBorderRight && isBelowBorderDown && isBelowBorderLeft    -> tiles.belowBorderRightDownLeft
-                            !isBelowBorderUp && isBelowBorderRight && isBelowBorderDown && !isBelowBorderLeft   -> tiles.belowBorderRightDown
-                            !isBelowBorderUp && isBelowBorderRight && !isBelowBorderDown && isBelowBorderLeft   -> tiles.belowBorderRightLeft
-                            !isBelowBorderUp && isBelowBorderRight && !isBelowBorderDown && !isBelowBorderLeft  -> tiles.belowBorderRight
-                            !isBelowBorderUp && !isBelowBorderRight && isBelowBorderDown && isBelowBorderLeft   -> tiles.belowBorderDownLeft
-                            !isBelowBorderUp && !isBelowBorderRight && isBelowBorderDown && !isBelowBorderLeft  -> tiles.belowBorderDown
-                            !isBelowBorderUp && !isBelowBorderRight && !isBelowBorderDown && isBelowBorderLeft  -> tiles.belowBorderLeft
-                            !isBelowBorderUp && !isBelowBorderRight && !isBelowBorderDown && !isBelowBorderLeft -> tiles.belowBorder
-                            else                                                                                -> null
-                        }
-
-                        /////
-
-                        for (l in 0 until maps[f].layers.size())
-                        {
-                            val side = enumValueOf<BlockSide>(maps[f].layers[l].name)
-
-                            val layer = (maps[f].layers[l] as TiledMapTileLayer)
-
-                            val cell = when (direction)
-                            {
-                                MapDirection.Up    -> layer.getCell(i, j)
-                                MapDirection.Right -> layer.getCell(j, room.width - 1 - i)
-                                MapDirection.Down  -> layer.getCell(room.width - 1 - i, room.height - 1 - j)
-                                MapDirection.Left  -> layer.getCell(room.height - 1 - j, i)
-                            }
-
-                            cell.tile = when (side)
-                            {
-                                BlockSide.Right -> if (!isRightBorder) null else tiles.rightBorder
-                                BlockSide.Left  -> if (!isLeftBorder) null else leftBorderTile
-                                BlockSide.Up    -> if (!isUpBorder) null else upBorderTile
-                                BlockSide.Down  -> if (!isDownBorder) null else tiles.downBorder
-                                BlockSide.Above -> if (!isAboveBorder) null else tiles.aboveBorder
-                                BlockSide.Below -> if (!isBelowBorder) null else belowBorderTile
-                            }
-                        }
+                        cell.tile = tile
 
                         /////
                     }
@@ -378,33 +328,6 @@ class KlexMap(val room : KlexRoom, val tiles : KlexTiles)
     fun changeSelection(selectPosition : Vector3)
     {
         selectMapPosition.set(selectPosition)
-
-        val map = maps[selectPosition.z.toInt()]
-
-        (map.layers[BlockSide.Right.name] as TiledMapTileLayer).getCell(
-            selectPosition.x.toInt(),
-            selectPosition.y.toInt()
-        ).tile = tiles.rightSelect
-        (map.layers[BlockSide.Left.name] as TiledMapTileLayer).getCell(
-            selectPosition.x.toInt(),
-            selectPosition.y.toInt()
-        ).tile = tiles.leftSelect
-        (map.layers[BlockSide.Up.name] as TiledMapTileLayer).getCell(
-            selectPosition.x.toInt(),
-            selectPosition.y.toInt()
-        ).tile = tiles.upSelect
-        (map.layers[BlockSide.Down.name] as TiledMapTileLayer).getCell(
-            selectPosition.x.toInt(),
-            selectPosition.y.toInt()
-        ).tile = tiles.downSelect
-        (map.layers[BlockSide.Above.name] as TiledMapTileLayer).getCell(
-            selectPosition.x.toInt(),
-            selectPosition.y.toInt()
-        ).tile = tiles.aboveSelect
-        (map.layers[BlockSide.Below.name] as TiledMapTileLayer).getCell(
-            selectPosition.x.toInt(),
-            selectPosition.y.toInt()
-        ).tile = tiles.belowSelect
     }
 
     fun info(position : Vector3)
