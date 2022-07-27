@@ -23,12 +23,8 @@ class KlexMap(val room : KlexRoom, val tiles : KlexTiles)
 
     //important
 
-    val map = TiledMap()
-    val renderer = KlexIsometricTiledMapRenderer(map, 1f)
-    val frameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, Gdx.graphics.width, Gdx.graphics.height, false)
-
-    //val frameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, tileLength, tileLength, false)
-    val spriteBatch = SpriteBatch()
+    val maps = mutableListOf<TiledMap>()
+    val renderers = mutableListOf<KlexIsometricTiledMapRenderer>()
 
     // dimensions
 
@@ -47,18 +43,33 @@ class KlexMap(val room : KlexRoom, val tiles : KlexTiles)
     {
         for (k in 0 until maxFloors)
         {
-            val layer = TiledMapTileLayer(maxWidth, maxHeight, tileLength, tileLengthHalf).apply { name=k.toString() }
+            maps.add(TiledMap())
+            renderers.add(KlexIsometricTiledMapRenderer(maps[k], 1f, k))
+
+            val belowLayer = TiledMapTileLayer(maxWidth, maxHeight, tileLength, tileLengthHalf).apply { name = "below" }
+            val leftLayer = TiledMapTileLayer(maxWidth, maxHeight, tileLength, tileLengthHalf).apply { name = "left" }
+            val upLayer = TiledMapTileLayer(maxWidth, maxHeight, tileLength, tileLengthHalf).apply { name = "up" }
+            val frontLayer = TiledMapTileLayer(maxWidth, maxHeight, tileLength, tileLengthHalf).apply { name = "front" }
 
             for (j in 0 until maxHeight)
             {
                 for (i in 0 until maxWidth)
                 {
-                    val cell = TiledMapTileLayer.Cell()
-                    layer.setCell(i, j, cell)
+                    val belowCell = TiledMapTileLayer.Cell()
+                    val leftCell = TiledMapTileLayer.Cell()
+                    val upCell = TiledMapTileLayer.Cell()
+                    val frontCell = TiledMapTileLayer.Cell()
+                    belowLayer.setCell(i, j, belowCell)
+                    leftLayer.setCell(i, j, leftCell)
+                    upLayer.setCell(i, j, upCell)
+                    frontLayer.setCell(i, j, frontCell)
                 }
             }
 
-            map.layers.add(layer)
+            maps[k].layers.add(belowLayer)
+            maps[k].layers.add(leftLayer)
+            maps[k].layers.add(upLayer)
+            maps[k].layers.add(frontLayer)
         }
     }
 
@@ -72,7 +83,10 @@ class KlexMap(val room : KlexRoom, val tiles : KlexTiles)
             {
                 for (i in 0 until maxWidth)
                 {
-                    (map.layers[k] as TiledMapTileLayer).getCell(i, j).tile = null
+                    for (layer in maps[k].layers)
+                    {
+                        (layer as TiledMapTileLayer).getCell(i, j).tile = null
+                    }
                 }
             }
         }
@@ -95,8 +109,6 @@ class KlexMap(val room : KlexRoom, val tiles : KlexTiles)
 
         for (k in 0 until maxFloors)
         {
-            val layer = (map.layers[k] as TiledMapTileLayer)
-
             for (j in 0 until room.height)
             {
                 for (i in 0 until room.width)
@@ -233,65 +245,47 @@ class KlexMap(val room : KlexRoom, val tiles : KlexTiles)
 
                         /////
 
-                        frameBuffer.begin()
-                        spriteBatch.enableBlending()
-                        Gdx.gl.glBlendFuncSeparate(
-                            GL20.GL_SRC_ALPHA,
-                            GL20.GL_ONE_MINUS_SRC_ALPHA,
-                            GL20.GL_ONE,
-                            GL20.GL_ONE_MINUS_SRC_ALPHA
-                        )
-                        Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
-                        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-                        spriteBatch.begin()
+                        val belowLayer = maps[k].layers["below"] as TiledMapTileLayer
+                        val leftLayer = maps[k].layers["left"] as TiledMapTileLayer
+                        val upLayer = maps[k].layers["up"] as TiledMapTileLayer
+                        val frontLayer = maps[k].layers["front"] as TiledMapTileLayer
 
-                        if (isBelowBorder)
+                        val belowCell = when (direction)
                         {
-                            if (isBelowBorderUp) spriteBatch.draw(tiles.belowBorderUp, 0f, 0f)
-                            if (isBelowBorderRight) spriteBatch.draw(tiles.belowBorderRight, 0f, 0f)
-                            if (isBelowBorderDown) spriteBatch.draw(tiles.belowBorderDown, 0f, 0f)
-                            if (isBelowBorderLeft) spriteBatch.draw(tiles.belowBorderLeft, 0f, 0f)
+                            MapDirection.Up    -> belowLayer.getCell(i, j)
+                            MapDirection.Right -> belowLayer.getCell(j, room.width - 1 - i)
+                            MapDirection.Down  -> belowLayer.getCell(room.width - 1 - i, room.height - 1 - j)
+                            MapDirection.Left  -> belowLayer.getCell(room.height - 1 - j, i)
                         }
 
-                        if (isLeftBorder)
+                        val leftCell = when (direction)
                         {
-                            if (isLeftBorderAbove) spriteBatch.draw(tiles.leftBorderAbove, 0f, 0f)
-                            if (isLeftBorderUp) spriteBatch.draw(tiles.leftBorderUp, 0f, 0f)
-                            if (isLeftBorderBelow) spriteBatch.draw(tiles.leftBorderBelow, 0f, 0f)
-                            if (isLeftBorderDown) spriteBatch.draw(tiles.leftBorderDown, 0f, 0f)
+                            MapDirection.Up    -> leftLayer.getCell(i, j)
+                            MapDirection.Right -> leftLayer.getCell(j, room.width - 1 - i)
+                            MapDirection.Down  -> leftLayer.getCell(room.width - 1 - i, room.height - 1 - j)
+                            MapDirection.Left  -> leftLayer.getCell(room.height - 1 - j, i)
                         }
 
-                        if (isUpBorder)
+                        val upCell = when (direction)
                         {
-                            if (isUpBorderAbove) spriteBatch.draw(tiles.upBorderAbove, 0f, 0f)
-                            if (isUpBorderRight) spriteBatch.draw(tiles.upBorderRight, 0f, 0f)
-                            if (isUpBorderBelow) spriteBatch.draw(tiles.upBorderBelow, 0f, 0f)
-                            if (isUpBorderLeft) spriteBatch.draw(tiles.upBorderLeft, 0f, 0f)
+                            MapDirection.Up    -> upLayer.getCell(i, j)
+                            MapDirection.Right -> upLayer.getCell(j, room.width - 1 - i)
+                            MapDirection.Down  -> upLayer.getCell(room.width - 1 - i, room.height - 1 - j)
+                            MapDirection.Left  -> upLayer.getCell(room.height - 1 - j, i)
                         }
 
-                        if (isRightBorder) spriteBatch.draw(tiles.rightBorder, 0f, 0f)
-                        if (isDownBorder) spriteBatch.draw(tiles.downBorder, 0f, 0f)
-                        if (isAboveBorder) spriteBatch.draw(tiles.aboveBorder, 0f, 0f)
-
-                        spriteBatch.end()
-                        val textureRegion = ScreenUtils.getFrameBufferTexture()
-                        frameBuffer.end()
-
-                        //TextureRegion(TextureRegion(frameBuffer.colorBufferTexture).apply { flip(false, true) })
-
-                        val tile = StaticTiledMapTile(textureRegion)
-
-                        /////
-
-                        val cell = when (direction)
+                        val frontCell = when (direction)
                         {
-                            MapDirection.Up    -> layer.getCell(i, j)
-                            MapDirection.Right -> layer.getCell(j, room.width - 1 - i)
-                            MapDirection.Down  -> layer.getCell(room.width - 1 - i, room.height - 1 - j)
-                            MapDirection.Left  -> layer.getCell(room.height - 1 - j, i)
+                            MapDirection.Up    -> frontLayer.getCell(i, j)
+                            MapDirection.Right -> frontLayer.getCell(j, room.width - 1 - i)
+                            MapDirection.Down  -> frontLayer.getCell(room.width - 1 - i, room.height - 1 - j)
+                            MapDirection.Left  -> frontLayer.getCell(room.height - 1 - j, i)
                         }
 
-                        cell.tile = tile
+                        belowCell.tile = if (isBelowBorder) tiles.below(isBelowBorderUp, isBelowBorderRight, isBelowBorderDown, isBelowBorderLeft) else tiles.belowBorderTile
+                        leftCell.tile = if (isLeftBorder) tiles.left(isLeftBorderAbove, isLeftBorderUp, isLeftBorderBelow, isLeftBorderDown) else tiles.leftBorderTile
+                        upCell.tile = if (isUpBorder) tiles.up(isUpBorderAbove, isUpBorderRight, isUpBorderBelow, isUpBorderLeft) else tiles.upBorderTile
+                        frontCell.tile = tiles.front(isDownBorder, isRightBorder, isAboveBorder)
 
                         /////
                     }
@@ -307,10 +301,10 @@ class KlexMap(val room : KlexRoom, val tiles : KlexTiles)
             MapDirection.Up    -> roomPosition.set(xMap.toFloat(), yMap.toFloat(), zMap.toFloat())
             MapDirection.Right -> roomPosition.set((height - yMap - 1).toFloat(), xMap.toFloat(), zMap.toFloat())
             MapDirection.Down  -> roomPosition.set(
-                (width - xMap - 1).toFloat(),
-                (height - yMap - 1).toFloat(),
-                zMap.toFloat()
-            )
+                    (width - xMap - 1).toFloat(),
+                    (height - yMap - 1).toFloat(),
+                    zMap.toFloat()
+                                                  )
             MapDirection.Left  -> roomPosition.set(yMap.toFloat(), (width - xMap - 1).toFloat(), zMap.toFloat())
         }
     }
@@ -328,6 +322,11 @@ class KlexMap(val room : KlexRoom, val tiles : KlexTiles)
     fun changeSelection(selectPosition : Vector3)
     {
         selectMapPosition.set(selectPosition)
+
+        (maps[selectMapPosition.z.toInt()].layers["below"] as TiledMapTileLayer).getCell(selectMapPosition.x.toInt(), selectMapPosition.y.toInt()).tile = tiles.belowSelectTile
+        (maps[selectMapPosition.z.toInt()].layers["left"] as TiledMapTileLayer).getCell(selectMapPosition.x.toInt(), selectMapPosition.y.toInt()).tile = tiles.leftSelectTile
+        (maps[selectMapPosition.z.toInt()].layers["up"] as TiledMapTileLayer).getCell(selectMapPosition.x.toInt(), selectMapPosition.y.toInt()).tile = tiles.upSelectTile
+        (maps[selectMapPosition.z.toInt()].layers["front"] as TiledMapTileLayer).getCell(selectMapPosition.x.toInt(), selectMapPosition.y.toInt()).tile = tiles.frontSelectTile
     }
 
     fun info(position : Vector3)
