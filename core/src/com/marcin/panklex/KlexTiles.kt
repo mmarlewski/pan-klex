@@ -19,27 +19,26 @@ class KlexTiles(assetManager : AssetManager)
     val frameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, Gdx.graphics.width, Gdx.graphics.height, false)
     val spriteBatch = SpriteBatch()
 
-    // select
+    // entity tiles
 
-    val downSelect = tileset[1][1]
-    val rightSelect = tileset[0][0]
-    val aboveSelect = tileset[2][0]
-    val leftSelect = tileset[0][1]
-    val upSelect = tileset[1][0]
-    val belowSelect = tileset[2][1]
+    val smallEntityTile = glue(tileset[0][7])
+    val bigEntityTile = glue(tileset[2][7])
 
     // select tiles
 
-    val frontSelectTile = glue(downSelect, rightSelect, aboveSelect)
-    val leftSelectTile = glue(leftSelect)
-    val upSelectTile = glue(upSelect)
-    val belowSelectTile = glue(belowSelect)
+    val belowSelectTile = glue(tileset[2][1])
+    val leftSelectTile = glue(tileset[0][1])
+    val upSelectTile = glue(tileset[1][0])
+    val downSelectTile = glue(tileset[1][1])
+    val rightSelectTile = glue(tileset[0][0])
+    val aboveSelectTile = glue(tileset[2][0])
 
     // border
 
-    val frontBordersDown = tileset[1][2]
-    val frontBordersRight = tileset[0][2]
-    val frontBordersAbove = tileset[2][2]
+    val belowBorderUp = tileset[2][3]
+    val belowBorderRight = tileset[2][4]
+    val belowBorderDown = tileset[2][5]
+    val belowBorderLeft = tileset[2][6]
 
     val leftBorderAbove = tileset[0][3]
     val leftBorderUp = tileset[0][4]
@@ -51,21 +50,30 @@ class KlexTiles(assetManager : AssetManager)
     val upBorderBelow = tileset[1][5]
     val upBorderLeft = tileset[1][6]
 
-    val belowBorderUp = tileset[2][3]
-    val belowBorderRight = tileset[2][4]
-    val belowBorderDown = tileset[2][5]
-    val belowBorderLeft = tileset[2][6]
+    val downBorder = tileset[1][2]
+
+    val rightBorder = tileset[0][2]
+
+    val aboveBorder = tileset[2][2]
 
     // border tiles
 
-    val frontBordersDownRightAboveTile = glue(frontBordersDown, frontBordersRight, frontBordersAbove)
-    val frontBordersDownRightTile = glue(frontBordersDown, frontBordersRight)
-    val frontBordersDownAboveTile = glue(frontBordersDown, frontBordersAbove)
-    val frontBordersDownTile = glue(frontBordersDown)
-    val frontBordersRightAboveTile = glue(frontBordersRight, frontBordersAbove)
-    val frontBordersRightTile = glue(frontBordersRight)
-    val frontBordersAboveTile = glue(frontBordersAbove)
-    val frontBordersTile = glue()
+    val belowBorderUpRightDownLeftTile = glue(belowBorderUp, belowBorderRight, belowBorderDown, belowBorderLeft)
+    val belowBorderUpRightDownTile = glue(belowBorderUp, belowBorderRight, belowBorderDown)
+    val belowBorderUpRightLeftTile = glue(belowBorderUp, belowBorderRight, belowBorderLeft)
+    val belowBorderUpRightTile = glue(belowBorderUp, belowBorderRight)
+    val belowBorderUpDownLeftTile = glue(belowBorderUp, belowBorderDown, belowBorderLeft)
+    val belowBorderUpDownTile = glue(belowBorderUp, belowBorderDown)
+    val belowBorderUpLeftTile = glue(belowBorderUp, belowBorderLeft)
+    val belowBorderUpTile = glue(belowBorderUp)
+    val belowBorderRightDownLeftTile = glue(belowBorderRight, belowBorderDown, belowBorderLeft)
+    val belowBorderRightDownTile = glue(belowBorderRight, belowBorderDown)
+    val belowBorderRightLeftTile = glue(belowBorderRight, belowBorderLeft)
+    val belowBorderRightTile = glue(belowBorderRight)
+    val belowBorderDownLeftTile = glue(belowBorderDown, belowBorderLeft)
+    val belowBorderDownTile = glue(belowBorderDown)
+    val belowBorderLeftTile = glue(belowBorderLeft)
+    val belowBorderTile = glue()
 
     val leftBorderAboveUpBelowDownTile = glue(leftBorderAbove, leftBorderUp, leftBorderBelow, leftBorderDown)
     val leftBorderAboveUpBelowTile = glue(leftBorderAbove, leftBorderUp, leftBorderBelow)
@@ -101,38 +109,35 @@ class KlexTiles(assetManager : AssetManager)
     val upBorderLeftTile = glue(upBorderLeft)
     val upBorderTile = glue()
 
-    val belowBorderUpRightDownLeftTile = glue(belowBorderUp, belowBorderRight, belowBorderDown, belowBorderLeft)
-    val belowBorderUpRightDownTile = glue(belowBorderUp, belowBorderRight, belowBorderDown)
-    val belowBorderUpRightLeftTile = glue(belowBorderUp, belowBorderRight, belowBorderLeft)
-    val belowBorderUpRightTile = glue(belowBorderUp, belowBorderRight)
-    val belowBorderUpDownLeftTile = glue(belowBorderUp, belowBorderDown, belowBorderLeft)
-    val belowBorderUpDownTile = glue(belowBorderUp, belowBorderDown)
-    val belowBorderUpLeftTile = glue(belowBorderUp, belowBorderLeft)
-    val belowBorderUpTile = glue(belowBorderUp)
-    val belowBorderRightDownLeftTile = glue(belowBorderRight, belowBorderDown, belowBorderLeft)
-    val belowBorderRightDownTile = glue(belowBorderRight, belowBorderDown)
-    val belowBorderRightLeftTile = glue(belowBorderRight, belowBorderLeft)
-    val belowBorderRightTile = glue(belowBorderRight)
-    val belowBorderDownLeftTile = glue(belowBorderDown, belowBorderLeft)
-    val belowBorderDownTile = glue(belowBorderDown)
-    val belowBorderLeftTile = glue(belowBorderLeft)
-    val belowBorderTile = glue()
+    val downBorderTile = glue(downBorder)
+
+    val rightBorderTile = glue(rightBorder)
+
+    val aboveBorderTile = glue(aboveBorder)
 
     // functions
 
-    fun front(down : Boolean, right : Boolean, above : Boolean) : StaticTiledMapTile
+    fun below(up : Boolean, right : Boolean, down : Boolean, left : Boolean) : StaticTiledMapTile
     {
         return when
         {
-            down && right && above    -> frontBordersDownRightAboveTile
-            down && right && !above   -> frontBordersDownRightTile
-            down && !right && above   -> frontBordersDownAboveTile
-            down && !right && !above  -> frontBordersDownTile
-            !down && right && above   -> frontBordersRightAboveTile
-            !down && right && !above  -> frontBordersRightTile
-            !down && !right && above  -> frontBordersAboveTile
-            !down && !right && !above -> frontBordersTile
-            else                      -> frontBordersTile
+            up && right && down && left     -> belowBorderUpRightDownLeftTile
+            up && right && down && !left    -> belowBorderUpRightDownTile
+            up && right && !down && left    -> belowBorderUpRightLeftTile
+            up && right && !down && !left   -> belowBorderUpRightTile
+            up && !right && down && left    -> belowBorderUpDownLeftTile
+            up && !right && down && !left   -> belowBorderUpDownTile
+            up && !right && !down && left   -> belowBorderUpLeftTile
+            up && !right && !down && !left  -> belowBorderUpTile
+            !up && right && down && left    -> belowBorderRightDownLeftTile
+            !up && right && down && !left   -> belowBorderRightDownTile
+            !up && right && !down && left   -> belowBorderRightLeftTile
+            !up && right && !down && !left  -> belowBorderRightTile
+            !up && !right && down && left   -> belowBorderDownLeftTile
+            !up && !right && down && !left  -> belowBorderDownTile
+            !up && !right && !down && left  -> belowBorderLeftTile
+            !up && !right && !down && !left -> belowBorderTile
+            else                            -> belowBorderTile
         }
     }
 
@@ -184,35 +189,15 @@ class KlexTiles(assetManager : AssetManager)
         }
     }
 
-    fun below(up : Boolean, right : Boolean, down : Boolean, left : Boolean) : StaticTiledMapTile
-    {
-        return when
-        {
-            up && right && down && left     -> belowBorderUpRightDownLeftTile
-            up && right && down && !left    -> belowBorderUpRightDownTile
-            up && right && !down && left    -> belowBorderUpRightLeftTile
-            up && right && !down && !left   -> belowBorderUpRightTile
-            up && !right && down && left    -> belowBorderUpDownLeftTile
-            up && !right && down && !left   -> belowBorderUpDownTile
-            up && !right && !down && left   -> belowBorderUpLeftTile
-            up && !right && !down && !left  -> belowBorderUpTile
-            !up && right && down && left    -> belowBorderRightDownLeftTile
-            !up && right && down && !left   -> belowBorderRightDownTile
-            !up && right && !down && left   -> belowBorderRightLeftTile
-            !up && right && !down && !left  -> belowBorderRightTile
-            !up && !right && down && left   -> belowBorderDownLeftTile
-            !up && !right && down && !left  -> belowBorderDownTile
-            !up && !right && !down && left  -> belowBorderLeftTile
-            !up && !right && !down && !left -> belowBorderTile
-            else                            -> belowBorderTile
-        }
-    }
+    fun down() = downBorderTile
+
+    fun right() = rightBorderTile
+
+    fun above() = aboveBorderTile
 
     fun glue(vararg regions : TextureRegion) : StaticTiledMapTile
     {
         frameBuffer.begin()
-        //spriteBatch.enableBlending()
-        //Gdx.gl.glBlendFuncSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA)
         Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         spriteBatch.begin()

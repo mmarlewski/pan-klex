@@ -174,7 +174,7 @@ class ScreenGame(name : String, val game : PanKlexGame) : BaseScreen(name, game)
                 floor((0.5f * worldTouchPosition.x - worldTouchPosition.y + map.tileLengthQuarter) / map.tileLengthHalf) + (currentFloor + 1)
         mapTouchPosition.y =
                 floor((0.5f * worldTouchPosition.x + worldTouchPosition.y - map.tileLengthQuarter) / map.tileLengthHalf) - (currentFloor + 1)
-        mapTouchPosition.z = currentFloor.toFloat()
+        mapTouchPosition.z = currentFloor.toFloat() + 1
         isTouchInMap =
                 (mapTouchPosition.x.toInt() in 0 until level.width && mapTouchPosition.y.toInt() in 0 until level.height)
     }
@@ -186,7 +186,6 @@ class ScreenGame(name : String, val game : PanKlexGame) : BaseScreen(name, game)
             map.getRoomPosition(mapTouchPosition, roomTouchPosition)
             map.updateMap()
             map.changeSelection(mapTouchPosition)
-            //game.log("map pos", "x ${mapTouchPosition.x} y ${mapTouchPosition.y} z ${mapTouchPosition.z}")
         }
     }
 
@@ -209,7 +208,7 @@ class ScreenGame(name : String, val game : PanKlexGame) : BaseScreen(name, game)
         for (k in 0 until map.maxFloors)
         {
             map.renderers[k].setView(gameCamera)
-            map.renderers[k].render()
+            map.renderers[k].klexRender(32,16)
         }
         stage.draw()
     }
