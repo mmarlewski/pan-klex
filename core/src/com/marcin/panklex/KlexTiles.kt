@@ -5,6 +5,7 @@ import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
@@ -22,7 +23,10 @@ class KlexTiles(assetManager : AssetManager)
     // entity tiles
 
     val smallEntityTile = glue(tileset[0][7])
-    val bigEntityTile = glue(tileset[2][7])
+    val bigEntityTile = glue(tileset[1][7])
+
+    val smallEntityOutline = tileset[0][8]
+    val bigEntityOutline = tileset[1][8]
 
     // select tiles
 

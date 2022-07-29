@@ -36,7 +36,7 @@ class KlexMap(val room : KlexRoom, val tiles : KlexTiles)
         for (k in 0 until maxFloors)
         {
             maps.add(TiledMap())
-            renderers.add(KlexIsometricTiledMapRenderer(maps[k], 1f, k))
+            renderers.add(KlexIsometricTiledMapRenderer(maps[k], 1f, k,tiles.bigEntityOutline))
 
             val layers = mutableListOf<TiledMapTileLayer>()
 

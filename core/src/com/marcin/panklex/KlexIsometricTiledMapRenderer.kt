@@ -1,7 +1,9 @@
 package com.marcin.panklex
 
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.maps.tiled.renderers.BatchTiledMapRenderer
@@ -12,7 +14,8 @@ import com.badlogic.gdx.math.Vector3
 import kotlin.math.sqrt
 
 // i have no idea what im doing
-class KlexIsometricTiledMapRenderer(map : TiledMap, unitScale : Float, val floor : Int) : IsometricTiledMapRenderer(map, unitScale)
+class KlexIsometricTiledMapRenderer(map : TiledMap, unitScale : Float, val floor : Int, val entity : TextureRegion) :
+    IsometricTiledMapRenderer(map, unitScale)
 {
     private var isoTransform : Matrix4? = null
     private var invIsotransform : Matrix4? = null
@@ -75,7 +78,8 @@ class KlexIsometricTiledMapRenderer(map : TiledMap, unitScale : Float, val floor
                 {
                     if (layer.isVisible && layer is TiledMapTileLayer)
                     {
-                        val color = Color.toFloatBits(batchColor.r, batchColor.g, batchColor.b, batchColor.a * layer.opacity)
+                        val color =
+                            Color.toFloatBits(batchColor.r, batchColor.g, batchColor.b, batchColor.a * layer.opacity)
                         val x = col * halfTileWidth + row * halfTileWidth
                         // draw each layer higher than previous
                         val y = row * halfTileHeight - col * halfTileHeight + floor * tileHeight
@@ -186,6 +190,8 @@ class KlexIsometricTiledMapRenderer(map : TiledMap, unitScale : Float, val floor
                 }
             }
         }
+
+        batch.draw(entity, 32f * 3 + 16f, 16f * 1 + 8f)
 
         endRender()
     }
