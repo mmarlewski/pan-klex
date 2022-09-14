@@ -100,4 +100,19 @@ class ObjectElevator(
         spaceSideTransparency[Direction3d.Right] = false
         spaceSideTransparency[Direction3d.Above] = true
     }
+
+    override fun canStoreEntity(spacePosition : Vector3) : Boolean
+    {
+        return false
+    }
+
+    override fun isGround(spacePosition : Vector3) : Boolean
+    {
+        return false
+    }
+
+    override fun getMoves(moveList : MutableList<Move>, spacePosition : Vector3, room : Room)
+    {
+        //
+    }
 }

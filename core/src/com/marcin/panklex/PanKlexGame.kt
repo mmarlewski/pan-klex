@@ -29,6 +29,9 @@ class PanKlexGame : Game()
     {
         assetManager.load("graphics/other/select.png", Texture::class.java)
         assetManager.load("graphics/other/lines.png", Texture::class.java)
+        assetManager.load("graphics/other/groundMove.png", Texture::class.java)
+        assetManager.load("graphics/other/fallMove.png", Texture::class.java)
+        assetManager.load("graphics/other/jumpMove.png", Texture::class.java)
 
         assetManager.load("graphics/entities/player.png", Texture::class.java)
 

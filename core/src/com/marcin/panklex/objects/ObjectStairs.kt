@@ -4,8 +4,96 @@ import com.badlogic.gdx.maps.tiled.TiledMapTile
 import com.badlogic.gdx.math.Vector3
 import com.marcin.panklex.*
 
+enum class StairsPosition
+{
+    Center, Left, DownLeft, Down, DownRight, Right, AboveCenter, AboveUp, AboveLeft, AboveRight
+}
+
+fun getStairsPosition(
+    centerPosition : Vector3, stairsPosition : StairsPosition, stairsDirection : Direction2d) : Vector3
+{
+    return when (stairsPosition)
+    {
+        StairsPosition.Center      -> Vector3(centerPosition.x, centerPosition.y, centerPosition.z)
+        StairsPosition.Left        -> when (stairsDirection)
+        {
+            Direction2d.Up    -> Vector3(centerPosition.x - 1, centerPosition.y, centerPosition.z)
+            Direction2d.Right -> Vector3(centerPosition.x, centerPosition.y + 1, centerPosition.z)
+            Direction2d.Down  -> Vector3(centerPosition.x + 1, centerPosition.y, centerPosition.z)
+            Direction2d.Left  -> Vector3(centerPosition.x, centerPosition.y - 1, centerPosition.z)
+        }
+        StairsPosition.DownLeft    -> when (stairsDirection)
+        {
+            Direction2d.Up    -> Vector3(centerPosition.x - 1, centerPosition.y - 1, centerPosition.z)
+            Direction2d.Right -> Vector3(centerPosition.x - 1, centerPosition.y + 1, centerPosition.z)
+            Direction2d.Down  -> Vector3(centerPosition.x + 1, centerPosition.y + 1, centerPosition.z)
+            Direction2d.Left  -> Vector3(centerPosition.x + 1, centerPosition.y - 1, centerPosition.z)
+        }
+        StairsPosition.Down        -> when (stairsDirection)
+        {
+            Direction2d.Up    -> Vector3(centerPosition.x, centerPosition.y - 1, centerPosition.z)
+            Direction2d.Right -> Vector3(centerPosition.x - 1, centerPosition.y, centerPosition.z)
+            Direction2d.Down  -> Vector3(centerPosition.x, centerPosition.y + 1, centerPosition.z)
+            Direction2d.Left  -> Vector3(centerPosition.x + 1, centerPosition.y, centerPosition.z)
+        }
+        StairsPosition.DownRight   -> when (stairsDirection)
+        {
+            Direction2d.Up    -> Vector3(centerPosition.x + 1, centerPosition.y - 1, centerPosition.z)
+            Direction2d.Right -> Vector3(centerPosition.x - 1, centerPosition.y - 1, centerPosition.z)
+            Direction2d.Down  -> Vector3(centerPosition.x - 1, centerPosition.y + 1, centerPosition.z)
+            Direction2d.Left  -> Vector3(centerPosition.x + 1, centerPosition.y + 1, centerPosition.z)
+        }
+        StairsPosition.Right       -> when (stairsDirection)
+        {
+            Direction2d.Up    -> Vector3(centerPosition.x + 1, centerPosition.y, centerPosition.z)
+            Direction2d.Right -> Vector3(centerPosition.x, centerPosition.y - 1, centerPosition.z)
+            Direction2d.Down  -> Vector3(centerPosition.x - 1, centerPosition.y, centerPosition.z)
+            Direction2d.Left  -> Vector3(centerPosition.x, centerPosition.y + 1, centerPosition.z)
+        }
+        StairsPosition.AboveCenter -> Vector3(centerPosition.x, centerPosition.y, centerPosition.z + 1)
+        StairsPosition.AboveUp     -> when (stairsDirection)
+        {
+            Direction2d.Up    -> Vector3(centerPosition.x, centerPosition.y + 1, centerPosition.z + 1)
+            Direction2d.Right -> Vector3(centerPosition.x + 1, centerPosition.y, centerPosition.z + 1)
+            Direction2d.Down  -> Vector3(centerPosition.x, centerPosition.y - 1, centerPosition.z + 1)
+            Direction2d.Left  -> Vector3(centerPosition.x - 1, centerPosition.y, centerPosition.z + 1)
+        }
+        StairsPosition.AboveLeft   -> when (stairsDirection)
+        {
+            Direction2d.Up    -> Vector3(centerPosition.x - 1, centerPosition.y, centerPosition.z + 1)
+            Direction2d.Right -> Vector3(centerPosition.x, centerPosition.y + 1, centerPosition.z + 1)
+            Direction2d.Down  -> Vector3(centerPosition.x + 1, centerPosition.y, centerPosition.z + 1)
+            Direction2d.Left  -> Vector3(centerPosition.x, centerPosition.y - 1, centerPosition.z + 1)
+        }
+        StairsPosition.AboveRight  -> when (stairsDirection)
+        {
+            Direction2d.Up    -> Vector3(centerPosition.x + 1, centerPosition.y, centerPosition.z + 1)
+            Direction2d.Right -> Vector3(centerPosition.x, centerPosition.y - 1, centerPosition.z + 1)
+            Direction2d.Down  -> Vector3(centerPosition.x - 1, centerPosition.y, centerPosition.z + 1)
+            Direction2d.Left  -> Vector3(centerPosition.x, centerPosition.y + 1, centerPosition.z + 1)
+        }
+    }
+}
+
 class ObjectStairs(val stairsPosition : Vector3, var stairsDirection : Direction2d) : Object("stairs")
 {
+    val stairsPositions = mutableMapOf<StairsPosition, Vector3>().apply {
+        for (position in StairsPosition.values())
+            this[position] = getStairsPosition(stairsPosition, position, stairsDirection)
+    }
+
+    val centerMoves = mutableMapOf<StairsPosition, StairsMove>().apply {
+        for (position in StairsPosition.values())
+            this[position] = StairsMove(
+                stairsPosition, stairsDirection, stairsPositions[StairsPosition.Center]!!, stairsPositions[position]!!)
+    }
+
+    val aboveMoves = mutableMapOf<StairsPosition, StairsMove>().apply {
+        for (position in StairsPosition.values())
+            this[position] = StairsMove(
+                stairsPosition, stairsDirection, stairsPositions[StairsPosition.AboveCenter]!!, stairsPositions[position]!!)
+    }
+
     override fun getOccupiedPositions(positions : MutableList<Vector3>)
     {
         positions.add(stairsPosition)
@@ -13,7 +101,8 @@ class ObjectStairs(val stairsPosition : Vector3, var stairsDirection : Direction
 
     override fun getPresentPositions(positions : MutableList<Vector3>)
     {
-        positions.add(stairsPosition)
+        positions.add(stairsPositions[StairsPosition.Center]!!)
+        positions.add(stairsPositions[StairsPosition.AboveCenter]!!)
     }
 
     override fun getTiles(
@@ -72,5 +161,24 @@ class ObjectStairs(val stairsPosition : Vector3, var stairsDirection : Direction
         spaceSideTransparency[Direction3d.Above] = true
 
         spaceSideTransparency[direction2dToDirection3d(stairsDirection)] = false
+    }
+
+    override fun canStoreEntity(spacePosition : Vector3) : Boolean
+    {
+        return false
+    }
+
+    override fun isGround(spacePosition : Vector3) : Boolean
+    {
+        return false
+    }
+
+    override fun getMoves(moveList : MutableList<Move>, spacePosition : Vector3, room : Room)
+    {
+        when (spacePosition)
+        {
+            stairsPositions[StairsPosition.Center]      -> moveList.addAll(centerMoves.values)
+            stairsPositions[StairsPosition.AboveCenter] -> moveList.addAll(aboveMoves.values)
+        }
     }
 }

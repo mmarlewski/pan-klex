@@ -53,4 +53,19 @@ class ObjectBridge(val bridgePosition : Vector3, var bridgeDirection : Direction
         spaceSideTransparency[Direction3d.Right] = true
         spaceSideTransparency[Direction3d.Above] = false
     }
+
+    override fun canStoreEntity(spacePosition : Vector3) : Boolean
+    {
+        return false
+    }
+
+    override fun isGround(spacePosition : Vector3) : Boolean
+    {
+        return true
+    }
+
+    override fun getMoves(moveList : MutableList<Move>, spacePosition : Vector3, room : Room)
+    {
+        //
+    }
 }

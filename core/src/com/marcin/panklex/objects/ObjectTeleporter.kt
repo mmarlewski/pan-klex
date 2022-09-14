@@ -8,6 +8,16 @@ class ObjectTeleporter(val teleporterPosition : Vector3) : Object("teleporter")
 {
     val fieldPosition = Vector3(teleporterPosition.x, teleporterPosition.y, teleporterPosition.z + 1)
 
+    val fieldPositionUp = Vector3(fieldPosition.x, fieldPosition.y + 1, fieldPosition.z)
+    val fieldPositionRight = Vector3(fieldPosition.x + 1, fieldPosition.y, fieldPosition.z)
+    val fieldPositionDown = Vector3(fieldPosition.x, fieldPosition.y - 1, fieldPosition.z)
+    val fieldPositionLeft = Vector3(fieldPosition.x - 1, fieldPosition.y, fieldPosition.z)
+
+    val throughTeleporterFieldMoveUp = ThroughTeleporterFieldMove(fieldPosition, fieldPositionUp)
+    val throughTeleporterFieldMoveRight = ThroughTeleporterFieldMove(fieldPosition, fieldPositionRight)
+    val throughTeleporterFieldMoveDown = ThroughTeleporterFieldMove(fieldPosition, fieldPositionDown)
+    val throughTeleporterFieldMoveLeft = ThroughTeleporterFieldMove(fieldPosition, fieldPositionLeft)
+
     override fun getOccupiedPositions(positions : MutableList<Vector3>)
     {
         positions.add(teleporterPosition)
@@ -75,6 +85,38 @@ class ObjectTeleporter(val teleporterPosition : Vector3) : Object("teleporter")
                 spaceSideTransparency[Direction3d.Down] = true
                 spaceSideTransparency[Direction3d.Right] = true
                 spaceSideTransparency[Direction3d.Above] = true
+            }
+        }
+    }
+
+    override fun canStoreEntity(spacePosition : Vector3) : Boolean
+    {
+        return when (spacePosition)
+        {
+            teleporterPosition -> false
+            else               -> true
+        }
+    }
+
+    override fun isGround(spacePosition : Vector3) : Boolean
+    {
+        return when (spacePosition)
+        {
+            teleporterPosition -> true
+            else               -> false
+        }
+    }
+
+    override fun getMoves(moveList : MutableList<Move>, spacePosition : Vector3, room : Room)
+    {
+        when (spacePosition)
+        {
+            fieldPosition ->
+            {
+                moveList.add(throughTeleporterFieldMoveUp)
+                moveList.add(throughTeleporterFieldMoveRight)
+                moveList.add(throughTeleporterFieldMoveDown)
+                moveList.add(throughTeleporterFieldMoveLeft)
             }
         }
     }

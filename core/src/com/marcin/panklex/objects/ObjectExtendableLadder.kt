@@ -133,4 +133,19 @@ class ObjectExtendableLadder(val originPosition : Vector3, var ladderDirection :
             }
         }
     }
+
+    override fun canStoreEntity(spacePosition : Vector3) : Boolean
+    {
+        return false
+    }
+
+    override fun isGround(spacePosition : Vector3) : Boolean
+    {
+        return false
+    }
+
+    override fun getMoves(moveList : MutableList<Move>, spacePosition : Vector3, room : Room)
+    {
+        //
+    }
 }

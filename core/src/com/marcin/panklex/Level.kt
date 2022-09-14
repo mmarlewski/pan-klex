@@ -12,7 +12,7 @@ class Level
     var levelHeight = 0
     var levelFloors = 0
     var levelSpaceArray = arrayOf<Array<Array<Space>>>()
-    var roomSpaces = mutableListOf<Space>()
+    var levelSpaces = mutableListOf<Space>()
     var objects = mutableListOf<Object>()
     var entities = mutableListOf<Entity>()
     var entityPlayer : EntityPlayer? = null
@@ -23,10 +23,10 @@ class Level
 
         // main
 
-        levelName = "manually created"
-        levelWidth = 5
-        levelHeight = 7
-        levelFloors = 5
+        levelName = "map"
+        levelWidth = 7
+        levelHeight = 10
+        levelFloors = 7
 
         // spaces
 
@@ -42,7 +42,7 @@ class Level
                 {
                     val space = Space(Vector3(i.toFloat(), j.toFloat(), k.toFloat()))
                     rowWidth += space
-                    roomSpaces.add(space)
+                    levelSpaces.add(space)
                 }
 
                 rowHeight += rowWidth
@@ -51,66 +51,105 @@ class Level
             levelSpaceArray += rowHeight
         }
 
-        // objects
+        // walls
 
         for (i in 0 until levelWidth)
         {
             for (j in 0 until levelHeight)
             {
-                objects.add(ObjectVendingMachine(Vector3(i.toFloat(), j.toFloat(), 0f), Direction2d.Down))
-                objects.add(
-                    ObjectVendingMachine(Vector3(i.toFloat(), j.toFloat(), (levelFloors - 1).toFloat()), Direction2d.Down))
+                objects.add(ObjectBlock(Vector3(i.toFloat(), j.toFloat(), 0f)))
+                objects.add(ObjectBlock(Vector3(i.toFloat(), j.toFloat(), (levelFloors - 1).toFloat())))
             }
         }
         for (k in 1 until levelFloors - 1)
         {
-            objects.add(ObjectVendingMachine(Vector3(0f, 0f, k.toFloat()), Direction2d.Down))
-            objects.add(ObjectVendingMachine(Vector3(1f, 0f, k.toFloat()), Direction2d.Down))
-            objects.add(ObjectVendingMachine(Vector3(2f, 0f, k.toFloat()), Direction2d.Down))
-            objects.add(ObjectVendingMachine(Vector3(3f, 0f, k.toFloat()), Direction2d.Down))
-            objects.add(ObjectVendingMachine(Vector3(4f, 0f, k.toFloat()), Direction2d.Down))
-
-            objects.add(ObjectVendingMachine(Vector3(4f, 1f, k.toFloat()), Direction2d.Down))
-            objects.add(ObjectHalfColumn(Vector3(4f, 2f, k.toFloat()), Direction2d.Right))
-            objects.add(ObjectVendingMachine(Vector3(4f, 3f, k.toFloat()), Direction2d.Down))
-            objects.add(ObjectBlock(Vector3(4f, 4f, k.toFloat())))
-            objects.add(ObjectVendingMachine(Vector3(4f, 5f, k.toFloat()), Direction2d.Down))
-
-            objects.add(ObjectVendingMachine(Vector3(4f, 6f, k.toFloat()), Direction2d.Down))
-            objects.add(ObjectVendingMachine(Vector3(3f, 6f, k.toFloat()), Direction2d.Down))
-            objects.add(ObjectVendingMachine(Vector3(2f, 6f, k.toFloat()), Direction2d.Down))
-            objects.add(ObjectVendingMachine(Vector3(1f, 6f, k.toFloat()), Direction2d.Down))
-            objects.add(ObjectVendingMachine(Vector3(0f, 6f, k.toFloat()), Direction2d.Down))
-
-            objects.add(ObjectVendingMachine(Vector3(0f, 5f, k.toFloat()), Direction2d.Down))
-            objects.add(ObjectVendingMachine(Vector3(0f, 4f, k.toFloat()), Direction2d.Down))
-            objects.add(ObjectVendingMachine(Vector3(0f, 3f, k.toFloat()), Direction2d.Down))
-            objects.add(ObjectVendingMachine(Vector3(0f, 2f, k.toFloat()), Direction2d.Down))
-            objects.add(ObjectVendingMachine(Vector3(0f, 1f, k.toFloat()), Direction2d.Down))
+            objects.add(ObjectBlock(Vector3(0f, 0f, k.toFloat())))
+            objects.add(ObjectBlock(Vector3(1f, 0f, k.toFloat())))
+            objects.add(ObjectBlock(Vector3(2f, 0f, k.toFloat())))
+            objects.add(ObjectBlock(Vector3(3f, 0f, k.toFloat())))
+            objects.add(ObjectBlock(Vector3(4f, 0f, k.toFloat())))
+            objects.add(ObjectBlock(Vector3(5f, 0f, k.toFloat())))
+            objects.add(ObjectBlock(Vector3(6f, 1f, k.toFloat())))
+            objects.add(ObjectBlock(Vector3(6f, 2f, k.toFloat())))
+            objects.add(ObjectBlock(Vector3(6f, 3f, k.toFloat())))
+            objects.add(ObjectBlock(Vector3(6f, 4f, k.toFloat())))
+            objects.add(ObjectBlock(Vector3(6f, 5f, k.toFloat())))
+            objects.add(ObjectBlock(Vector3(6f, 6f, k.toFloat())))
+            objects.add(ObjectBlock(Vector3(6f, 7f, k.toFloat())))
+            objects.add(ObjectBlock(Vector3(6f, 8f, k.toFloat())))
+            objects.add(ObjectBlock(Vector3(6f, 9f, k.toFloat())))
+            objects.add(ObjectBlock(Vector3(6f, 9f, k.toFloat())))
+            objects.add(ObjectBlock(Vector3(5f, 9f, k.toFloat())))
+            objects.add(ObjectBlock(Vector3(4f, 9f, k.toFloat())))
+            objects.add(ObjectBlock(Vector3(3f, 9f, k.toFloat())))
+            objects.add(ObjectBlock(Vector3(2f, 9f, k.toFloat())))
+            objects.add(ObjectBlock(Vector3(1f, 9f, k.toFloat())))
+            objects.add(ObjectBlock(Vector3(0f, 9f, k.toFloat())))
+            objects.add(ObjectBlock(Vector3(0f, 8f, k.toFloat())))
+            objects.add(ObjectBlock(Vector3(0f, 7f, k.toFloat())))
+            objects.add(ObjectBlock(Vector3(0f, 6f, k.toFloat())))
+            objects.add(ObjectBlock(Vector3(0f, 5f, k.toFloat())))
+            objects.add(ObjectBlock(Vector3(0f, 4f, k.toFloat())))
+            objects.add(ObjectBlock(Vector3(0f, 3f, k.toFloat())))
+            objects.add(ObjectBlock(Vector3(0f, 2f, k.toFloat())))
+            objects.add(ObjectBlock(Vector3(0f, 1f, k.toFloat())))
         }
 
-        objects.add(ObjectExtendableBridge(Vector3(1f, 2f, 1f), Direction2d.Right, 3))
-        objects.add(ObjectHalfArch(Vector3(1f, 4f, 1f), Direction2d.Left))
-        objects.add(ObjectBridge(Vector3(2f, 4f, 1f), Direction2d.Right))
-        objects.add(ObjectHalfColumn(Vector3(3f, 4f, 1f), Direction2d.Right))
-        objects.add(ObjectArch(Vector3(2f, 4f, 2f), Direction2d.Right))
-        objects.add(ObjectColumn(Vector3(2f, 4f, 3f)))
-        objects.add(ObjectExtendableLadder(Vector3(1f, 3f, 3f), Direction2d.Left, 3))
-        objects.add(ObjectLadder(Vector3(1f, 5f, 3f), Direction2d.Left, 3))
-        objects.add(
-            ObjectElevator(
-                Vector3(2f, 5f, 3f), 3, listOf(Direction2d.Left, Direction2d.Right, Direction2d.Right),
-                listOf(ElevatorShaftType.Door, ElevatorShaftType.Screen, ElevatorShaftType.ScreenBroken)))
+        // objects
 
-        objects.add(ObjectDoor(Vector3(0f, 2f, 2f), Direction2d.Right))
-        objects.add(ObjectPoweredDoor(Vector3(0f, 4f, 2f), Direction2d.Right))
-        objects.add(ObjectTeleporter(Vector3(3f, 1f, 1f)))
-        objects.add(ObjectSwitch(Vector3(3f, 1f, 3f), Direction2d.Left))
-        objects.add(ObjectStairs(Vector3(2f, 1f, 1f), Direction2d.Left))
+        objects.add(ObjectVendingMachine(Vector3(2f, 2f, 1f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(2f, 3f, 1f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(3f, 2f, 1f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(3f, 3f, 1f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(1f, 1f, 2f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(1f, 2f, 2f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(1f, 3f, 2f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(2f, 1f, 2f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(2f, 2f, 2f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(2f, 3f, 2f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(3f, 1f, 2f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(3f, 2f, 2f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(3f, 3f, 2f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(1f, 1f, 3f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(1f, 2f, 3f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(1f, 3f, 3f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(2f, 1f, 3f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(2f, 2f, 3f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(2f, 3f, 3f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(3f, 1f, 3f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(3f, 2f, 3f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(3f, 3f, 3f), Direction2d.Down))
+
+        objects.add(ObjectTeleporter(Vector3(3f, 7f, 3f)))
+
+        objects.add(ObjectExtendableBridge(Vector3(3f, 6f, 3f), Direction2d.Down, 3))
+
+        objects.add(ObjectLadder(Vector3(3f, 8f, 5f), Direction2d.Up, 5))
+        objects.add(ObjectLadder(Vector3(4f, 8f, 5f), Direction2d.Up, 5))
+
+        objects.add(ObjectStairs(Vector3(2f, 8f, 3f), Direction2d.Right))
+        objects.add(ObjectStairs(Vector3(1f, 8f, 2f), Direction2d.Up))
+        objects.add(ObjectStairs(Vector3(1f, 7f, 1f), Direction2d.Up))
+        objects.add(ObjectStairs(Vector3(2f, 7f, 1f), Direction2d.Left))
+
+        objects.add(ObjectHalfArch(Vector3(5f, 8f, 3f), Direction2d.Up))
+        objects.add(ObjectBridge(Vector3(5f, 7f, 3f), Direction2d.Up))
+        objects.add(ObjectBridge(Vector3(5f, 6f, 3f), Direction2d.Up))
+        objects.add(ObjectBridge(Vector3(5f, 5f, 3f), Direction2d.Up))
+        objects.add(ObjectStairs(Vector3(5f, 5f, 4f), Direction2d.Down))
+        objects.add(ObjectBridge(Vector3(5f, 4f, 4f), Direction2d.Up))
+        objects.add(ObjectBridge(Vector3(5f, 3f, 4f), Direction2d.Up))
+        objects.add(ObjectBridge(Vector3(5f, 2f, 4f), Direction2d.Up))
+        objects.add(ObjectHalfArch(Vector3(5f, 1f, 4f), Direction2d.Down))
+
+        objects.add(ObjectLadder(Vector3(1f, 4f, 4f), Direction2d.Down, 4))
+
+        objects.add(ObjectHalfColumn(Vector3(1f, 2f, 4f), Direction2d.Right))
+        objects.add(ObjectColumn(Vector3(5f, 8f, 1f)))
 
         // entities
 
-        entityPlayer = EntityPlayer(Vector3(2f, 4f, 3f))
+        entityPlayer = EntityPlayer(Vector3(5f, 8f, 4f))
         entities.add(entityPlayer!!)
 
         Gdx.app.log("level", "created level")
@@ -125,7 +164,7 @@ class Level
     {
         Gdx.app.log("level", "updating entities...")
 
-        for (space in roomSpaces)
+        for (space in levelSpaces)
         {
             space.entityOccupying = null
         }
@@ -142,7 +181,7 @@ class Level
     {
         Gdx.app.log("level", "updating objects...")
 
-        for (space in roomSpaces)
+        for (space in levelSpaces)
         {
             space.objectOccupying = null
             space.objectsPresent.clear()
@@ -174,7 +213,7 @@ class Level
     {
         Gdx.app.log("level", "updating sideTransparency...")
 
-        for (space in roomSpaces)
+        for (space in levelSpaces)
         {
             val objectOccupying = space.objectOccupying
 
@@ -194,11 +233,80 @@ class Level
         Gdx.app.log("level", "updated sideTransparency")
     }
 
+    fun updateSpacesAboveAndBelow()
+    {
+        Gdx.app.log("level", "updating spaces above and below...")
+
+        for (space in levelSpaces)
+        {
+            var spacesAbove = 0
+            var spacesBelow = 0
+
+            var spaceAbove = getSpace(space.position, Direction3d.Above)
+            var spaceBelow = getSpace(space.position, Direction3d.Below)
+
+            while (spaceAbove != null && spaceAbove.objectOccupying == null)
+            {
+                spacesAbove++
+                spaceAbove = getSpace(spaceAbove.position, Direction3d.Above)
+            }
+
+            while (spaceBelow != null && spaceBelow.objectOccupying == null)
+            {
+                spacesBelow++
+                spaceBelow = getSpace(spaceBelow.position, Direction3d.Below)
+            }
+
+            space.spacesAbove = spacesAbove
+            space.spacesBelow = spacesBelow
+        }
+
+        Gdx.app.log("level", "updated spaces above and below")
+    }
+
+    fun updateGround()
+    {
+        Gdx.app.log("level", "updating ground...")
+
+        for (space in levelSpaces)
+        {
+            val objectOccupying = space.objectOccupying
+
+            space.isGround = objectOccupying?.isGround(space.position) ?: false
+        }
+
+        for (space in levelSpaces)
+        {
+            val spaceBelow = getSpace(space.position, Direction3d.Below)
+
+            space.isOnGround = spaceBelow?.isGround ?: true
+        }
+
+        Gdx.app.log("level", "updated ground")
+    }
+
+    fun clearPathfinding()
+    {
+        Gdx.app.log("level", "clearing pathfinding...")
+
+        for (space in levelSpaces)
+        {
+            space.isOnPath = false
+            space.move = null
+            space.parentSpace = null
+            space.parentMove = null
+            space.globalCost = Int.MAX_VALUE
+            space.localCost = Int.MAX_VALUE
+        }
+
+        Gdx.app.log("level", "cleared pathfinding")
+    }
+
     fun clearBorder()
     {
         Gdx.app.log("level", "clearing border...")
 
-        for (space in roomSpaces)
+        for (space in levelSpaces)
         {
             space.isOnBorder = false
             space.isWithinBorder = false
@@ -211,7 +319,7 @@ class Level
     {
         Gdx.app.log("level", "clearing sideVisibility...")
 
-        for (space in roomSpaces)
+        for (space in levelSpaces)
         {
             for (side in Direction3d.values())
             {

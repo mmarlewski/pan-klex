@@ -73,4 +73,19 @@ class ObjectHalfColumn(val halfColumnPosition : Vector3, var halfColumnDirection
 
         spaceSideTransparency[direction2dToDirection3d(oppositeDirection2d(halfColumnDirection))] = false
     }
+
+    override fun canStoreEntity(spacePosition : Vector3) : Boolean
+    {
+        return false
+    }
+
+    override fun isGround(spacePosition : Vector3) : Boolean
+    {
+        return true
+    }
+
+    override fun getMoves(moveList : MutableList<Move>, spacePosition : Vector3, room : Room)
+    {
+        //
+    }
 }

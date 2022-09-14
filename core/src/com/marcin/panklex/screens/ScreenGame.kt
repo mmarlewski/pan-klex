@@ -10,11 +10,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
-import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.marcin.panklex.*
 import kotlin.math.floor
@@ -30,6 +27,7 @@ class ScreenGame(name : String, val game : PanKlexGame) : BaseScreen(name, game)
     val level = Level()
     val room = Room(level)
     val map = Map(room, tiles)
+    val pathfinding = Pathfinding(room)
 
     // dragging
 
@@ -37,7 +35,7 @@ class ScreenGame(name : String, val game : PanKlexGame) : BaseScreen(name, game)
     var dragOrigin = Vector2()
     var dragDifference = Vector2()
 
-    // touch
+    // mouse
 
     var isBeingTouched = false
     var isTouched = false
@@ -53,40 +51,25 @@ class ScreenGame(name : String, val game : PanKlexGame) : BaseScreen(name, game)
     // other
 
     var currentFloor = 0
+    var isMoving = false
+    var isMoveAccessible = false
 
     // hud
 
-    val leftArrowDirectionButton = TextButton("<---", TextButton.TextButtonStyle(null, null, null, BitmapFont()))
     val currentDirectionLabel = Label("direction", Label.LabelStyle(BitmapFont(), Color.CYAN))
-    val rightArrowDirectionButton = TextButton("--->", TextButton.TextButtonStyle(null, null, null, BitmapFont()))
-    val currentFloorLabel = Label("floor", Label.LabelStyle(BitmapFont(), Color.GREEN))
+    val currentFloorLabel = Label("floor", Label.LabelStyle(BitmapFont(), Color.YELLOW))
+    val isMovingLabel = Label("move", Label.LabelStyle(BitmapFont(), Color.GREEN))
 
     init
     {
         // hud
 
-        leftArrowDirectionButton.addListener(object : ClickListener()
-                                             {
-                                                 override fun clicked(event : InputEvent?, x : Float, y : Float)
-                                                 {
-                                                     changeDirection(direction2dToLeft(map.mapDirection))
-                                                 }
-                                             })
-        rightArrowDirectionButton.addListener(object : ClickListener()
-                                              {
-                                                  override fun clicked(event : InputEvent?, x : Float, y : Float)
-                                                  {
-                                                      changeDirection(direction2dToRight(map.mapDirection))
-                                                  }
-                                              })
-
         val table = Table()
         table.top().setFillParent(true)
         table.defaults().pad(10f)
-        table.add(leftArrowDirectionButton)
         table.add(currentDirectionLabel)
-        table.add(rightArrowDirectionButton)
         table.add(currentFloorLabel)
+        table.add(isMovingLabel)
         stage.addActor(table)
 
         // init
@@ -94,15 +77,23 @@ class ScreenGame(name : String, val game : PanKlexGame) : BaseScreen(name, game)
         level.createLevel()
         level.updateEntities()
         level.updateObjects()
-        level.clearBorder()
         level.updateSideTransparency()
+        level.updateGround()
+        level.updateSpacesAboveAndBelow()
         level.clearSideVisibility()
-        room.updateRoom(Vector3(1f, 1f, 1f))
-        room.updateTiles(tiles, map.mapDirection)
+        level.clearBorder()
+        level.clearPathfinding()
+        room.updateRoom(level.entityPlayer!!.playerPosition)
+        room.updateEntityTiles(tiles, map.mapDirection)
+        room.updateObjectTiles(tiles, map.mapDirection)
+        room.updateLinesTiles(tiles, map.mapDirection)
+        room.updateMoveTiles(tiles, map.mapDirection)
+        room.updateSelectTiles(tiles, levelMousePosition, isMoving, pathfinding.isPathFound, isMoveAccessible)
         map.createMap()
         map.updateMap()
         changeDirection(map.mapDirection)
         changeFloor(0)
+        changeIsMoving(false)
 
         //Gdx.graphics.setTitle("Level: \"${level.levelName}\"")
 
@@ -115,7 +106,8 @@ class ScreenGame(name : String, val game : PanKlexGame) : BaseScreen(name, game)
     {
         currentDirectionLabel.setText("$direction")
         map.changeMapDirection(direction)
-        room.updateTiles(tiles, map.mapDirection)
+        room.updateObjectTiles(tiles, map.mapDirection)
+        room.updateLinesTiles(tiles, map.mapDirection)
         map.updateMap()
     }
 
@@ -125,6 +117,35 @@ class ScreenGame(name : String, val game : PanKlexGame) : BaseScreen(name, game)
         {
             currentFloorLabel.setText("floor: $floor")
             currentFloor = floor
+        }
+    }
+
+    fun changeIsMoving(newIsMoving : Boolean)
+    {
+        when (newIsMoving)
+        {
+            true  -> isMovingLabel.setText("moving player")
+            false -> isMovingLabel.setText("not moving")
+        }
+
+        isMoving = newIsMoving
+    }
+
+    fun updateIsMoveAccessible()
+    {
+        isMoveAccessible = false
+
+        if (isMoving && pathfinding.isPathFound)
+        {
+            val levelMouseSpace = room.getSpace(levelMousePosition)
+
+            if (levelMouseSpace != null && levelMouseSpace.isOnGround)
+            {
+                if (levelMouseSpace.isObjectOccupyingNullOrCanStoreEntity(levelMousePosition))
+                {
+                    isMoveAccessible = true
+                }
+            }
         }
     }
 
@@ -158,8 +179,16 @@ class ScreenGame(name : String, val game : PanKlexGame) : BaseScreen(name, game)
     {
         if (wasLevelMousePositionChanged)
         {
-            room.updateTiles(tiles, map.mapDirection)
-            map.changeSelection(levelMousePosition)
+            if (isMoving)
+            {
+                level.clearPathfinding()
+                pathfinding.findPath(level.entityPlayer!!.playerPosition, levelMousePosition)
+                updateIsMoveAccessible()
+                room.updateMoveTiles(tiles, map.mapDirection)
+            }
+
+
+            room.updateSelectTiles(tiles, levelMousePosition, isMoving, pathfinding.isPathFound, isMoveAccessible)
             map.updateMap()
 
             wasLevelMousePositionChanged = false
@@ -190,7 +219,7 @@ class ScreenGame(name : String, val game : PanKlexGame) : BaseScreen(name, game)
         for (k in 0 until map.mapFloors)
         {
             map.renderers[k].setView(gameCamera)
-            map.renderers[k].renderEntityOutline()
+            map.renderers[k].renderOutlineLayers()
         }
         stage.draw()
     }
@@ -211,34 +240,107 @@ class ScreenGame(name : String, val game : PanKlexGame) : BaseScreen(name, game)
         when (keycode)
         {
             // direction
-            Input.Keys.Q ->
+            Input.Keys.Q     ->
             {
                 changeDirection(direction2dToLeft(map.mapDirection))
+                updateMouse()
             }
-            Input.Keys.E ->
+            Input.Keys.E     ->
             {
                 changeDirection(direction2dToRight(map.mapDirection))
                 updateMouse()
             }
             // floor
-            Input.Keys.W ->
+            Input.Keys.W     ->
             {
                 changeFloor(currentFloor + 1)
                 updateMouse()
             }
-            Input.Keys.S ->
+            Input.Keys.S     ->
             {
                 changeFloor(currentFloor - 1)
                 updateMouse()
             }
-            Input.Keys.A ->
+            Input.Keys.A     ->
             {
                 changeFloor(room.roomFloorStart)
                 updateMouse()
             }
-            Input.Keys.D ->
+            Input.Keys.D     ->
             {
                 changeFloor(room.roomFloorEnd)
+                updateMouse()
+            }
+            Input.Keys.X     ->
+            {
+                changeIsMoving(!isMoving)
+                when (isMoving)
+                {
+                    true  ->
+                    {
+                        level.clearPathfinding()
+                        pathfinding.findPath(level.entityPlayer!!.playerPosition, levelMousePosition)
+                        updateIsMoveAccessible()
+                        room.updateMoveTiles(tiles, map.mapDirection)
+                    }
+                    false ->
+                    {
+                        level.clearPathfinding()
+                        room.updateMoveTiles(tiles, map.mapDirection)
+                    }
+                }
+                room.updateSelectTiles(tiles, levelMousePosition, isMoving, pathfinding.isPathFound, isMoveAccessible)
+                map.updateMap()
+            }
+            // numbers
+            Input.Keys.NUM_1 ->
+            {
+                changeFloor(1)
+                updateMouse()
+            }
+            Input.Keys.NUM_2 ->
+            {
+                changeFloor(2)
+                updateMouse()
+            }
+            Input.Keys.NUM_3 ->
+            {
+                changeFloor(3)
+                updateMouse()
+            }
+            Input.Keys.NUM_4 ->
+            {
+                changeFloor(4)
+                updateMouse()
+            }
+            Input.Keys.NUM_5 ->
+            {
+                changeFloor(5)
+                updateMouse()
+            }
+            Input.Keys.NUM_6 ->
+            {
+                changeFloor(6)
+                updateMouse()
+            }
+            Input.Keys.NUM_7 ->
+            {
+                changeFloor(7)
+                updateMouse()
+            }
+            Input.Keys.NUM_8 ->
+            {
+                changeFloor(8)
+                updateMouse()
+            }
+            Input.Keys.NUM_9 ->
+            {
+                changeFloor(9)
+                updateMouse()
+            }
+            Input.Keys.NUM_0 ->
+            {
+                changeFloor(0)
                 updateMouse()
             }
         }
@@ -263,10 +365,18 @@ class ScreenGame(name : String, val game : PanKlexGame) : BaseScreen(name, game)
         if (button == Input.Buttons.RIGHT)
         {
             updateMouse(screenX, screenY)
-            level.changePlayerPosition(levelMousePosition)
-            level.updateEntities()
-            room.updateTiles(tiles, map.mapDirection)
-            map.updateMap()
+
+            updateIsMoveAccessible()
+
+            if (isMoveAccessible)
+            {
+                level.changePlayerPosition(levelMousePosition)
+                level.updateEntities()
+                level.clearPathfinding()
+                room.updateEntityTiles(tiles, map.mapDirection)
+                room.updateMoveTiles(tiles, map.mapDirection)
+                map.updateMap()
+            }
         }
 
         return true

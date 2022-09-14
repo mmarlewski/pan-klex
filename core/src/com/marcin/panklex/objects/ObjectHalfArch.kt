@@ -73,4 +73,19 @@ class ObjectHalfArch(val halfArchPosition : Vector3, var halfArchDirection : Dir
 
         spaceSideTransparency[direction2dToDirection3d(halfArchDirection)] = false
     }
+
+    override fun canStoreEntity(spacePosition : Vector3) : Boolean
+    {
+        return false
+    }
+
+    override fun isGround(spacePosition : Vector3) : Boolean
+    {
+        return true
+    }
+
+    override fun getMoves(moveList : MutableList<Move>, spacePosition : Vector3, room : Room)
+    {
+        //
+    }
 }

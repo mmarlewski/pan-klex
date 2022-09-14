@@ -73,10 +73,16 @@ class Map(val room : Room, val tiles : Tiles)
                 name = SpaceLayer.SideAbove.name
             })
             layers.add(TiledMapTileLayer(mapMaxWidth, mapMaxHeight, tileLength, tileLengthHalf).apply {
+                name = SpaceLayer.MoveWhole.name
+            })
+            layers.add(TiledMapTileLayer(mapMaxWidth, mapMaxHeight, tileLength, tileLengthHalf).apply {
                 name = SpaceLayer.SelectFront.name
             })
             layers.add(TiledMapTileLayer(mapMaxWidth, mapMaxHeight, tileLength, tileLengthHalf).apply {
                 name = SpaceLayer.EntityOutline.name
+            })
+            layers.add(TiledMapTileLayer(mapMaxWidth, mapMaxHeight, tileLength, tileLengthHalf).apply {
+                name = SpaceLayer.MoveOutline.name
             })
 
             for (j in 0 until mapMaxHeight)
@@ -194,17 +200,6 @@ class Map(val room : Room, val tiles : Tiles)
         mapDirection = newDirection
     }
 
-    fun changeSelection(levelPosition : Vector3)
-    {
-        val space = room.getSpace(levelPosition)
-
-        if (space != null)
-        {
-            space.layerTiles[SpaceLayer.SelectBack] = tiles.selectBack
-            space.layerTiles[SpaceLayer.SelectFront] = tiles.selectFront
-        }
-    }
-
     fun getObjectiveMapPosition(relativeMapPosition : Vector3, objectiveMapPosition : Vector3)
     {
         val x = relativeMapPosition.x
@@ -238,7 +233,8 @@ class Map(val room : Room, val tiles : Tiles)
     fun getLevelPosition(objectiveMapPosition : Vector3, levelPosition : Vector3)
     {
         levelPosition.set(
-            room.roomWidthStart + objectiveMapPosition.x, room.roomHeightStart + objectiveMapPosition.y, room.roomFloorStart + objectiveMapPosition.z)
+            room.roomWidthStart + objectiveMapPosition.x, room.roomHeightStart + objectiveMapPosition.y,
+            room.roomFloorStart + objectiveMapPosition.z)
     }
 
     fun info(levelPosition : Vector3)

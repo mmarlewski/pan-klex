@@ -13,4 +13,10 @@ abstract class Object(val objectType : String)
         mapDirection : Direction2d)
 
     abstract fun getSideTransparency(spaceSideTransparency : HashMap<Direction3d, Boolean>, spacePosition : Vector3)
+
+    abstract fun canStoreEntity(spacePosition : Vector3) : Boolean
+
+    abstract fun isGround(spacePosition : Vector3) : Boolean
+
+    abstract fun getMoves(moveList : MutableList<Move>, spacePosition : Vector3, room : Room)
 }

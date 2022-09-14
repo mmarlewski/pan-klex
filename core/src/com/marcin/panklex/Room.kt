@@ -106,7 +106,10 @@ class Room(val level : Level)
 
                             val oppositeSide = oppositeDirection3d(side)
 
-                            neighbour.sideVisibility[oppositeSide] = true
+                            if (current.sideTransparency[side] == true)
+                            {
+                                neighbour.sideVisibility[oppositeSide] = true
+                            }
 
                             // on border
 
@@ -173,38 +176,60 @@ class Room(val level : Level)
         Gdx.app.log("room", "updated room")
     }
 
-    fun updateTiles(tiles : Tiles, mapDirection : Direction2d)
+    fun updateEntityTiles(tiles : Tiles, mapDirection : Direction2d)
     {
-        //Gdx.app.log("room","updating tiles...")
+        Gdx.app.log("room", "updating entity tiles...")
 
         for (space in roomSpaces)
         {
-            // clear
-
-            for (layer in SpaceLayer.values())
-            {
-                space.layerTiles[layer] = null
-            }
-
-            // EntityWhole, EntityOutline
+            space.layerTiles[SpaceLayer.EntityWhole] = null
+            space.layerTiles[SpaceLayer.EntityOutline] = null
 
             val entityOccupying = space.entityOccupying
 
-            if (entityOccupying != null)
-            {
-                entityOccupying.getTiles(tiles, space.layerTiles)
-            }
+            entityOccupying?.getTiles(tiles, space.layerTiles)
+        }
+
+        Gdx.app.log("room", "updated entity tiles")
+    }
+
+    fun updateObjectTiles(tiles : Tiles, mapDirection : Direction2d)
+    {
+        Gdx.app.log("room", "updating object tiles...")
+
+        for (space in roomSpaces)
+        {
+            space.layerTiles[SpaceLayer.SideBelow] = null
+            space.layerTiles[SpaceLayer.SideLeft] = null
+            space.layerTiles[SpaceLayer.SideUp] = null
+            space.layerTiles[SpaceLayer.Behind] = null
+            space.layerTiles[SpaceLayer.Before] = null
+            space.layerTiles[SpaceLayer.SideDown] = null
+            space.layerTiles[SpaceLayer.SideRight] = null
+            space.layerTiles[SpaceLayer.SideAbove] = null
+
+            val objectOccupying = space.objectOccupying
+
+            objectOccupying?.getTiles(tiles, space.layerTiles, space.position, mapDirection)
+        }
+
+        Gdx.app.log("room", "updated object tiles")
+    }
+
+    fun updateLinesTiles(tiles : Tiles, mapDirection : Direction2d)
+    {
+        Gdx.app.log("room", "updating lines tiles...")
+
+        for (space in roomSpaces)
+        {
+            space.layerTiles[SpaceLayer.LinesBelow] = null
+            space.layerTiles[SpaceLayer.LinesLeft] = null
+            space.layerTiles[SpaceLayer.LinesUp] = null
 
             val objectOccupying = space.objectOccupying
 
             if (objectOccupying != null)
             {
-                // sides, Behind, Before
-
-                objectOccupying.getTiles(tiles, space.layerTiles, space.position, mapDirection)
-
-                // lines
-
                 if (space.isOnBorder)
                 {
                     var isAboveLine = false
@@ -255,7 +280,72 @@ class Room(val level : Level)
             }
         }
 
-        //Gdx.app.log("room","updated tiles")
+        Gdx.app.log("room", "updated lines tiles")
+    }
+
+    fun updateMoveTiles(tiles : Tiles, mapDirection : Direction2d)
+    {
+        Gdx.app.log("room", "updating move tiles...")
+
+        for (space in roomSpaces)
+        {
+            space.layerTiles[SpaceLayer.MoveWhole] = null
+            space.layerTiles[SpaceLayer.MoveOutline] = null
+
+            if (space.isOnPath)
+            {
+                space.move?.getMoveTiles(tiles, space.layerTiles, space.position, mapDirection)
+            }
+        }
+
+        Gdx.app.log("room", "updated move tiles")
+    }
+
+    fun updateSelectTiles(
+        tiles : Tiles, selectPosition : Vector3, isMoving : Boolean, isPathFound : Boolean, isMoveAccessible : Boolean)
+    {
+        //Gdx.app.log("room", "updating select tiles...")
+
+        for (space in roomSpaces)
+        {
+            space.layerTiles[SpaceLayer.SelectBack] = null
+            space.layerTiles[SpaceLayer.SelectFront] = null
+
+            if (space.position == selectPosition)
+            {
+                when (isMoving)
+                {
+                    true  -> when (isPathFound)
+                    {
+                        true  -> when (isMoveAccessible)
+                        {
+                            true  ->
+                            {
+                                space.layerTiles[SpaceLayer.SelectBack] = tiles.selectPathFoundBack
+                                space.layerTiles[SpaceLayer.SelectFront] = tiles.selectPathFoundFront
+                            }
+                            false ->
+                            {
+                                space.layerTiles[SpaceLayer.SelectBack] = tiles.selectInaccessibleBack
+                                space.layerTiles[SpaceLayer.SelectFront] = tiles.selectInaccessibleFront
+                            }
+                        }
+                        false ->
+                        {
+                            space.layerTiles[SpaceLayer.SelectBack] = tiles.selectPathNotFoundBack
+                            space.layerTiles[SpaceLayer.SelectFront] = tiles.selectPathNotFoundFront
+                        }
+                    }
+                    false ->
+                    {
+                        space.layerTiles[SpaceLayer.SelectBack] = tiles.selectNotMovingBack
+                        space.layerTiles[SpaceLayer.SelectFront] = tiles.selectNotMovingFront
+                    }
+                }
+            }
+        }
+
+        //Gdx.app.log("room", "updated select tiles")
     }
 
     fun getSpace(x : Int, y : Int, z : Int) : Space?

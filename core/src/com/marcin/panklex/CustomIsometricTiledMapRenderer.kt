@@ -71,8 +71,8 @@ class CustomIsometricTiledMapRenderer(map : TiledMap, unitScale : Float, private
             {
                 for (layer in map.layers)
                 {
-                    // every layer except EntityOutline
-                    if (layer.isVisible && layer is TiledMapTileLayer && layer.name != SpaceLayer.EntityOutline.name)
+                    // every layer except outlines
+                    if (layer.isVisible && layer is TiledMapTileLayer && layer.name != SpaceLayer.EntityOutline.name && layer.name != SpaceLayer.MoveOutline.name)
                     {
                         renderCellLayer(
                             batchColor, col, halfTileWidth.toInt(), row, tileHeight.toInt(), halfTileHeight.toInt(), layer)
@@ -84,7 +84,7 @@ class CustomIsometricTiledMapRenderer(map : TiledMap, unitScale : Float, private
         endRender()
     }
 
-    fun renderEntityOutline()
+    fun renderOutlineLayers()
     {
         val width = tileLength
         val height = tileLengthHalf
@@ -111,10 +111,13 @@ class CustomIsometricTiledMapRenderer(map : TiledMap, unitScale : Float, private
         {
             for (col in col1..col2)
             {
-                // only EntityOutline
+                // only EntityOutline and MoveOutline
                 renderCellLayer(
                     batchColor, col, halfTileWidth.toInt(), row, tileHeight.toInt(), halfTileHeight.toInt(),
                     map.layers[SpaceLayer.EntityOutline.name] as TiledMapTileLayer)
+                renderCellLayer(
+                    batchColor, col, halfTileWidth.toInt(), row, tileHeight.toInt(), halfTileHeight.toInt(),
+                    map.layers[SpaceLayer.MoveOutline.name] as TiledMapTileLayer)
             }
         }
 

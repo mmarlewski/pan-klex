@@ -75,4 +75,19 @@ class ObjectPoweredDoor(val poweredDoorPosition : Vector3, val poweredDoorDirect
         spaceSideTransparency[Direction3d.Right] = false
         spaceSideTransparency[Direction3d.Above] = false
     }
+
+    override fun canStoreEntity(spacePosition : Vector3) : Boolean
+    {
+        return false
+    }
+
+    override fun isGround(spacePosition : Vector3) : Boolean
+    {
+        return true
+    }
+
+    override fun getMoves(moveList : MutableList<Move>, spacePosition : Vector3, room : Room)
+    {
+        //
+    }
 }

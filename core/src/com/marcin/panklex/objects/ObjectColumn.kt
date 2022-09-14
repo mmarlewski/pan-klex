@@ -39,4 +39,19 @@ class ObjectColumn(val columnPosition : Vector3) : Object("column")
         spaceSideTransparency[Direction3d.Right] = true
         spaceSideTransparency[Direction3d.Above] = true
     }
+
+    override fun canStoreEntity(spacePosition : Vector3) : Boolean
+    {
+        return false
+    }
+
+    override fun isGround(spacePosition : Vector3) : Boolean
+    {
+        return true
+    }
+
+    override fun getMoves(moveList : MutableList<Move>, spacePosition : Vector3, room : Room)
+    {
+        //
+    }
 }
