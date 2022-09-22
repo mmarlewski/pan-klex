@@ -11,9 +11,13 @@ import com.marcin.panklex.screens.*
 class PanKlexGame : Game()
 {
     lateinit var spriteBatch : SpriteBatch
-    val assetManager = AssetManager()
+    lateinit var assetManager : AssetManager
 
     lateinit var screenGame : ScreenGame
+    lateinit var screenContainer : ScreenContainer
+    lateinit var screenVendingMachine : ScreenVendingMachine
+    lateinit var screenElevator : ScreenElevator
+    lateinit var screenStation : ScreenStation
 
     fun changeInputProcessor(inputProcessor : InputProcessor)
     {
@@ -27,11 +31,16 @@ class PanKlexGame : Game()
 
     fun loadAssets()
     {
+        assetManager = AssetManager()
+
         assetManager.load("graphics/other/select.png", Texture::class.java)
         assetManager.load("graphics/other/lines.png", Texture::class.java)
         assetManager.load("graphics/other/groundMove.png", Texture::class.java)
         assetManager.load("graphics/other/fallMove.png", Texture::class.java)
-        assetManager.load("graphics/other/jumpMove.png", Texture::class.java)
+        assetManager.load("graphics/other/dist2JumpMove.png", Texture::class.java)
+        assetManager.load("graphics/other/dist3JumpMove.png", Texture::class.java)
+        assetManager.load("graphics/other/items.png", Texture::class.java)
+        assetManager.load("graphics/other/upgrades.png", Texture::class.java)
 
         assetManager.load("graphics/entities/player.png", Texture::class.java)
 
@@ -53,6 +62,7 @@ class PanKlexGame : Game()
         assetManager.load("graphics/objects/extendableLadder.png", Texture::class.java)
         assetManager.load("graphics/objects/bridge.png", Texture::class.java)
         assetManager.load("graphics/objects/extendableBridge.png", Texture::class.java)
+        assetManager.load("graphics/objects/rope.png", Texture::class.java)
 
         assetManager.finishLoading()
     }
@@ -61,7 +71,11 @@ class PanKlexGame : Game()
     {
         loadAssets()
         spriteBatch = SpriteBatch()
-        screenGame = ScreenGame("screen Game", this)
+        screenGame = ScreenGame("game", this)
+        screenContainer = ScreenContainer("container", this)
+        screenVendingMachine = ScreenVendingMachine("vending machine", this)
+        screenElevator = ScreenElevator("elevator", this)
+        screenStation = ScreenStation("station", this)
         changeScreen(screenGame)
     }
 
@@ -69,6 +83,11 @@ class PanKlexGame : Game()
     {
         spriteBatch.dispose()
         assetManager.dispose()
+
         screenGame.dispose()
+        screenContainer.dispose()
+        screenVendingMachine.dispose()
+        screenElevator.dispose()
+        screenStation.dispose()
     }
 }

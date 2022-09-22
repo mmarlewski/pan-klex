@@ -17,7 +17,7 @@ class ObjectArch(val archPosition : Vector3, var archDirection : Direction2d) : 
     }
 
     override fun getTiles(
-        tiles : Tiles, spaceLayerTiles : HashMap<SpaceLayer, TiledMapTile?>, spacePosition : Vector3,
+        tiles : Tiles, spaceLayerTiles : MutableMap<SpaceLayer, TiledMapTile?>, spacePosition : Vector3,
         mapDirection : Direction2d)
     {
         val relativeArchPosition = objectiveToRelativeDirection2d(archDirection, mapDirection)
@@ -52,7 +52,7 @@ class ObjectArch(val archPosition : Vector3, var archDirection : Direction2d) : 
         }
     }
 
-    override fun getSideTransparency(spaceSideTransparency : HashMap<Direction3d, Boolean>, spacePosition : Vector3)
+    override fun getSideTransparency(spaceSideTransparency : MutableMap<Direction3d, Boolean>, spacePosition : Vector3)
     {
         spaceSideTransparency[Direction3d.Below] = true
         spaceSideTransparency[Direction3d.Left] = when (archDirection)
@@ -89,6 +89,11 @@ class ObjectArch(val archPosition : Vector3, var archDirection : Direction2d) : 
     }
 
     override fun getMoves(moveList : MutableList<Move>, spacePosition : Vector3, room : Room)
+    {
+        //
+    }
+
+    override fun getActions(actionArray : Array<Action?>, spacePosition : Vector3)
     {
         //
     }

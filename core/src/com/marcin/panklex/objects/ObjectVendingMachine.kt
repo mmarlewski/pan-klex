@@ -9,6 +9,35 @@ class ObjectVendingMachine(var vendingMachinePosition : Vector3, var vendingMach
 {
     var isVendingMachineBroken = false
 
+    val vendingMachineItems = mutableMapOf<PlayerItem, Int>().apply {
+        for (item in PlayerItem.values())
+            this[item] = 0
+    }
+
+    val actionSwitchToVendingMachineScreen = Action(
+        "buy items",
+        "( change screen )")
+    {
+        val objectVendingMachine = it.mouseObject as ObjectVendingMachine
+        val entityPlayer = it.level.entityPlayer
+
+        it.game.screenVendingMachine.setVendingMachineAndPlayer(objectVendingMachine, entityPlayer)
+        it.game.screenVendingMachine.updateWidgets()
+        it.game.changeScreen(it.game.screenVendingMachine)
+    }
+
+    fun getVendingMachineItem(item : PlayerItem) : Int
+    {
+        return vendingMachineItems[item] ?: 0
+    }
+
+    fun changeVendingMachineItem(item : PlayerItem, by : Int)
+    {
+        var count = vendingMachineItems[item]!!
+        count += by
+        vendingMachineItems[item] = count
+    }
+
     override fun getOccupiedPositions(positions : MutableList<Vector3>)
     {
         positions.add(vendingMachinePosition)
@@ -20,7 +49,7 @@ class ObjectVendingMachine(var vendingMachinePosition : Vector3, var vendingMach
     }
 
     override fun getTiles(
-        tiles : Tiles, spaceLayerTiles : HashMap<SpaceLayer, TiledMapTile?>, spacePosition : Vector3,
+        tiles : Tiles, spaceLayerTiles : MutableMap<SpaceLayer, TiledMapTile?>, spacePosition : Vector3,
         mapDirection : Direction2d)
     {
         val vendingMachineRelativeDirection = objectiveToRelativeDirection2d(vendingMachineDirection, mapDirection)
@@ -48,7 +77,7 @@ class ObjectVendingMachine(var vendingMachinePosition : Vector3, var vendingMach
             if (isVendingMachineBroken) tiles.vendingMachineBlankBrokenAbove else tiles.vendingMachineBlankAbove
     }
 
-    override fun getSideTransparency(spaceSideTransparency : HashMap<Direction3d, Boolean>, spacePosition : Vector3)
+    override fun getSideTransparency(spaceSideTransparency : MutableMap<Direction3d, Boolean>, spacePosition : Vector3)
     {
         spaceSideTransparency[Direction3d.Below] = false
         spaceSideTransparency[Direction3d.Left] = false
@@ -71,5 +100,10 @@ class ObjectVendingMachine(var vendingMachinePosition : Vector3, var vendingMach
     override fun getMoves(moveList : MutableList<Move>, spacePosition : Vector3, room : Room)
     {
         //
+    }
+
+    override fun getActions(actionArray : Array<Action?>, spacePosition : Vector3)
+    {
+        actionArray[0] = actionSwitchToVendingMachineScreen.apply { isActionPossible = true }
     }
 }

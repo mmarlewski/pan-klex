@@ -17,7 +17,7 @@ class ObjectBlock(val blockPosition : Vector3) : Object("block")
     }
 
     override fun getTiles(
-        tiles : Tiles, spaceLayerTiles : HashMap<SpaceLayer, TiledMapTile?>, spacePosition : Vector3,
+        tiles : Tiles, spaceLayerTiles : MutableMap<SpaceLayer, TiledMapTile?>, spacePosition : Vector3,
         mapDirection : Direction2d)
     {
         spaceLayerTiles[SpaceLayer.SideBelow] = null
@@ -30,7 +30,7 @@ class ObjectBlock(val blockPosition : Vector3) : Object("block")
         spaceLayerTiles[SpaceLayer.SideAbove] = tiles.blockAbove
     }
 
-    override fun getSideTransparency(spaceSideTransparency : HashMap<Direction3d, Boolean>, spacePosition : Vector3)
+    override fun getSideTransparency(spaceSideTransparency : MutableMap<Direction3d, Boolean>, spacePosition : Vector3)
     {
         spaceSideTransparency[Direction3d.Below] = false
         spaceSideTransparency[Direction3d.Left] = false
@@ -51,6 +51,11 @@ class ObjectBlock(val blockPosition : Vector3) : Object("block")
     }
 
     override fun getMoves(moveList : MutableList<Move>, spacePosition : Vector3, room : Room)
+    {
+        //
+    }
+
+    override fun getActions(actionArray : Array<Action?>, spacePosition : Vector3)
     {
         //
     }

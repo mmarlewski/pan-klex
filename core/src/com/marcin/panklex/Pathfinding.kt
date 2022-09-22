@@ -14,9 +14,11 @@ class Pathfinding(val room : Room)
 
     fun getDistance(position1 : Vector3, position2 : Vector3) : Int
     {
-        return (sqrt(
-            (position2.x - position1.x).pow(2) + (position2.y - position1.y).pow(2) + (position2.z - position1.z).pow(
-                2))).toInt()
+        var sum = (position2.x - position1.x).pow(2)
+        sum += (position2.y - position1.y).pow(2)
+        sum += (position2.z - position1.z).pow(2)
+
+        return (sqrt(sum)).toInt()
     }
 
     fun findPath(start : Vector3, end : Vector3)

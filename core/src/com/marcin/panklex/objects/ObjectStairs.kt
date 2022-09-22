@@ -3,6 +3,7 @@ package com.marcin.panklex.objects
 import com.badlogic.gdx.maps.tiled.TiledMapTile
 import com.badlogic.gdx.math.Vector3
 import com.marcin.panklex.*
+import com.marcin.panklex.moves.MoveStairs
 
 enum class StairsPosition
 {
@@ -82,15 +83,15 @@ class ObjectStairs(val stairsPosition : Vector3, var stairsDirection : Direction
             this[position] = getStairsPosition(stairsPosition, position, stairsDirection)
     }
 
-    val centerMoves = mutableMapOf<StairsPosition, StairsMove>().apply {
+    val centerMoves = mutableMapOf<StairsPosition, MoveStairs>().apply {
         for (position in StairsPosition.values())
-            this[position] = StairsMove(
+            this[position] = MoveStairs(
                 stairsPosition, stairsDirection, stairsPositions[StairsPosition.Center]!!, stairsPositions[position]!!)
     }
 
-    val aboveMoves = mutableMapOf<StairsPosition, StairsMove>().apply {
+    val aboveMoves = mutableMapOf<StairsPosition, MoveStairs>().apply {
         for (position in StairsPosition.values())
-            this[position] = StairsMove(
+            this[position] = MoveStairs(
                 stairsPosition, stairsDirection, stairsPositions[StairsPosition.AboveCenter]!!, stairsPositions[position]!!)
     }
 
@@ -106,7 +107,7 @@ class ObjectStairs(val stairsPosition : Vector3, var stairsDirection : Direction
     }
 
     override fun getTiles(
-        tiles : Tiles, spaceLayerTiles : HashMap<SpaceLayer, TiledMapTile?>, spacePosition : Vector3,
+        tiles : Tiles, spaceLayerTiles : MutableMap<SpaceLayer, TiledMapTile?>, spacePosition : Vector3,
         mapDirection : Direction2d)
     {
         val relativeStairsDirection2d = objectiveToRelativeDirection2d(stairsDirection, mapDirection)
@@ -151,7 +152,7 @@ class ObjectStairs(val stairsPosition : Vector3, var stairsDirection : Direction
         }
     }
 
-    override fun getSideTransparency(spaceSideTransparency : HashMap<Direction3d, Boolean>, spacePosition : Vector3)
+    override fun getSideTransparency(spaceSideTransparency : MutableMap<Direction3d, Boolean>, spacePosition : Vector3)
     {
         spaceSideTransparency[Direction3d.Below] = false
         spaceSideTransparency[Direction3d.Left] = true
@@ -180,5 +181,10 @@ class ObjectStairs(val stairsPosition : Vector3, var stairsDirection : Direction
             stairsPositions[StairsPosition.Center]      -> moveList.addAll(centerMoves.values)
             stairsPositions[StairsPosition.AboveCenter] -> moveList.addAll(aboveMoves.values)
         }
+    }
+
+    override fun getActions(actionArray : Array<Action?>, spacePosition : Vector3)
+    {
+        //
     }
 }

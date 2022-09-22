@@ -10,7 +10,7 @@ abstract class BaseScreen(val baseName : String, val baseGame : PanKlexGame) : S
 {
     val camera = OrthographicCamera()
     val viewport = FitViewport(screenResolution.x, screenResolution.y, camera)
-    val stage by lazy { Stage(viewport, baseGame.spriteBatch) }
+    val stage = Stage(viewport, baseGame.spriteBatch)
 
     override fun show()
     {

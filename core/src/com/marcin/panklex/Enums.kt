@@ -2,6 +2,16 @@ package com.marcin.panklex
 
 import com.badlogic.gdx.math.Vector3
 
+enum class PlayerItem
+{
+    Cell, Coin, Pickaxe, Gear, RopeArrow, PointingArrow
+}
+
+enum class PlayerUpgrade
+{
+    LongFallLeg, SpringLeg, DrillArm, ExtendedArm
+}
+
 enum class DirectionX
 {
     Right, Left
@@ -670,5 +680,16 @@ fun dist1ConnToDirection2d(dist1Conn : Dist1Conn) : Direction2d?
         Dist1Conn.Left      -> Direction2d.Left
         Dist1Conn.UpLeft    -> null
         Dist1Conn.Center    -> null
+    }
+}
+
+fun direction2dToDist1Conn(direction2d : Direction2d) : Dist1Conn
+{
+    return when (direction2d)
+    {
+        Direction2d.Up    -> Dist1Conn.Up
+        Direction2d.Right -> Dist1Conn.Right
+        Direction2d.Down  -> Dist1Conn.Down
+        Direction2d.Left  -> Dist1Conn.Left
     }
 }

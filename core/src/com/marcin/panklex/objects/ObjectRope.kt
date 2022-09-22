@@ -5,10 +5,18 @@ import com.badlogic.gdx.math.Vector3
 import com.marcin.panklex.*
 import com.marcin.panklex.moves.MoveLadder
 import com.marcin.panklex.moves.MoveLadderLike
+import com.marcin.panklex.moves.MoveRope
 
-class ObjectLadder(val ladderOriginPosition : Vector3, var ladderDirection : Direction2d, var ladderLength : Int) :
-    ObjectLadderLike(ladderOriginPosition, ladderDirection, ladderLength, "ladder")
+class ObjectRope(val ropeOriginPosition : Vector3, var ropeDirection : Direction2d, var ropeLength : Int) :
+    ObjectLadderLike(ropeOriginPosition, ropeDirection, ropeLength, "rope")
 {
+    val firstPosition = centerPositions[1]
+    val firstPart = getLadderLikePart(firstPosition)
+    val originPart = getLadderLikePart(ladderLikeOriginPosition)
+    val lastPosition = centerPositions.last()
+    val lastPart = getLadderLikePart(lastPosition)
+    val isExtended = false
+
     init
     {
         createMoves()
@@ -20,7 +28,7 @@ class ObjectLadder(val ladderOriginPosition : Vector3, var ladderDirection : Dir
         {
             for (endPosition in endPositions)
             {
-                ladderLikePart.centerMoves.add(MoveLadder(ladderLikePart.centerPosition, endPosition, this))
+                ladderLikePart.centerMoves.add(MoveRope(ladderLikePart.centerPosition, endPosition, this))
             }
         }
     }
@@ -40,33 +48,30 @@ class ObjectLadder(val ladderOriginPosition : Vector3, var ladderDirection : Dir
         tiles : Tiles, spaceLayerTiles : MutableMap<SpaceLayer, TiledMapTile?>, spacePosition : Vector3,
         mapDirection : Direction2d)
     {
-        when (spacePosition)
-        {
-            ladderOriginPosition -> Unit
-            else                 ->
-            {
-                val relativeLadderDirection = objectiveToRelativeDirection2d(ladderDirection, mapDirection)
+        val relativeLadderDirection = objectiveToRelativeDirection2d(ropeDirection, mapDirection)
 
-                spaceLayerTiles[SpaceLayer.SideBelow] = null
-                spaceLayerTiles[SpaceLayer.SideLeft] = null
-                spaceLayerTiles[SpaceLayer.SideUp] = null
-                spaceLayerTiles[SpaceLayer.Behind] = when (relativeLadderDirection)
-                {
-                    Direction2d.Left -> tiles.ladderLeft
-                    Direction2d.Up   -> tiles.ladderUp
-                    else             -> null
-                }
-                spaceLayerTiles[SpaceLayer.Before] = when (relativeLadderDirection)
-                {
-                    Direction2d.Down  -> tiles.ladderDown
-                    Direction2d.Right -> tiles.ladderRight
-                    else              -> null
-                }
-                spaceLayerTiles[SpaceLayer.SideDown] = null
-                spaceLayerTiles[SpaceLayer.SideRight] = null
-                spaceLayerTiles[SpaceLayer.SideAbove] = null
+        spaceLayerTiles[SpaceLayer.Behind] = when (spacePosition)
+        {
+            ropeOriginPosition -> null
+            firstPosition      -> when (relativeLadderDirection)
+            {
+                Direction2d.Up    -> tiles.ropeTopUp
+                Direction2d.Right -> tiles.ropeTopRight
+                Direction2d.Down  -> tiles.ropeTopDown
+                Direction2d.Left  -> tiles.ropeTopLeft
             }
+            lastPosition       -> tiles.ropeBottom
+            in centerPositions -> tiles.ropeMiddle
+            else               -> null
         }
+
+        spaceLayerTiles[SpaceLayer.SideBelow] = null
+        spaceLayerTiles[SpaceLayer.SideLeft] = null
+        spaceLayerTiles[SpaceLayer.SideUp] = null
+        spaceLayerTiles[SpaceLayer.Before] = null
+        spaceLayerTiles[SpaceLayer.SideDown] = null
+        spaceLayerTiles[SpaceLayer.SideRight] = null
+        spaceLayerTiles[SpaceLayer.SideAbove] = null
     }
 
     override fun getSideTransparency(spaceSideTransparency : MutableMap<Direction3d, Boolean>, spacePosition : Vector3)

@@ -91,13 +91,15 @@ class Map(val room : Room, val tiles : Tiles)
                 {
                     for (layer in layers)
                     {
-                        val cell = TiledMapTileLayer.Cell()
-                        layer.setCell(i, j, cell)
+                        layer.setCell(i, j, TiledMapTileLayer.Cell())
                     }
                 }
             }
 
-            layers.forEach(maps[k].layers::add)
+            for (layer in layers)
+            {
+                maps[k].layers.add(layer)
+            }
         }
 
         Gdx.app.log("map", "created map")

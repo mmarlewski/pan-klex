@@ -9,6 +9,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.ScreenUtils
 
 class Tiles(assetManager : AssetManager)
@@ -18,7 +20,7 @@ class Tiles(assetManager : AssetManager)
     val frameBuffer = FrameBuffer(Pixmap.Format.RGBA8888, Gdx.graphics.width, Gdx.graphics.height, false)
     val spriteBatch = SpriteBatch()
 
-    fun glueIntoTile(vararg regions : TextureRegion) : StaticTiledMapTile?
+    fun glueIntoTile(vararg regions : TextureRegion) : StaticTiledMapTile
     {
         frameBuffer.begin()
         Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
@@ -65,23 +67,71 @@ class Tiles(assetManager : AssetManager)
     val fallMoveWhole = StaticTiledMapTile(fallMove[0][0])
     val fallMoveOutline = StaticTiledMapTile(fallMove[0][1])
 
-    val jumpMove = TextureRegion(assetManager.get<Texture>("graphics/other/jumpMove.png")).split(tileLength, tileLength)
-    val jumpMoveUpWhole = StaticTiledMapTile(jumpMove[0][0])
-    val jumpMoveUpRightWhole = StaticTiledMapTile(jumpMove[1][0])
-    val jumpMoveRightWhole = StaticTiledMapTile(jumpMove[2][0])
-    val jumpMoveDownRightWhole = StaticTiledMapTile(jumpMove[3][0])
-    val jumpMoveDownWhole = StaticTiledMapTile(jumpMove[4][0])
-    val jumpMoveDownLeftWhole = StaticTiledMapTile(jumpMove[5][0])
-    val jumpMoveLeftWhole = StaticTiledMapTile(jumpMove[6][0])
-    val jumpMoveUpLeftWhole = StaticTiledMapTile(jumpMove[7][0])
-    val jumpMoveUpOutline = StaticTiledMapTile(jumpMove[0][1])
-    val jumpMoveUpRightOutline = StaticTiledMapTile(jumpMove[1][1])
-    val jumpMoveRightOutline = StaticTiledMapTile(jumpMove[2][1])
-    val jumpMoveDownRightOutline = StaticTiledMapTile(jumpMove[3][1])
-    val jumpMoveDownOutline = StaticTiledMapTile(jumpMove[4][1])
-    val jumpMoveDownLeftOutline = StaticTiledMapTile(jumpMove[5][1])
-    val jumpMoveLeftOutline = StaticTiledMapTile(jumpMove[6][1])
-    val jumpMoveUpLeftOutline = StaticTiledMapTile(jumpMove[7][1])
+    val dist2JumpMove =
+        TextureRegion(assetManager.get<Texture>("graphics/other/dist2JumpMove.png")).split(tileLength, tileLength)
+    val dist2JumpMoveUpWhole = StaticTiledMapTile(dist2JumpMove[0][0])
+    val dist2JumpMoveUpRightWhole = StaticTiledMapTile(dist2JumpMove[1][0])
+    val dist2JumpMoveRightWhole = StaticTiledMapTile(dist2JumpMove[2][0])
+    val dist2JumpMoveDownRightWhole = StaticTiledMapTile(dist2JumpMove[3][0])
+    val dist2JumpMoveDownWhole = StaticTiledMapTile(dist2JumpMove[4][0])
+    val dist2JumpMoveDownLeftWhole = StaticTiledMapTile(dist2JumpMove[5][0])
+    val dist2JumpMoveLeftWhole = StaticTiledMapTile(dist2JumpMove[6][0])
+    val dist2JumpMoveUpLeftWhole = StaticTiledMapTile(dist2JumpMove[7][0])
+    val dist2JumpMoveUpOutline = StaticTiledMapTile(dist2JumpMove[0][1])
+    val dist2JumpMoveUpRightOutline = StaticTiledMapTile(dist2JumpMove[1][1])
+    val dist2JumpMoveRightOutline = StaticTiledMapTile(dist2JumpMove[2][1])
+    val dist2JumpMoveDownRightOutline = StaticTiledMapTile(dist2JumpMove[3][1])
+    val dist2JumpMoveDownOutline = StaticTiledMapTile(dist2JumpMove[4][1])
+    val dist2JumpMoveDownLeftOutline = StaticTiledMapTile(dist2JumpMove[5][1])
+    val dist2JumpMoveLeftOutline = StaticTiledMapTile(dist2JumpMove[6][1])
+    val dist2JumpMoveUpLeftOutline = StaticTiledMapTile(dist2JumpMove[7][1])
+
+    val dist3JumpMove =
+        TextureRegion(assetManager.get<Texture>("graphics/other/dist3JumpMove.png")).split(tileLength, tileLength)
+    val dist3JumpMoveUpWhole = StaticTiledMapTile(dist3JumpMove[0][0])
+    val dist3JumpMoveUpRightWhole = StaticTiledMapTile(dist3JumpMove[1][0])
+    val dist3JumpMoveRightWhole = StaticTiledMapTile(dist3JumpMove[2][0])
+    val dist3JumpMoveDownRightWhole = StaticTiledMapTile(dist3JumpMove[3][0])
+    val dist3JumpMoveDownWhole = StaticTiledMapTile(dist3JumpMove[4][0])
+    val dist3JumpMoveDownLeftWhole = StaticTiledMapTile(dist3JumpMove[5][0])
+    val dist3JumpMoveLeftWhole = StaticTiledMapTile(dist3JumpMove[6][0])
+    val dist3JumpMoveUpLeftWhole = StaticTiledMapTile(dist3JumpMove[7][0])
+    val dist3JumpMoveUpOutline = StaticTiledMapTile(dist3JumpMove[0][1])
+    val dist3JumpMoveUpRightOutline = StaticTiledMapTile(dist3JumpMove[1][1])
+    val dist3JumpMoveRightOutline = StaticTiledMapTile(dist3JumpMove[2][1])
+    val dist3JumpMoveDownRightOutline = StaticTiledMapTile(dist3JumpMove[3][1])
+    val dist3JumpMoveDownOutline = StaticTiledMapTile(dist3JumpMove[4][1])
+    val dist3JumpMoveDownLeftOutline = StaticTiledMapTile(dist3JumpMove[5][1])
+    val dist3JumpMoveLeftOutline = StaticTiledMapTile(dist3JumpMove[6][1])
+    val dist3JumpMoveUpLeftOutline = StaticTiledMapTile(dist3JumpMove[7][1])
+
+    val items = TextureRegion(assetManager.get<Texture>("graphics/other/items.png")).split(tileLengthHalf, tileLengthHalf)
+    val itemCell = items[0][0]
+    val itemCoin = items[1][0]
+    val itemPickaxe = items[0][1]
+    val itemGear = items[1][1]
+    val itemRopeArrow = items[0][2]
+    val itemPointingArrow = items[1][2]
+
+    val upgrades =
+        TextureRegion(assetManager.get<Texture>("graphics/other/upgrades.png")).split(tileLengthHalf, tileLengthHalf)
+    val upgradeLongFallLegUnlocked = upgrades[0][0]
+    val upgradeLongFallLegLocked = upgrades[0][1]
+    val upgradeSpringLegUnlocked = upgrades[1][0]
+    val upgradeSpringLegLocked = upgrades[1][1]
+    val upgradeDrillArmUnlocked = upgrades[2][0]
+    val upgradeDrillArmLocked = upgrades[2][1]
+    val upgradeExtendedArmUnlocked = upgrades[3][0]
+    val upgradeExtendedArmLocked = upgrades[3][1]
+
+    val upgradeLongFallLegUnlockedDrawable = TextureRegionDrawable(upgrades[0][0])
+    val upgradeLongFallLegLockedDrawable = TextureRegionDrawable(upgrades[0][1])
+    val upgradeSpringLegUnlockedDrawable = TextureRegionDrawable(upgrades[1][0])
+    val upgradeSpringLegLockedDrawable = TextureRegionDrawable(upgrades[1][1])
+    val upgradeDrillArmUnlockedDrawable = TextureRegionDrawable(upgrades[2][0])
+    val upgradeDrillArmLockedDrawable = TextureRegionDrawable(upgrades[2][1])
+    val upgradeExtendedArmUnlockedDrawable = TextureRegionDrawable(upgrades[3][0])
+    val upgradeExtendedArmLockedDrawable = TextureRegionDrawable(upgrades[3][1])
 
     val lines = TextureRegion(assetManager.get<Texture>("graphics/other/lines.png")).split(tileLength, tileLength)
     val belowLinesUp = lines[0][1]
@@ -697,36 +747,50 @@ class Tiles(assetManager : AssetManager)
     val poweredDoorPoweredAbove = StaticTiledMapTile(poweredDoor[7][2])
 
     val elevator = TextureRegion(assetManager.get<Texture>("graphics/objects/elevator.png")).split(tileLength, tileLength)
-    val elevatorEmptyDown = StaticTiledMapTile(elevator[0][0])
-    val elevatorEmptyRight = StaticTiledMapTile(elevator[0][1])
-    val elevatorEmptyBrokenDown = StaticTiledMapTile(elevator[1][0])
-    val elevatorEmptyBrokenRight = StaticTiledMapTile(elevator[1][1])
-    val elevatorDoorDown = StaticTiledMapTile(elevator[2][0])
-    val elevatorDoorRight = StaticTiledMapTile(elevator[2][1])
-    val elevatorDoorBrokenDown = StaticTiledMapTile(elevator[3][0])
-    val elevatorDoorBrokenRight = StaticTiledMapTile(elevator[3][1])
-    val elevatorScreenBrokenDown = StaticTiledMapTile(elevator[4][0])
-    val elevatorScreenBrokenRight = StaticTiledMapTile(elevator[4][1])
-    val elevatorScreenBlankDown = StaticTiledMapTile(elevator[5][0])
-    val elevatorScreenBlankRight = StaticTiledMapTile(elevator[5][1])
-    val elevatorScreen1Down = StaticTiledMapTile(elevator[6][0])
-    val elevatorScreen1Right = StaticTiledMapTile(elevator[6][1])
-    val elevatorScreen2Down = StaticTiledMapTile(elevator[7][0])
-    val elevatorScreen2Right = StaticTiledMapTile(elevator[7][1])
-    val elevatorScreen3Down = StaticTiledMapTile(elevator[8][0])
-    val elevatorScreen3Right = StaticTiledMapTile(elevator[8][1])
-    val elevatorScreen4Down = StaticTiledMapTile(elevator[9][0])
-    val elevatorScreen4Right = StaticTiledMapTile(elevator[9][1])
-    val elevatorScreen5Down = StaticTiledMapTile(elevator[10][0])
-    val elevatorScreen5Right = StaticTiledMapTile(elevator[10][1])
-    val elevatorScreen6Down = StaticTiledMapTile(elevator[11][0])
-    val elevatorScreen6Right = StaticTiledMapTile(elevator[11][1])
-    val elevatorScreen7Down = StaticTiledMapTile(elevator[12][0])
-    val elevatorScreen7Right = StaticTiledMapTile(elevator[12][1])
-    val elevatorScreen8Down = StaticTiledMapTile(elevator[13][0])
-    val elevatorScreen8Right = StaticTiledMapTile(elevator[13][1])
-    val elevatorScreen9Down = StaticTiledMapTile(elevator[14][0])
-    val elevatorScreen9Right = StaticTiledMapTile(elevator[14][1])
+    val elevatorLeft = StaticTiledMapTile(elevator[0][0])
+    val elevatorUp = StaticTiledMapTile(elevator[0][1])
+    val elevatorEmptyDown = StaticTiledMapTile(elevator[1][0])
+    val elevatorEmptyRight = StaticTiledMapTile(elevator[1][1])
+    val elevatorEmptyBrokenDown = StaticTiledMapTile(elevator[2][0])
+    val elevatorEmptyBrokenRight = StaticTiledMapTile(elevator[2][1])
+    val elevatorDoorDown = StaticTiledMapTile(elevator[3][0])
+    val elevatorDoorRight = StaticTiledMapTile(elevator[3][1])
+    val elevatorDoorBrokenDown = StaticTiledMapTile(elevator[4][0])
+    val elevatorDoorBrokenRight = StaticTiledMapTile(elevator[4][1])
+    val elevatorScreenBrokenDown = StaticTiledMapTile(elevator[5][0])
+    val elevatorScreenBrokenRight = StaticTiledMapTile(elevator[5][1])
+    val elevatorScreenBlankDown = StaticTiledMapTile(elevator[6][0])
+    val elevatorScreenBlankRight = StaticTiledMapTile(elevator[6][1])
+    val elevatorScreen1Down = StaticTiledMapTile(elevator[7][0])
+    val elevatorScreen1Right = StaticTiledMapTile(elevator[7][1])
+    val elevatorScreen2Down = StaticTiledMapTile(elevator[8][0])
+    val elevatorScreen2Right = StaticTiledMapTile(elevator[8][1])
+    val elevatorScreen3Down = StaticTiledMapTile(elevator[9][0])
+    val elevatorScreen3Right = StaticTiledMapTile(elevator[9][1])
+    val elevatorScreen4Down = StaticTiledMapTile(elevator[10][0])
+    val elevatorScreen4Right = StaticTiledMapTile(elevator[10][1])
+    val elevatorScreen5Down = StaticTiledMapTile(elevator[11][0])
+    val elevatorScreen5Right = StaticTiledMapTile(elevator[11][1])
+    val elevatorScreen6Down = StaticTiledMapTile(elevator[12][0])
+    val elevatorScreen6Right = StaticTiledMapTile(elevator[12][1])
+    val elevatorScreen7Down = StaticTiledMapTile(elevator[13][0])
+    val elevatorScreen7Right = StaticTiledMapTile(elevator[13][1])
+    val elevatorScreen8Down = StaticTiledMapTile(elevator[14][0])
+    val elevatorScreen8Right = StaticTiledMapTile(elevator[14][1])
+    val elevatorScreen9Down = StaticTiledMapTile(elevator[15][0])
+    val elevatorScreen9Right = StaticTiledMapTile(elevator[15][1])
+
+    val rope = TextureRegion(assetManager.get<Texture>("graphics/objects/rope.png")).split(tileLength, tileLength)
+    val ropeMiddle = StaticTiledMapTile(rope[0][0])
+    val ropeBottom = StaticTiledMapTile(rope[1][0])
+    val ropeTopUp = StaticTiledMapTile(rope[0][2])
+    val ropeTopRight = StaticTiledMapTile(rope[1][1])
+    val ropeTopDown = StaticTiledMapTile(rope[1][2])
+    val ropeTopLeft = StaticTiledMapTile(rope[0][1])
+    val ropeMoveAboveWhole = StaticTiledMapTile(rope[0][3])
+    val ropeMoveAboveOutline = StaticTiledMapTile(rope[0][4])
+    val ropeMoveBelowWhole = StaticTiledMapTile(rope[1][3])
+    val ropeMoveBelowOutline = StaticTiledMapTile(rope[1][4])
 
     /*
     val Below = StaticTiledMapTile(stairs[0][0])

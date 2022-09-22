@@ -15,7 +15,7 @@ class Level
     var levelSpaces = mutableListOf<Space>()
     var objects = mutableListOf<Object>()
     var entities = mutableListOf<Entity>()
-    var entityPlayer : EntityPlayer? = null
+    var entityPlayer = EntityPlayer()
 
     fun createLevel()
     {
@@ -97,30 +97,78 @@ class Level
 
         // objects
 
-        objects.add(ObjectVendingMachine(Vector3(2f, 2f, 1f), Direction2d.Down))
-        objects.add(ObjectVendingMachine(Vector3(2f, 3f, 1f), Direction2d.Down))
-        objects.add(ObjectVendingMachine(Vector3(3f, 2f, 1f), Direction2d.Down))
-        objects.add(ObjectVendingMachine(Vector3(3f, 3f, 1f), Direction2d.Down))
-        objects.add(ObjectVendingMachine(Vector3(1f, 1f, 2f), Direction2d.Down))
-        objects.add(ObjectVendingMachine(Vector3(1f, 2f, 2f), Direction2d.Down))
-        objects.add(ObjectVendingMachine(Vector3(1f, 3f, 2f), Direction2d.Down))
-        objects.add(ObjectVendingMachine(Vector3(2f, 1f, 2f), Direction2d.Down))
-        objects.add(ObjectVendingMachine(Vector3(2f, 2f, 2f), Direction2d.Down))
-        objects.add(ObjectVendingMachine(Vector3(2f, 3f, 2f), Direction2d.Down))
-        objects.add(ObjectVendingMachine(Vector3(3f, 1f, 2f), Direction2d.Down))
-        objects.add(ObjectVendingMachine(Vector3(3f, 2f, 2f), Direction2d.Down))
-        objects.add(ObjectVendingMachine(Vector3(3f, 3f, 2f), Direction2d.Down))
-        objects.add(ObjectVendingMachine(Vector3(1f, 1f, 3f), Direction2d.Down))
-        objects.add(ObjectVendingMachine(Vector3(1f, 2f, 3f), Direction2d.Down))
-        objects.add(ObjectVendingMachine(Vector3(1f, 3f, 3f), Direction2d.Down))
-        objects.add(ObjectVendingMachine(Vector3(2f, 1f, 3f), Direction2d.Down))
-        objects.add(ObjectVendingMachine(Vector3(2f, 2f, 3f), Direction2d.Down))
-        objects.add(ObjectVendingMachine(Vector3(2f, 3f, 3f), Direction2d.Down))
-        objects.add(ObjectVendingMachine(Vector3(3f, 1f, 3f), Direction2d.Down))
-        objects.add(ObjectVendingMachine(Vector3(3f, 2f, 3f), Direction2d.Down))
-        objects.add(ObjectVendingMachine(Vector3(3f, 3f, 3f), Direction2d.Down))
+        val firstTeleporter = ObjectTeleporter(Vector3(3f, 7f, 3f))
+        val secondTeleporter = ObjectTeleporter(Vector3(1f, 1f, 4f))
 
-        objects.add(ObjectTeleporter(Vector3(3f, 7f, 3f)))
+        firstTeleporter.otherTeleporter = secondTeleporter
+        secondTeleporter.otherTeleporter = firstTeleporter
+
+        objects.add(firstTeleporter)
+        objects.add(secondTeleporter)
+
+        val chest = ObjectChest(Vector3(4f, 4f, 1f), Direction2d.Right).apply {
+            changeChestItem(PlayerItem.Cell, 3)
+            changeChestItem(PlayerItem.Coin, 5)
+            changeChestItem(PlayerItem.Pickaxe, 4)
+            changeChestItem(PlayerItem.Gear, 2)
+            changeChestItem(PlayerItem.RopeArrow, 1)
+            changeChestItem(PlayerItem.PointingArrow, 1)
+        }
+        objects.add(chest)
+
+        val vendingMachine = ObjectVendingMachine(Vector3(4f, 5f, 1f), Direction2d.Right).apply {
+            changeVendingMachineItem(PlayerItem.Cell, 3)
+            changeVendingMachineItem(PlayerItem.Pickaxe, 3)
+            changeVendingMachineItem(PlayerItem.Gear, 3)
+            changeVendingMachineItem(PlayerItem.RopeArrow, 3)
+            changeVendingMachineItem(PlayerItem.PointingArrow, 3)
+        }
+        objects.add(vendingMachine)
+
+        objects.add(ObjectStation(Vector3(4f, 6f, 1f), PlayerUpgrade.SpringLeg))
+
+        val elevatorParts = listOf(
+            ElevatorPart(Vector3(4f, 3f, 1f), Direction2d.Right, ElevatorPartType.Door),
+            ElevatorPart(Vector3(4f, 3f, 2f), Direction2d.Right, ElevatorPartType.Empty),
+            ElevatorPart(Vector3(4f, 3f, 3f), Direction2d.Right, ElevatorPartType.Screen),
+            ElevatorPart(Vector3(4f, 3f, 4f), Direction2d.Left, ElevatorPartType.Door),
+            ElevatorPart(Vector3(4f, 3f, 5f), Direction2d.Right, ElevatorPartType.Door)
+                                  )
+        val elevatorFloors = listOf(
+            ElevatorFloor(elevatorParts[0], "first", 1),
+            ElevatorFloor(elevatorParts[3], "second", 2),
+            ElevatorFloor(elevatorParts[4], "third", 3)
+                                   )
+        val elevator = ObjectElevator(elevatorParts, elevatorFloors)
+        elevator.changeCurrentFloor(elevatorFloors[0])
+        objects.add(elevator)
+
+        objects.add(ObjectRope(Vector3(4f, 2f, 4f), Direction2d.Left, 4))
+
+        objects.add(ObjectVendingMachine(Vector3(1f, 3f, 1f), Direction2d.Down))
+
+        objects.add(ObjectPoweredDoor(Vector3(2f, 3f, 1f), Direction2d.Up))
+
+        objects.add(ObjectVendingMachine(Vector3(3f, 3f, 1f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(3f, 2f, 1f), Direction2d.Down))
+
+        objects.add(ObjectDoor(Vector3(3f, 1f, 1f), Direction2d.Left))
+
+        objects.add(ObjectVendingMachine(Vector3(1f, 3f, 2f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(2f, 3f, 2f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(3f, 3f, 2f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(3f, 2f, 2f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(3f, 1f, 2f), Direction2d.Down))
+
+        objects.add(ObjectVendingMachine(Vector3(1f, 1f, 3f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(2f, 1f, 3f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(3f, 1f, 3f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(1f, 2f, 3f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(2f, 2f, 3f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(3f, 2f, 3f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(1f, 3f, 3f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(2f, 3f, 3f), Direction2d.Down))
+        objects.add(ObjectVendingMachine(Vector3(3f, 3f, 3f), Direction2d.Down))
 
         objects.add(ObjectExtendableBridge(Vector3(3f, 6f, 3f), Direction2d.Down, 3))
 
@@ -142,22 +190,23 @@ class Level
         objects.add(ObjectBridge(Vector3(5f, 2f, 4f), Direction2d.Up))
         objects.add(ObjectHalfArch(Vector3(5f, 1f, 4f), Direction2d.Down))
 
-        objects.add(ObjectLadder(Vector3(1f, 4f, 4f), Direction2d.Down, 4))
+        objects.add(ObjectExtendableLadder(Vector3(1f, 4f, 4f), Direction2d.Down, 4))
 
         objects.add(ObjectHalfColumn(Vector3(1f, 2f, 4f), Direction2d.Right))
         objects.add(ObjectColumn(Vector3(5f, 8f, 1f)))
 
-        // entities
+        // player
 
-        entityPlayer = EntityPlayer(Vector3(5f, 8f, 4f))
-        entities.add(entityPlayer!!)
+        entityPlayer.setPosition(5f, 8f, 4f)
+        //entityPlayer.changePlayerUpgrade(PlayerUpgrade.SpringLeg, true)
+        entities.add(entityPlayer)
 
         Gdx.app.log("level", "created level")
     }
 
     fun changePlayerPosition(newPosition : Vector3)
     {
-        entityPlayer?.playerPosition?.set(newPosition)
+        entityPlayer.playerPosition.set(newPosition)
     }
 
     fun updateEntities()
@@ -332,7 +381,11 @@ class Level
 
     fun getSpace(x : Int, y : Int, z : Int) : Space?
     {
-        return if (x in 0 until levelWidth && y in 0 until levelHeight && z in 0 until levelFloors) levelSpaceArray[z][y][x] else null
+        return when
+        {
+            x in 0 until levelWidth && y in 0 until levelHeight && z in 0 until levelFloors -> levelSpaceArray[z][y][x]
+            else                                                                            -> null
+        }
     }
 
     fun getSpace(position : Vector3) : Space?

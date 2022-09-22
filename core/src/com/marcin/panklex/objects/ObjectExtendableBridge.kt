@@ -8,6 +8,35 @@ class ObjectExtendableBridge(val originPosition : Vector3, var bridgeDirection :
     Object("extendableBridge")
 {
     val extensionPositions = mutableListOf<Vector3>()
+    var isExtended = false
+
+    val actionExtendBridge = Action(
+        "extend bridge",
+        "")
+    {
+        val objectExtendableBridge = it.mouseObject as ObjectExtendableBridge
+        objectExtendableBridge.isExtended = true
+        it.level.updateObjects()
+        it.level.updateSideTransparency()
+        it.level.updateGround()
+        it.level.updateSpacesAboveAndBelow()
+        it.room.updateObjectTiles(it.tiles, it.map.mapDirection)
+        it.map.updateMap()
+    }
+
+    val actionFoldBridge = Action(
+        "fold bridge",
+        "")
+    {
+        val objectExtendableBridge = it.mouseObject as ObjectExtendableBridge
+        objectExtendableBridge.isExtended = false
+        it.level.updateObjects()
+        it.level.updateSideTransparency()
+        it.level.updateGround()
+        it.level.updateSpacesAboveAndBelow()
+        it.room.updateObjectTiles(it.tiles, it.map.mapDirection)
+        it.map.updateMap()
+    }
 
     init
     {
@@ -30,17 +59,23 @@ class ObjectExtendableBridge(val originPosition : Vector3, var bridgeDirection :
     override fun getOccupiedPositions(positions : MutableList<Vector3>)
     {
         positions.add(originPosition)
-        positions.addAll(extensionPositions)
+        if (isExtended)
+        {
+            positions.addAll(extensionPositions)
+        }
     }
 
     override fun getPresentPositions(positions : MutableList<Vector3>)
     {
         positions.add(originPosition)
-        positions.addAll(extensionPositions)
+        if (isExtended)
+        {
+            positions.addAll(extensionPositions)
+        }
     }
 
     override fun getTiles(
-        tiles : Tiles, spaceLayerTiles : HashMap<SpaceLayer, TiledMapTile?>, spacePosition : Vector3,
+        tiles : Tiles, spaceLayerTiles : MutableMap<SpaceLayer, TiledMapTile?>, spacePosition : Vector3,
         mapDirection : Direction2d)
     {
         val relativeLadderDirection = objectiveToRelativeDirection2d(bridgeDirection, mapDirection)
@@ -94,7 +129,7 @@ class ObjectExtendableBridge(val originPosition : Vector3, var bridgeDirection :
         }
     }
 
-    override fun getSideTransparency(spaceSideTransparency : HashMap<Direction3d, Boolean>, spacePosition : Vector3)
+    override fun getSideTransparency(spaceSideTransparency : MutableMap<Direction3d, Boolean>, spacePosition : Vector3)
     {
         spaceSideTransparency[Direction3d.Below] = true
         spaceSideTransparency[Direction3d.Left] = true
@@ -117,5 +152,21 @@ class ObjectExtendableBridge(val originPosition : Vector3, var bridgeDirection :
     override fun getMoves(moveList : MutableList<Move>, spacePosition : Vector3, room : Room)
     {
         //
+    }
+
+    override fun getActions(actionArray : Array<Action?>, spacePosition : Vector3)
+    {
+        if (spacePosition == originPosition)
+        {
+            actionArray[0] = actionExtendBridge.apply {
+                actionDescription = if (isExtended) "( bridge is extended )" else "( bridge is folded )"
+                isActionPossible = !isExtended
+            }
+
+            actionArray[1] = actionFoldBridge.apply {
+                actionDescription = if (isExtended) "( bridge is extended )" else "( bridge is folded )"
+                isActionPossible = isExtended
+            }
+        }
     }
 }

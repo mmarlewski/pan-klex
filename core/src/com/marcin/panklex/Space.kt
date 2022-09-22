@@ -2,6 +2,10 @@ package com.marcin.panklex
 
 import com.badlogic.gdx.maps.tiled.TiledMapTile
 import com.badlogic.gdx.math.Vector3
+import com.marcin.panklex.moves.MoveFall
+import com.marcin.panklex.moves.MoveGround
+import com.marcin.panklex.moves.MoveJumpDist2
+import com.marcin.panklex.moves.MoveJumpDist3
 
 class Space(val position : Vector3)
 {
@@ -13,9 +17,18 @@ class Space(val position : Vector3)
 
     // sides and layers
 
-    val layerTiles = HashMap<SpaceLayer, TiledMapTile?>()
-    val sideTransparency = HashMap<Direction3d, Boolean>()
-    val sideVisibility = HashMap<Direction3d, Boolean>()
+    val layerTiles = mutableMapOf<SpaceLayer, TiledMapTile?>().apply {
+        for (layer in SpaceLayer.values())
+            this[layer] = null
+    }
+    val sideTransparency = mutableMapOf<Direction3d, Boolean>().apply {
+        for (direction in Direction3d.values())
+            this[direction] = true
+    }
+    val sideVisibility = mutableMapOf<Direction3d, Boolean>().apply {
+        for (direction in Direction3d.values())
+            this[direction] = false
+    }
 
     // border
 
@@ -36,10 +49,19 @@ class Space(val position : Vector3)
 
     val moveList = mutableListOf<Move>()
 
-    val groundMoves = mutableMapOf<Dist1Conn, GroundMove>()
-    val fallMove = FallMove(position, Vector3(position.x, position.y, position.z - 1))
-    val jump2Moves = mutableMapOf<Dist2Conn, Jump2Move>()
-    val jump3Moves = mutableMapOf<Dist3Conn, Jump3Move>()
+    val groundMoves = mutableMapOf<Dist1Conn, MoveGround>().apply {
+        for (direction in Dist1Conn.values())
+            this[direction] = MoveGround(position, getPositionDist1Conn(position, direction))
+    }
+    val fallMove = MoveFall(position, Vector3(position.x, position.y, position.z - 1))
+    val jump2Moves = mutableMapOf<Dist2Conn, MoveJumpDist2>().apply {
+        for (direction in Dist2Conn.values())
+            this[direction] = MoveJumpDist2(position, direction)
+    }
+    val jump3Moves = mutableMapOf<Dist3Conn, MoveJumpDist3>().apply {
+        for (direction in Dist3Conn.values())
+            this[direction] = MoveJumpDist3(position, direction)
+    }
 
     // pathfinding
 
@@ -49,39 +71,6 @@ class Space(val position : Vector3)
     var parentMove : Move? = null
     var globalCost = 0
     var localCost = 0
-
-    init
-    {
-        for (layer in SpaceLayer.values())
-        {
-            layerTiles[layer] = null
-        }
-
-        for (side in Direction3d.values())
-        {
-            sideTransparency[side] = true
-        }
-
-        for (side in Direction3d.values())
-        {
-            sideVisibility[side] = false
-        }
-
-        for (direction in Dist1Conn.values())
-        {
-            groundMoves[direction] = GroundMove(position, getPositionDist1Conn(position, direction))
-        }
-
-        for (direction in Dist2Conn.values())
-        {
-            jump2Moves[direction] = Jump2Move(position, direction)
-        }
-
-        for (direction in Dist3Conn.values())
-        {
-            jump3Moves[direction] = Jump3Move(position, direction)
-        }
-    }
 
     fun isObjectOccupyingNullOrCanStoreEntity(position : Vector3) : Boolean
     {
@@ -120,20 +109,23 @@ class Space(val position : Vector3)
                     }
                 }
 
-                for (direction in Dist3Conn.values())
+                if (room.entityPlayer.hasPlayerUpgrade(PlayerUpgrade.SpringLeg))
                 {
-                    val move = jump3Moves[direction]!!
-                    val dist1Space = room.getSpace(move.dist1Position)
-                    val dist2Space = room.getSpace(move.dist2Position)
-                    val dist3Space = room.getSpace(move.dist3Position)
-
-                    if (dist1Space?.isObjectOccupyingNullOrCanStoreEntity(position) != false)
+                    for (direction in Dist3Conn.values())
                     {
-                        if (dist2Space?.isObjectOccupyingNullOrCanStoreEntity(position) != false)
+                        val move = jump3Moves[direction]!!
+                        val dist1Space = room.getSpace(move.dist1Position)
+                        val dist2Space = room.getSpace(move.dist2Position)
+                        val dist3Space = room.getSpace(move.dist3Position)
+
+                        if (dist1Space?.isObjectOccupyingNullOrCanStoreEntity(position) != false)
                         {
-                            if (dist3Space?.isObjectOccupyingNullOrCanStoreEntity(position) != false)
+                            if (dist2Space?.isObjectOccupyingNullOrCanStoreEntity(position) != false)
                             {
-                                moveList.add(move)
+                                if (dist3Space?.isObjectOccupyingNullOrCanStoreEntity(position) != false)
+                                {
+                                    moveList.add(move)
+                                }
                             }
                         }
                     }

@@ -4,8 +4,22 @@ import com.badlogic.gdx.maps.tiled.TiledMapTile
 import com.badlogic.gdx.math.Vector3
 import com.marcin.panklex.*
 
-class ObjectStation(val stationPosition : Vector3) : Object("station")
+class ObjectStation(val stationPosition : Vector3, val upgrade : PlayerUpgrade) : Object("station")
 {
+    var isUpgradeTaken = false
+
+    val actionSwitchToStationScreen = Action(
+        "add upgrade",
+        "( change screen )")
+    {
+        val objectStation = it.mouseObject as ObjectStation
+        val entityPlayer = it.level.entityPlayer
+
+        it.game.screenStation.setStationAndPlayer(objectStation, entityPlayer)
+        it.game.screenStation.updateWidgets()
+        it.game.changeScreen(it.game.screenStation)
+    }
+
     override fun getOccupiedPositions(positions : MutableList<Vector3>)
     {
         positions.add(stationPosition)
@@ -17,7 +31,7 @@ class ObjectStation(val stationPosition : Vector3) : Object("station")
     }
 
     override fun getTiles(
-        tiles : Tiles, spaceLayerTiles : HashMap<SpaceLayer, TiledMapTile?>, spacePosition : Vector3,
+        tiles : Tiles, spaceLayerTiles : MutableMap<SpaceLayer, TiledMapTile?>, spacePosition : Vector3,
         mapDirection : Direction2d)
     {
         spaceLayerTiles[SpaceLayer.SideBelow] = null
@@ -28,7 +42,7 @@ class ObjectStation(val stationPosition : Vector3) : Object("station")
         spaceLayerTiles[SpaceLayer.SideAbove] = tiles.stationAbove
     }
 
-    override fun getSideTransparency(spaceSideTransparency : HashMap<Direction3d, Boolean>, spacePosition : Vector3)
+    override fun getSideTransparency(spaceSideTransparency : MutableMap<Direction3d, Boolean>, spacePosition : Vector3)
     {
         spaceSideTransparency[Direction3d.Below] = false
         spaceSideTransparency[Direction3d.Left] = false
@@ -51,5 +65,10 @@ class ObjectStation(val stationPosition : Vector3) : Object("station")
     override fun getMoves(moveList : MutableList<Move>, spacePosition : Vector3, room : Room)
     {
         //
+    }
+
+    override fun getActions(actionArray : Array<Action?>, spacePosition : Vector3)
+    {
+        actionArray[0] = actionSwitchToStationScreen.apply { isActionPossible=true }
     }
 }

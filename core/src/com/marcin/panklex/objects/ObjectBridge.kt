@@ -17,7 +17,7 @@ class ObjectBridge(val bridgePosition : Vector3, var bridgeDirection : Direction
     }
 
     override fun getTiles(
-        tiles : Tiles, spaceLayerTiles : HashMap<SpaceLayer, TiledMapTile?>, spacePosition : Vector3,
+        tiles : Tiles, spaceLayerTiles : MutableMap<SpaceLayer, TiledMapTile?>, spacePosition : Vector3,
         mapDirection : Direction2d)
     {
         val relativeBridgeDirection2d = objectiveToRelativeDirection2d(bridgeDirection, mapDirection)
@@ -44,7 +44,7 @@ class ObjectBridge(val bridgePosition : Vector3, var bridgeDirection : Direction
         }
     }
 
-    override fun getSideTransparency(spaceSideTransparency : HashMap<Direction3d, Boolean>, spacePosition : Vector3)
+    override fun getSideTransparency(spaceSideTransparency : MutableMap<Direction3d, Boolean>, spacePosition : Vector3)
     {
         spaceSideTransparency[Direction3d.Below] = true
         spaceSideTransparency[Direction3d.Left] = true
@@ -65,6 +65,11 @@ class ObjectBridge(val bridgePosition : Vector3, var bridgeDirection : Direction
     }
 
     override fun getMoves(moveList : MutableList<Move>, spacePosition : Vector3, room : Room)
+    {
+        //
+    }
+
+    override fun getActions(actionArray : Array<Action?>, spacePosition : Vector3)
     {
         //
     }

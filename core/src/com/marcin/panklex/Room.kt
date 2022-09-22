@@ -2,6 +2,7 @@ package com.marcin.panklex
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Vector3
+import com.marcin.panklex.entities.EntityPlayer
 
 class Room(val level : Level)
 {
@@ -16,6 +17,7 @@ class Room(val level : Level)
     var roomFloorEnd = 0
     var roomFloors = 0
     var roomSpaces = mutableListOf<Space>()
+    var entityPlayer = level.entityPlayer
 
     fun updateRoom(startingPosition : Vector3)
     {
@@ -176,7 +178,7 @@ class Room(val level : Level)
         Gdx.app.log("room", "updated room")
     }
 
-    fun updateEntityTiles(tiles : Tiles, mapDirection : Direction2d)
+    fun updateEntityTiles(tiles : Tiles)
     {
         Gdx.app.log("room", "updating entity tiles...")
 

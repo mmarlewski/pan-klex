@@ -2,10 +2,15 @@ package com.marcin.panklex.objects
 
 import com.badlogic.gdx.maps.tiled.TiledMapTile
 import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.marcin.panklex.*
+import com.marcin.panklex.moves.MoveThroughTeleportField
 
 class ObjectTeleporter(val teleporterPosition : Vector3) : Object("teleporter")
 {
+    lateinit var otherTeleporter : ObjectTeleporter
+    var isPowered = false
+
     val fieldPosition = Vector3(teleporterPosition.x, teleporterPosition.y, teleporterPosition.z + 1)
 
     val fieldPositionUp = Vector3(fieldPosition.x, fieldPosition.y + 1, fieldPosition.z)
@@ -13,10 +18,54 @@ class ObjectTeleporter(val teleporterPosition : Vector3) : Object("teleporter")
     val fieldPositionDown = Vector3(fieldPosition.x, fieldPosition.y - 1, fieldPosition.z)
     val fieldPositionLeft = Vector3(fieldPosition.x - 1, fieldPosition.y, fieldPosition.z)
 
-    val throughTeleporterFieldMoveUp = ThroughTeleporterFieldMove(fieldPosition, fieldPositionUp)
-    val throughTeleporterFieldMoveRight = ThroughTeleporterFieldMove(fieldPosition, fieldPositionRight)
-    val throughTeleporterFieldMoveDown = ThroughTeleporterFieldMove(fieldPosition, fieldPositionDown)
-    val throughTeleporterFieldMoveLeft = ThroughTeleporterFieldMove(fieldPosition, fieldPositionLeft)
+    val throughTeleporterFieldMoveUp = MoveThroughTeleportField(fieldPosition, fieldPositionUp)
+    val throughTeleporterFieldMoveRight = MoveThroughTeleportField(fieldPosition, fieldPositionRight)
+    val throughTeleporterFieldMoveDown = MoveThroughTeleportField(fieldPosition, fieldPositionDown)
+    val throughTeleporterFieldMoveLeft = MoveThroughTeleportField(fieldPosition, fieldPositionLeft)
+
+    val actionPowerTeleport = Action(
+        "power teleport",
+        "")
+    {
+        val objectTeleporter = it.mouseObject as ObjectTeleporter
+        val entityPlayer = it.level.entityPlayer
+
+        if (entityPlayer.getPlayerItem(PlayerItem.Cell) > 0)
+        {
+            entityPlayer.changePlayerItem(PlayerItem.Cell, -1)
+            objectTeleporter.isPowered = true
+            it.updateItemLabels()
+        }
+        it.room.updateObjectTiles(it.tiles, it.map.mapDirection)
+        it.map.updateMap()
+    }
+
+    val actionUnpowerTeleport = Action(
+        "unpower teleport",
+        "")
+    {
+        val objectTeleporter = it.mouseObject as ObjectTeleporter
+        val entityPlayer = it.level.entityPlayer
+
+        entityPlayer.changePlayerItem(PlayerItem.Cell, 1)
+        objectTeleporter.isPowered = false
+        it.updateItemLabels()
+        it.room.updateObjectTiles(it.tiles, it.map.mapDirection)
+        it.map.updateMap()
+    }
+
+    val actionUseTeleport = Action(
+        "use teleport",
+        "teleport player")
+    {
+        val objectTeleporter = it.mouseObject as ObjectTeleporter
+        val entityPlayer = it.level.entityPlayer
+
+        entityPlayer.setPosition(otherTeleporter.fieldPosition)
+        it.level.updateEntities()
+        it.room.updateEntityTiles(it.tiles)
+        it.map.updateMap()
+    }
 
     override fun getOccupiedPositions(positions : MutableList<Vector3>)
     {
@@ -31,7 +80,7 @@ class ObjectTeleporter(val teleporterPosition : Vector3) : Object("teleporter")
     }
 
     override fun getTiles(
-        tiles : Tiles, spaceLayerTiles : HashMap<SpaceLayer, TiledMapTile?>, spacePosition : Vector3,
+        tiles : Tiles, spaceLayerTiles : MutableMap<SpaceLayer, TiledMapTile?>, spacePosition : Vector3,
         mapDirection : Direction2d)
     {
         spaceLayerTiles[SpaceLayer.SideBelow] = null
@@ -39,12 +88,12 @@ class ObjectTeleporter(val teleporterPosition : Vector3) : Object("teleporter")
         spaceLayerTiles[SpaceLayer.SideUp] = null
         spaceLayerTiles[SpaceLayer.Behind] = when (spacePosition)
         {
-            fieldPosition -> tiles.teleporterFieldBehind
+            fieldPosition -> if (isPowered) tiles.teleporterFieldBehind else null
             else          -> null
         }
         spaceLayerTiles[SpaceLayer.Before] = when (spacePosition)
         {
-            fieldPosition -> tiles.teleporterFieldBefore
+            fieldPosition -> if (isPowered) tiles.teleporterFieldBefore else null
             else          -> null
         }
         spaceLayerTiles[SpaceLayer.SideDown] = when (spacePosition)
@@ -59,12 +108,12 @@ class ObjectTeleporter(val teleporterPosition : Vector3) : Object("teleporter")
         }
         spaceLayerTiles[SpaceLayer.SideAbove] = when (spacePosition)
         {
-            teleporterPosition -> tiles.teleporterPoweredAbove
+            teleporterPosition -> if (isPowered) tiles.teleporterPoweredAbove else tiles.teleporterUnpoweredAbove
             else               -> null
         }
     }
 
-    override fun getSideTransparency(spaceSideTransparency : HashMap<Direction3d, Boolean>, spacePosition : Vector3)
+    override fun getSideTransparency(spaceSideTransparency : MutableMap<Direction3d, Boolean>, spacePosition : Vector3)
     {
         when (spacePosition)
         {
@@ -118,6 +167,24 @@ class ObjectTeleporter(val teleporterPosition : Vector3) : Object("teleporter")
                 moveList.add(throughTeleporterFieldMoveDown)
                 moveList.add(throughTeleporterFieldMoveLeft)
             }
+        }
+    }
+
+    override fun getActions(actionArray : Array<Action?>, spacePosition : Vector3)
+    {
+        actionArray[0] = actionPowerTeleport.apply {
+            actionDescription = if (isPowered) "( teleporter is powered )" else "( teleporter is not powered )"
+            isActionPossible = !isPowered
+        }
+
+        actionArray[1] = actionUnpowerTeleport.apply {
+            actionDescription = if (isPowered) "( teleporter is powered )" else "( teleporter is not powered )"
+            isActionPossible = isPowered
+        }
+
+        actionArray[2] = actionUseTeleport.apply {
+            actionDescription = if (isPowered) "( teleporter is powered )" else "( teleporter is not powered )"
+            isActionPossible = (isPowered && otherTeleporter.isPowered)
         }
     }
 }

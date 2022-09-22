@@ -17,7 +17,7 @@ class ObjectSwitch(var switchPosition : Vector3, var switchDirection : Direction
     }
 
     override fun getTiles(
-        tiles : Tiles, spaceLayerTiles : HashMap<SpaceLayer, TiledMapTile?>, spacePosition : Vector3,
+        tiles : Tiles, spaceLayerTiles : MutableMap<SpaceLayer, TiledMapTile?>, spacePosition : Vector3,
         mapDirection : Direction2d)
     {
         val vendingMachineRelativeDirection = objectiveToRelativeDirection2d(switchDirection, mapDirection)
@@ -46,7 +46,7 @@ class ObjectSwitch(var switchPosition : Vector3, var switchDirection : Direction
         spaceLayerTiles[SpaceLayer.SideAbove] = tiles.switchBlankAbove
     }
 
-    override fun getSideTransparency(spaceSideTransparency : HashMap<Direction3d, Boolean>, spacePosition : Vector3)
+    override fun getSideTransparency(spaceSideTransparency : MutableMap<Direction3d, Boolean>, spacePosition : Vector3)
     {
         spaceSideTransparency[Direction3d.Below] = false
         spaceSideTransparency[Direction3d.Left] = false
@@ -67,6 +67,11 @@ class ObjectSwitch(var switchPosition : Vector3, var switchDirection : Direction
     }
 
     override fun getMoves(moveList : MutableList<Move>, spacePosition : Vector3, room : Room)
+    {
+        //
+    }
+
+    override fun getActions(actionArray : Array<Action?>, spacePosition : Vector3)
     {
         //
     }
