@@ -8,7 +8,7 @@ import com.marcin.panklex.moves.MoveLadderLike
 import com.marcin.panklex.moves.MoveRope
 
 class ObjectRope(val ropeOriginPosition : Vector3, var ropeDirection : Direction2d, var ropeLength : Int) :
-    ObjectLadderLike(ropeOriginPosition, ropeDirection, ropeLength, "rope")
+        ObjectLadderLike(ropeOriginPosition, ropeDirection, ropeLength, "rope")
 {
     val firstPosition = centerPositions[1]
     val firstPart = getLadderLikePart(firstPosition)
@@ -35,7 +35,13 @@ class ObjectRope(val ropeOriginPosition : Vector3, var ropeDirection : Direction
 
     override fun getOccupiedPositions(positions : MutableList<Vector3>)
     {
-        positions.addAll(centerPositions)
+        for (position in centerPositions)
+        {
+            if (position != ropeOriginPosition)
+            {
+                positions.add(position)
+            }
+        }
     }
 
     override fun getPresentPositions(positions : MutableList<Vector3>)
@@ -45,8 +51,9 @@ class ObjectRope(val ropeOriginPosition : Vector3, var ropeDirection : Direction
     }
 
     override fun getTiles(
-        tiles : Tiles, spaceLayerTiles : MutableMap<SpaceLayer, TiledMapTile?>, spacePosition : Vector3,
-        mapDirection : Direction2d)
+            tiles : Tiles, spaceLayerTiles : MutableMap<SpaceLayer, TiledMapTile?>, spacePosition : Vector3,
+            mapDirection : Direction2d
+    )
     {
         val relativeLadderDirection = objectiveToRelativeDirection2d(ropeDirection, mapDirection)
 

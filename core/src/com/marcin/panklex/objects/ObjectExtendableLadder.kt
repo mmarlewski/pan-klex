@@ -7,7 +7,7 @@ import com.marcin.panklex.moves.MoveExtendableLadder
 import com.marcin.panklex.moves.MoveLadder
 
 class ObjectExtendableLadder(val ladderOriginPosition : Vector3, var ladderDirection : Direction2d, var ladderLength : Int) :
-    ObjectLadderLike(ladderOriginPosition, ladderDirection, ladderLength, "extendable ladder")
+        ObjectLadderLike(ladderOriginPosition, ladderDirection, ladderLength, "extendable ladder")
 {
     val firstPosition = centerPositions[1]
     val firstPart = getLadderLikePart(firstPosition)
@@ -20,8 +20,8 @@ class ObjectExtendableLadder(val ladderOriginPosition : Vector3, var ladderDirec
     }
 
     val actionExtendLadder = Action(
-        "extend ladder",
-        "")
+            "extend ladder",
+            "")
     {
         val objectExtendableLadder = it.mouseObject as ObjectExtendableLadder
         objectExtendableLadder.isExtended = true
@@ -31,8 +31,8 @@ class ObjectExtendableLadder(val ladderOriginPosition : Vector3, var ladderDirec
     }
 
     val actionFoldLadder = Action(
-        "fold ladder",
-        "")
+            "fold ladder",
+            "")
     {
         val objectExtendableLadder = it.mouseObject as ObjectExtendableLadder
         objectExtendableLadder.isExtended = false
@@ -56,7 +56,7 @@ class ObjectExtendableLadder(val ladderOriginPosition : Vector3, var ladderDirec
     {
         for (ladderLikePart in ladderLikeParts)
         {
-            if (!(!isExtended && ladderLikePart.centerPosition != ladderOriginPosition && ladderLikePart.centerPosition != firstPosition))
+            if (!(!isExtended && ladderLikePart.centerPosition != firstPosition))
             {
                 positions.add(ladderLikePart.centerPosition)
             }
@@ -76,8 +76,8 @@ class ObjectExtendableLadder(val ladderOriginPosition : Vector3, var ladderDirec
     }
 
     override fun getTiles(
-        tiles : Tiles, spaceLayerTiles : MutableMap<SpaceLayer, TiledMapTile?>, spacePosition : Vector3,
-        mapDirection : Direction2d)
+            tiles : Tiles, spaceLayerTiles : MutableMap<SpaceLayer, TiledMapTile?>, spacePosition : Vector3,
+            mapDirection : Direction2d)
     {
         val relativeLadderDirection = objectiveToRelativeDirection2d(ladderDirection, mapDirection)
 

@@ -2,7 +2,6 @@ package com.marcin.panklex
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Vector3
-import com.marcin.panklex.entities.EntityPlayer
 
 class Room(val level : Level)
 {
@@ -18,6 +17,8 @@ class Room(val level : Level)
     var roomFloors = 0
     var roomSpaces = mutableListOf<Space>()
     var entityPlayer = level.entityPlayer
+
+    val selectPosition = Vector3()
 
     fun updateRoom(startingPosition : Vector3)
     {
@@ -230,55 +231,241 @@ class Room(val level : Level)
 
             val objectOccupying = space.objectOccupying
 
-            if (objectOccupying != null)
+            if (objectOccupying != null && space.isOnBorder)
             {
-                if (space.isOnBorder)
+                var isAboveUpLine = false
+                var isAboveRightLine = false
+                var isAboveDownLine = false
+                var isAboveLeftLine = false
+
+                var isLeftAboveLine = false
+                var isLeftUpLine = false
+                var isLeftBelowLine = false
+                var isLeftDownLine = false
+
+                var isUpAboveLine = false
+                var isUpRightLine = false
+                var isUpBelowLine = false
+                var isUpLeftLine = false
+
+                var isDownAboveLine = false
+                var isDownRightLine = false
+                var isDownBelowLine = false
+                var isDownLeftLine = false
+
+                var isRightAboveLine = false
+                var isRightUpLine = false
+                var isRightBelowLine = false
+                var isRightDownLine = false
+
+                var isBelowUpLine = false
+                var isBelowRightLine = false
+                var isBelowDownLine = false
+                var isBelowLeftLine = false
+
+                val aboveSpace = getSpace(space.position, Direction3d.Above)
+                val upSpace = getSpace(space.position, Direction3d.Up)
+                val rightSpace = getSpace(space.position, Direction3d.Right)
+                val downSpace = getSpace(space.position, Direction3d.Down)
+                val leftSpace = getSpace(space.position, Direction3d.Left)
+                val belowSpace = getSpace(space.position, Direction3d.Below)
+
+                if (aboveSpace != null && !aboveSpace.isOnBorder)
                 {
-                    var isAboveLine = false
-                    var isUpLine = false
-                    var isRightLine = false
-                    var isDownLine = false
-                    var isLeftLine = false
-                    var isBelowLine = false
+                    val aboveUpSpace = getSpace(aboveSpace.position, Direction3d.Up)
+                    if (aboveUpSpace == null || aboveUpSpace.isOnBorder ||
+                        (upSpace != null && !upSpace.isOnBorder)
+                    ) isAboveUpLine = true
 
-                    val aboveSpace = getSpace(space.position, Direction3d.Above)
-                    val upSpace = getSpace(space.position, Direction3d.Up)
-                    val rightSpace = getSpace(space.position, Direction3d.Right)
-                    val downSpace = getSpace(space.position, Direction3d.Down)
-                    val leftSpace = getSpace(space.position, Direction3d.Left)
-                    val belowSpace = getSpace(space.position, Direction3d.Below)
+                    val aboveRightSpace = getSpace(aboveSpace.position, Direction3d.Right)
+                    if (aboveRightSpace == null || aboveRightSpace.isOnBorder ||
+                        (rightSpace != null && !rightSpace.isOnBorder)
+                    ) isAboveRightLine = true
 
-                    if (aboveSpace == null || !aboveSpace.isOnBorder) isAboveLine = true
-                    if (upSpace == null || !upSpace.isOnBorder) isUpLine = true
-                    if (rightSpace == null || !rightSpace.isOnBorder) isRightLine = true
-                    if (downSpace == null || !downSpace.isOnBorder) isDownLine = true
-                    if (leftSpace == null || !leftSpace.isOnBorder) isLeftLine = true
-                    if (belowSpace == null || !belowSpace.isOnBorder) isBelowLine = true
+                    val aboveDownSpace = getSpace(aboveSpace.position, Direction3d.Down)
+                    if (aboveDownSpace == null || aboveDownSpace.isOnBorder ||
+                        (downSpace != null && !downSpace.isOnBorder)
+                    ) isAboveDownLine = true
 
-                    space.layerTiles[SpaceLayer.LinesBelow] = when (mapDirection)
-                    {
-                        Direction2d.Up    -> tiles.getBelow(isUpLine, isRightLine, isDownLine, isLeftLine)
-                        Direction2d.Right -> tiles.getBelow(isRightLine, isDownLine, isLeftLine, isUpLine)
-                        Direction2d.Down  -> tiles.getBelow(isDownLine, isLeftLine, isUpLine, isRightLine)
-                        Direction2d.Left  -> tiles.getBelow(isLeftLine, isUpLine, isRightLine, isDownLine)
-                    }
-
-                    space.layerTiles[SpaceLayer.LinesLeft] = when (mapDirection)
-                    {
-                        Direction2d.Up    -> tiles.getLeft(isAboveLine, isUpLine, isBelowLine, isDownLine)
-                        Direction2d.Right -> tiles.getLeft(isAboveLine, isRightLine, isBelowLine, isLeftLine)
-                        Direction2d.Down  -> tiles.getLeft(isAboveLine, isDownLine, isBelowLine, isUpLine)
-                        Direction2d.Left  -> tiles.getLeft(isAboveLine, isLeftLine, isBelowLine, isRightLine)
-                    }
-
-                    space.layerTiles[SpaceLayer.LinesUp] = when (mapDirection)
-                    {
-                        Direction2d.Up    -> tiles.getUp(isAboveLine, isRightLine, isBelowLine, isLeftLine)
-                        Direction2d.Right -> tiles.getUp(isAboveLine, isDownLine, isBelowLine, isUpLine)
-                        Direction2d.Down  -> tiles.getUp(isAboveLine, isLeftLine, isBelowLine, isRightLine)
-                        Direction2d.Left  -> tiles.getUp(isAboveLine, isUpLine, isBelowLine, isDownLine)
-                    }
+                    val aboveLeftSpace = getSpace(aboveSpace.position, Direction3d.Left)
+                    if (aboveLeftSpace == null || aboveLeftSpace.isOnBorder ||
+                        (leftSpace != null && !leftSpace.isOnBorder)
+                    ) isAboveLeftLine = true
                 }
+
+                if (leftSpace != null && !leftSpace.isOnBorder)
+                {
+                    val leftAboveSpace = getSpace(leftSpace.position, Direction3d.Above)
+                    if (leftAboveSpace == null || leftAboveSpace.isOnBorder ||
+                        (aboveSpace != null && !aboveSpace.isOnBorder)
+                    ) isLeftAboveLine = true
+
+                    val leftUpSpace = getSpace(leftSpace.position, Direction3d.Up)
+                    if (leftUpSpace == null || leftUpSpace.isOnBorder ||
+                        (upSpace != null && !upSpace.isOnBorder)
+                    ) isLeftUpLine = true
+
+                    val leftBelowSpace = getSpace(leftSpace.position, Direction3d.Below)
+                    if (leftBelowSpace == null || leftBelowSpace.isOnBorder ||
+                        (belowSpace != null && !belowSpace.isOnBorder)
+                    ) isLeftBelowLine = true
+
+                    val leftDownSpace = getSpace(leftSpace.position, Direction3d.Down)
+                    if (leftDownSpace == null || leftDownSpace.isOnBorder ||
+                        (downSpace != null && !downSpace.isOnBorder)
+                    ) isLeftDownLine = true
+                }
+
+                if (upSpace != null && !upSpace.isOnBorder)
+                {
+                    val upAboveSpace = getSpace(upSpace.position, Direction3d.Above)
+                    if (upAboveSpace == null || upAboveSpace.isOnBorder ||
+                        (aboveSpace != null && !aboveSpace.isOnBorder)
+                    ) isUpAboveLine = true
+
+                    val upRightSpace = getSpace(upSpace.position, Direction3d.Right)
+                    if (upRightSpace == null || upRightSpace.isOnBorder ||
+                        (rightSpace != null && !rightSpace.isOnBorder)
+                    ) isUpRightLine = true
+
+                    val upBelowSpace = getSpace(upSpace.position, Direction3d.Below)
+                    if (upBelowSpace == null || upBelowSpace.isOnBorder ||
+                        (belowSpace != null && !belowSpace.isOnBorder)
+                    ) isUpBelowLine = true
+
+                    val upLeftSpace = getSpace(upSpace.position, Direction3d.Left)
+                    if (upLeftSpace == null || upLeftSpace.isOnBorder ||
+                        (leftSpace != null && !leftSpace.isOnBorder)
+                    ) isUpLeftLine = true
+                }
+
+                if (downSpace != null && !downSpace.isOnBorder)
+                {
+                    val downAboveSpace = getSpace(downSpace.position, Direction3d.Above)
+                    if (downAboveSpace == null || downAboveSpace.isOnBorder ||
+                        (aboveSpace != null && !aboveSpace.isOnBorder)
+                    ) isDownAboveLine = true
+
+                    val downRightSpace = getSpace(downSpace.position, Direction3d.Right)
+                    if (downRightSpace == null || downRightSpace.isOnBorder ||
+                        (rightSpace != null && !rightSpace.isOnBorder)
+                    ) isDownRightLine = true
+
+                    val downBelowSpace = getSpace(downSpace.position, Direction3d.Below)
+                    if (downBelowSpace == null || downBelowSpace.isOnBorder ||
+                        (belowSpace != null && !belowSpace.isOnBorder)
+                    ) isDownBelowLine = true
+
+                    val downLeftSpace = getSpace(downSpace.position, Direction3d.Left)
+                    if (downLeftSpace == null || downLeftSpace.isOnBorder ||
+                        (leftSpace != null && !leftSpace.isOnBorder)
+                    ) isDownLeftLine = true
+                }
+
+                if (rightSpace != null && !rightSpace.isOnBorder)
+                {
+                    val rightAboveSpace = getSpace(rightSpace.position, Direction3d.Above)
+                    if (rightAboveSpace == null || rightAboveSpace.isOnBorder ||
+                        (aboveSpace != null && !aboveSpace.isOnBorder)
+                    ) isRightAboveLine = true
+
+                    val rightUpSpace = getSpace(rightSpace.position, Direction3d.Up)
+                    if (rightUpSpace == null || rightUpSpace.isOnBorder ||
+                        (upSpace != null && !upSpace.isGround)
+                    ) isRightUpLine = true
+
+                    val rightBelowSpace = getSpace(rightSpace.position, Direction3d.Below)
+                    if (rightBelowSpace == null || rightBelowSpace.isOnBorder ||
+                        (belowSpace != null && !belowSpace.isOnBorder)
+                    ) isRightBelowLine = true
+
+                    val rightDownSpace = getSpace(rightSpace.position, Direction3d.Down)
+                    if (rightDownSpace == null || rightDownSpace.isOnBorder ||
+                        (downSpace != null && !downSpace.isOnBorder)
+                    ) isRightDownLine = true
+                }
+
+                if (belowSpace != null && !belowSpace.isOnBorder)
+                {
+                    val belowUpSpace = getSpace(belowSpace.position, Direction3d.Up)
+                    if (belowUpSpace == null || belowUpSpace.isOnBorder ||
+                        (upSpace != null && !upSpace.isGround)
+                    ) isBelowUpLine = true
+
+                    val belowRightSpace = getSpace(belowSpace.position, Direction3d.Right)
+                    if (belowRightSpace == null || belowRightSpace.isOnBorder ||
+                        (rightSpace != null && !rightSpace.isOnBorder)
+                    ) isBelowRightLine = true
+
+                    val belowDownSpace = getSpace(belowSpace.position, Direction3d.Down)
+                    if (belowDownSpace == null || belowDownSpace.isOnBorder ||
+                        (downSpace != null && !downSpace.isOnBorder)
+                    ) isBelowDownLine = true
+
+                    val belowLeftSpace = getSpace(belowSpace.position, Direction3d.Left)
+                    if (belowLeftSpace == null || belowLeftSpace.isOnBorder ||
+                        (leftSpace != null && !leftSpace.isOnBorder)
+                    ) isBelowLeftLine = true
+                }
+
+                space.layerTiles[SpaceLayer.LinesLeft] = when (mapDirection)
+                {
+                    Direction2d.Up    -> tiles.getLeft(isLeftAboveLine, isLeftUpLine, isLeftBelowLine, isLeftDownLine)
+                    Direction2d.Right -> tiles.getLeft(isUpAboveLine, isUpRightLine, isUpBelowLine, isUpLeftLine)
+                    Direction2d.Down  -> tiles.getLeft(isRightAboveLine, isRightDownLine, isRightBelowLine, isRightUpLine)
+                    Direction2d.Left  -> tiles.getLeft(isDownAboveLine, isDownLeftLine, isDownBelowLine, isDownRightLine)
+                }
+
+                space.layerTiles[SpaceLayer.LinesUp] = when (mapDirection)
+                {
+                    Direction2d.Up    -> tiles.getUp(isUpAboveLine, isUpRightLine, isUpBelowLine, isUpLeftLine)
+                    Direction2d.Right -> tiles.getUp(isRightAboveLine, isRightDownLine, isRightBelowLine, isRightUpLine)
+                    Direction2d.Down  -> tiles.getUp(isDownAboveLine, isDownLeftLine, isDownBelowLine, isDownRightLine)
+                    Direction2d.Left  -> tiles.getUp(isLeftAboveLine, isLeftUpLine, isLeftBelowLine, isLeftDownLine)
+                }
+
+                space.layerTiles[SpaceLayer.LinesBelow] = when (mapDirection)
+                {
+                    Direction2d.Up    -> tiles.getBelow(isBelowUpLine, isBelowRightLine, isBelowDownLine, isBelowLeftLine)
+                    Direction2d.Right -> tiles.getBelow(isBelowRightLine, isBelowDownLine, isBelowLeftLine, isBelowUpLine)
+                    Direction2d.Down  -> tiles.getBelow(isBelowDownLine, isBelowLeftLine, isBelowUpLine, isBelowRightLine)
+                    Direction2d.Left  -> tiles.getBelow(isBelowLeftLine, isBelowUpLine, isBelowRightLine, isBelowDownLine)
+                }
+
+                /*
+                if (space.position.x == 29f && space.position.y == 21f && space.position.z == 7f)
+                {
+                    Gdx.app.log("lines above up", isAboveUpLine.toString())
+                    Gdx.app.log("lines above right", isAboveRightLine.toString())
+                    Gdx.app.log("lines above down", isAboveDownLine.toString())
+                    Gdx.app.log("lines above left", isAboveUpLine.toString())
+
+                    Gdx.app.log("lines left above", isLeftAboveLine.toString())
+                    Gdx.app.log("lines left up", isLeftUpLine.toString())
+                    Gdx.app.log("lines left below", isLeftBelowLine.toString())
+                    Gdx.app.log("lines left down", isLeftDownLine.toString())
+
+                    Gdx.app.log("lines up above", isUpAboveLine.toString())
+                    Gdx.app.log("lines up right", isUpRightLine.toString())
+                    Gdx.app.log("lines up below", isUpBelowLine.toString())
+                    Gdx.app.log("lines up left", isUpLeftLine.toString())
+
+                    Gdx.app.log("lines down above", isDownAboveLine.toString())
+                    Gdx.app.log("lines down right", isDownRightLine.toString())
+                    Gdx.app.log("lines down below", isDownBelowLine.toString())
+                    Gdx.app.log("lines down left", isDownLeftLine.toString())
+
+                    Gdx.app.log("lines right above", isRightAboveLine.toString())
+                    Gdx.app.log("lines right up", isRightUpLine.toString())
+                    Gdx.app.log("lines right below", isRightBelowLine.toString())
+                    Gdx.app.log("lines right down", isRightDownLine.toString())
+
+                    Gdx.app.log("lines below up", isBelowUpLine.toString())
+                    Gdx.app.log("lines below right", isBelowRightLine.toString())
+                    Gdx.app.log("lines below down", isBelowDownLine.toString())
+                    Gdx.app.log("lines below left", isBelowLeftLine.toString())
+                }
+                 */
             }
         }
 
@@ -304,48 +491,54 @@ class Room(val level : Level)
     }
 
     fun updateSelectTiles(
-        tiles : Tiles, selectPosition : Vector3, isMoving : Boolean, isPathFound : Boolean, isMoveAccessible : Boolean)
+            tiles : Tiles, newSelectPosition : Vector3, isMoving : Boolean, isPathFound : Boolean, isMoveAccessible : Boolean
+    )
     {
         //Gdx.app.log("room", "updating select tiles...")
 
-        for (space in roomSpaces)
-        {
-            space.layerTiles[SpaceLayer.SelectBack] = null
-            space.layerTiles[SpaceLayer.SelectFront] = null
+        val selectSpace = getSpace(selectPosition)
+        val newSelectSpace = getSpace(newSelectPosition)
 
-            if (space.position == selectPosition)
+        if (selectSpace != null)
+        {
+            selectSpace.layerTiles[SpaceLayer.SelectBack] = null
+            selectSpace.layerTiles[SpaceLayer.SelectFront] = null
+        }
+
+        if (newSelectSpace != null)
+        {
+            when (isMoving)
             {
-                when (isMoving)
+                true  -> when (isPathFound)
                 {
-                    true  -> when (isPathFound)
+                    true  -> when (isMoveAccessible)
                     {
-                        true  -> when (isMoveAccessible)
+                        true  ->
                         {
-                            true  ->
-                            {
-                                space.layerTiles[SpaceLayer.SelectBack] = tiles.selectPathFoundBack
-                                space.layerTiles[SpaceLayer.SelectFront] = tiles.selectPathFoundFront
-                            }
-                            false ->
-                            {
-                                space.layerTiles[SpaceLayer.SelectBack] = tiles.selectInaccessibleBack
-                                space.layerTiles[SpaceLayer.SelectFront] = tiles.selectInaccessibleFront
-                            }
+                            newSelectSpace.layerTiles[SpaceLayer.SelectBack] = tiles.selectPathFoundBack
+                            newSelectSpace.layerTiles[SpaceLayer.SelectFront] = tiles.selectPathFoundFront
                         }
                         false ->
                         {
-                            space.layerTiles[SpaceLayer.SelectBack] = tiles.selectPathNotFoundBack
-                            space.layerTiles[SpaceLayer.SelectFront] = tiles.selectPathNotFoundFront
+                            newSelectSpace.layerTiles[SpaceLayer.SelectBack] = tiles.selectInaccessibleBack
+                            newSelectSpace.layerTiles[SpaceLayer.SelectFront] = tiles.selectInaccessibleFront
                         }
                     }
                     false ->
                     {
-                        space.layerTiles[SpaceLayer.SelectBack] = tiles.selectNotMovingBack
-                        space.layerTiles[SpaceLayer.SelectFront] = tiles.selectNotMovingFront
+                        newSelectSpace.layerTiles[SpaceLayer.SelectBack] = tiles.selectPathNotFoundBack
+                        newSelectSpace.layerTiles[SpaceLayer.SelectFront] = tiles.selectPathNotFoundFront
                     }
+                }
+                false ->
+                {
+                    newSelectSpace.layerTiles[SpaceLayer.SelectBack] = tiles.selectNotMovingBack
+                    newSelectSpace.layerTiles[SpaceLayer.SelectFront] = tiles.selectNotMovingFront
                 }
             }
         }
+
+        selectPosition.set(newSelectPosition)
 
         //Gdx.app.log("room", "updated select tiles")
     }

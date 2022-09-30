@@ -145,6 +145,7 @@ class Map(val room : Room, val tiles : Tiles)
 
         val spaceObjectivePosition = Vector3()
         val spaceRelativePosition = Vector3()
+        val spaceLevelPosition = Vector3()
 
         for (k in 0 until room.roomFloors)
         {
@@ -154,8 +155,9 @@ class Map(val room : Room, val tiles : Tiles)
                 {
                     spaceObjectivePosition.set(i.toFloat(), j.toFloat(), k.toFloat())
                     getRelativeMapPosition(spaceObjectivePosition, spaceRelativePosition)
+                    getLevelPosition(spaceObjectivePosition, spaceLevelPosition)
 
-                    val space = room.getSpace(spaceObjectivePosition)
+                    val space = room.getSpace(spaceLevelPosition)
 
                     if (space != null)
                     {
@@ -227,7 +229,7 @@ class Map(val room : Room, val tiles : Tiles)
         {
             Direction2d.Up    -> relativeMapPosition.set(x, y, z)
             Direction2d.Right -> relativeMapPosition.set(room.roomHeight - 1 - y, x, z)
-            Direction2d.Down  -> relativeMapPosition.set(room.roomWidth - 1 - x, mapHeight - 1 - y, z)
+            Direction2d.Down  -> relativeMapPosition.set(room.roomWidth - 1 - x, room.roomHeight - 1 - y, z)
             Direction2d.Left  -> relativeMapPosition.set(y, room.roomWidth - 1 - x, z)
         }
     }
@@ -235,8 +237,10 @@ class Map(val room : Room, val tiles : Tiles)
     fun getLevelPosition(objectiveMapPosition : Vector3, levelPosition : Vector3)
     {
         levelPosition.set(
-            room.roomWidthStart + objectiveMapPosition.x, room.roomHeightStart + objectiveMapPosition.y,
-            room.roomFloorStart + objectiveMapPosition.z)
+                room.roomWidthStart + objectiveMapPosition.x,
+                room.roomHeightStart + objectiveMapPosition.y,
+                room.roomFloorStart + objectiveMapPosition.z
+        )
     }
 
     fun info(levelPosition : Vector3)

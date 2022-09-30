@@ -7,7 +7,7 @@ import com.marcin.panklex.moves.MoveLadder
 import com.marcin.panklex.moves.MoveLadderLike
 
 class ObjectLadder(val ladderOriginPosition : Vector3, var ladderDirection : Direction2d, var ladderLength : Int) :
-    ObjectLadderLike(ladderOriginPosition, ladderDirection, ladderLength, "ladder")
+        ObjectLadderLike(ladderOriginPosition, ladderDirection, ladderLength, "ladder")
 {
     init
     {
@@ -27,7 +27,13 @@ class ObjectLadder(val ladderOriginPosition : Vector3, var ladderDirection : Dir
 
     override fun getOccupiedPositions(positions : MutableList<Vector3>)
     {
-        positions.addAll(centerPositions)
+        for (position in centerPositions)
+        {
+            if (position != ladderOriginPosition)
+            {
+                positions.add(position)
+            }
+        }
     }
 
     override fun getPresentPositions(positions : MutableList<Vector3>)
@@ -37,8 +43,8 @@ class ObjectLadder(val ladderOriginPosition : Vector3, var ladderDirection : Dir
     }
 
     override fun getTiles(
-        tiles : Tiles, spaceLayerTiles : MutableMap<SpaceLayer, TiledMapTile?>, spacePosition : Vector3,
-        mapDirection : Direction2d)
+            tiles : Tiles, spaceLayerTiles : MutableMap<SpaceLayer, TiledMapTile?>, spacePosition : Vector3,
+            mapDirection : Direction2d)
     {
         when (spacePosition)
         {
