@@ -37,15 +37,12 @@ class ObjectElevator(val elevatorParts : List<ElevatorPart>, val elevatorFloors 
         "( change current floor )")
     {
         val levelPosition = it.levelMousePosition
-        val objectElevator = it.mouseObject as ObjectElevator
-        val elevatorPart = objectElevator.getElevatorPart(levelPosition)
-        val elevatorFloor = objectElevator.getElevatorFloor(levelPosition)
-        val entityPlayer = it.level.entityPlayer
+        val elevatorFloor = this.getElevatorFloor(levelPosition)
 
-        objectElevator.updateFloorsAccessibility()
+        this.updateFloorsAccessibility()
         if (elevatorFloor != null && elevatorFloor.isAccessible)
         {
-            objectElevator.changeCurrentFloor(elevatorFloor)
+            this.changeCurrentFloor(elevatorFloor)
         }
         it.room.updateObjectTiles(it.tiles, it.map.mapDirection)
         it.map.updateMap()
@@ -56,15 +53,13 @@ class ObjectElevator(val elevatorParts : List<ElevatorPart>, val elevatorFloors 
         "( change screen )")
     {
         val levelPosition = it.levelMousePosition
-        val objectElevator = it.mouseObject as ObjectElevator
-        val elevatorPart = objectElevator.getElevatorPart(levelPosition)
-        val elevatorFloor = objectElevator.getElevatorFloor(levelPosition)
+        val elevatorFloor = this.getElevatorFloor(levelPosition)
         val entityPlayer = it.level.entityPlayer
 
-        objectElevator.updateFloorsAccessibility()
-        if (elevatorFloor != null && objectElevator.currentElevatorFloor == elevatorFloor)
+        this.updateFloorsAccessibility()
+        if (elevatorFloor != null && this.currentElevatorFloor == elevatorFloor)
         {
-            it.game.screenElevator.setElevatorAndPlayer(objectElevator, entityPlayer)
+            it.game.screenElevator.setElevatorAndPlayer(this, entityPlayer)
             it.game.screenElevator.updateWidgets()
             it.game.changeScreen(it.game.screenElevator)
         }
@@ -75,8 +70,7 @@ class ObjectElevator(val elevatorParts : List<ElevatorPart>, val elevatorFloors 
         "+1 gear")
     {
         val levelPosition = it.levelMousePosition
-        val objectElevator = it.mouseObject as ObjectElevator
-        val elevatorPart = objectElevator.getElevatorPart(levelPosition)
+        val elevatorPart = this.getElevatorPart(levelPosition)
         val entityPlayer = it.level.entityPlayer
 
         if (elevatorPart != null)
@@ -92,7 +86,7 @@ class ObjectElevator(val elevatorParts : List<ElevatorPart>, val elevatorFloors 
             }
         }
         entityPlayer.changePlayerItem(PlayerItem.Gear, 1)
-        objectElevator.updateFloorsAccessibility()
+        this.updateFloorsAccessibility()
         it.updateItemLabels()
         it.room.updateObjectTiles(it.tiles, it.map.mapDirection)
         it.map.updateMap()
@@ -103,8 +97,7 @@ class ObjectElevator(val elevatorParts : List<ElevatorPart>, val elevatorFloors 
         "-1 gear")
     {
         val levelPosition = it.levelMousePosition
-        val objectElevator = it.mouseObject as ObjectElevator
-        val elevatorPart = objectElevator.getElevatorPart(levelPosition)
+        val elevatorPart = this.getElevatorPart(levelPosition)
         val entityPlayer = it.level.entityPlayer
 
         if (elevatorPart != null)
@@ -120,7 +113,7 @@ class ObjectElevator(val elevatorParts : List<ElevatorPart>, val elevatorFloors 
             }
         }
         entityPlayer.changePlayerItem(PlayerItem.Gear, -1)
-        objectElevator.updateFloorsAccessibility()
+        this.updateFloorsAccessibility()
         it.updateItemLabels()
         it.room.updateObjectTiles(it.tiles, it.map.mapDirection)
         it.map.updateMap()

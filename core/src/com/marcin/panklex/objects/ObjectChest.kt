@@ -15,10 +15,9 @@ class ObjectChest(val chestPosition : Vector3, val chestDirection : Direction2d)
         "search chest",
         "( change screen )")
     {
-        val objectChest = it.mouseObject as ObjectChest
         val entityPlayer = it.level.entityPlayer
 
-        it.game.screenContainer.setChestAndPlayer(objectChest, entityPlayer)
+        it.game.screenContainer.setChestAndPlayer(this, entityPlayer)
         it.game.screenContainer.updateWidgets()
         it.game.changeScreen(it.game.screenContainer)
     }

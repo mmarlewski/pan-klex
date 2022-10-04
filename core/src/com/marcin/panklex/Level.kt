@@ -21,7 +21,7 @@ class Level
     {
         Gdx.app.log("level", "creating level...")
 
-        if (false)
+        if (true)
         {
             // main
 
@@ -127,7 +127,9 @@ class Level
             }
             objects.add(vendingMachine)
 
-            objects.add(ObjectStation(Vector3(4f, 6f, 1f), PlayerUpgrade.SpringLeg))
+            val objectStation = ObjectStation(Vector3(4f, 6f, 1f), PlayerUpgrade.ExtendedArm)
+
+            objects.add(objectStation)
 
             val elevatorParts = listOf(
                     ElevatorPart(Vector3(4f, 3f, 1f), Direction2d.Right, ElevatorPartType.Door),
@@ -172,7 +174,9 @@ class Level
             objects.add(ObjectVendingMachine(Vector3(2f, 3f, 3f), Direction2d.Down))
             objects.add(ObjectVendingMachine(Vector3(3f, 3f, 3f), Direction2d.Down))
 
-            objects.add(ObjectExtendableBridge(Vector3(3f, 6f, 3f), Direction2d.Down, 3))
+            val extendableBridge = ObjectExtendableBridge(Vector3(3f, 6f, 3f), Direction2d.Down, 3)
+
+            objects.add(extendableBridge)
 
             objects.add(ObjectLadder(Vector3(3f, 8f, 5f), Direction2d.Up, 5))
             objects.add(ObjectLadder(Vector3(4f, 8f, 5f), Direction2d.Up, 5))
@@ -192,10 +196,19 @@ class Level
             objects.add(ObjectBridge(Vector3(5f, 2f, 4f), Direction2d.Up))
             objects.add(ObjectHalfArch(Vector3(5f, 1f, 4f), Direction2d.Down))
 
-            objects.add(ObjectExtendableLadder(Vector3(1f, 4f, 4f), Direction2d.Down, 4))
+            val extendableLadder = ObjectExtendableLadder(Vector3(1f, 4f, 4f), Direction2d.Down, 4)
+
+            objects.add(extendableLadder)
 
             objects.add(ObjectHalfColumn(Vector3(1f, 2f, 4f), Direction2d.Right))
             objects.add(ObjectColumn(Vector3(5f, 8f, 1f)))
+
+            val objectSwitch = ObjectSwitch(
+                    Vector3(0f, 4f, 4f), Direction2d.Right, extendableLadder.actionFoldLadder,
+                    extendableLadder.actionExtendLadder
+            )
+
+            objects.add(objectSwitch)
 
             // player
 
@@ -204,7 +217,7 @@ class Level
             entities.add(entityPlayer)
         }
 
-        if (true)
+        if (false)
         {
             // main
 

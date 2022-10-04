@@ -1,6 +1,7 @@
 package com.marcin.panklex
 
 import com.badlogic.gdx.math.Vector3
+import kotlin.math.abs
 
 enum class PlayerItem
 {
@@ -57,8 +58,17 @@ enum class Dist3Conn
 
 enum class SpaceLayer
 {
-    SelectBack, LinesBelow, SideBelow, LinesLeft, SideLeft, LinesUp, SideUp, Behind, EntityWhole, Before, SideDown,
-    SideRight, SideAbove, MoveWhole, SelectFront, EntityOutline, MoveOutline
+    LineBack, SelectBack, LinesBelow, SideBelow, LinesLeft, SideLeft, LinesUp, SideUp, Behind, EntityWhole, Before, SideDown,
+    SideRight, SideAbove, MoveWhole, LineFront, SelectFront, EntityOutline, MoveOutline
+}
+
+fun arePositionsNextToEachOther(firstPosition : Vector3, secondPosition : Vector3) : Boolean
+{
+    val dx = abs(firstPosition.x - secondPosition.x)
+    val dy = abs(firstPosition.y - secondPosition.y)
+    val dz = abs(firstPosition.z - secondPosition.z)
+
+    return !(dx > 1 || dy > 1 || dz > 1)
 }
 
 fun getDirectionX(startPosition : Vector3, endPosition : Vector3) : DirectionX?

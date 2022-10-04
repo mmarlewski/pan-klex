@@ -18,10 +18,9 @@ class ObjectVendingMachine(var vendingMachinePosition : Vector3, var vendingMach
         "buy items",
         "( change screen )")
     {
-        val objectVendingMachine = it.mouseObject as ObjectVendingMachine
         val entityPlayer = it.level.entityPlayer
 
-        it.game.screenVendingMachine.setVendingMachineAndPlayer(objectVendingMachine, entityPlayer)
+        it.game.screenVendingMachine.setVendingMachineAndPlayer(this, entityPlayer)
         it.game.screenVendingMachine.updateWidgets()
         it.game.changeScreen(it.game.screenVendingMachine)
     }

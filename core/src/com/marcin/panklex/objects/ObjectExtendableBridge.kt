@@ -14,8 +14,7 @@ class ObjectExtendableBridge(val originPosition : Vector3, var bridgeDirection :
         "extend bridge",
         "")
     {
-        val objectExtendableBridge = it.mouseObject as ObjectExtendableBridge
-        objectExtendableBridge.isExtended = true
+        this.isExtended = true
         it.level.updateObjects()
         it.level.updateSideTransparency()
         it.level.updateGround()
@@ -28,8 +27,7 @@ class ObjectExtendableBridge(val originPosition : Vector3, var bridgeDirection :
         "fold bridge",
         "")
     {
-        val objectExtendableBridge = it.mouseObject as ObjectExtendableBridge
-        objectExtendableBridge.isExtended = false
+        this.isExtended = false
         it.level.updateObjects()
         it.level.updateSideTransparency()
         it.level.updateGround()

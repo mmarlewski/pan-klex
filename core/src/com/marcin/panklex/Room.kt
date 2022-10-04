@@ -490,6 +490,27 @@ class Room(val level : Level)
         Gdx.app.log("room", "updated move tiles")
     }
 
+    fun updateLineTiles(tiles : Tiles, linePositions : MutableList<Vector3>)
+    {
+        Gdx.app.log("room", "updating line tiles...")
+
+        for (space in roomSpaces)
+        {
+            if (space.position in linePositions)
+            {
+                space.layerTiles[SpaceLayer.LineBack] = tiles.lineBack
+                space.layerTiles[SpaceLayer.LineFront] = tiles.lineFront
+            }
+            else
+            {
+                space.layerTiles[SpaceLayer.LineBack] = null
+                space.layerTiles[SpaceLayer.LineFront] = null
+            }
+        }
+
+        Gdx.app.log("room", "updated line tiles")
+    }
+
     fun updateSelectTiles(
             tiles : Tiles, newSelectPosition : Vector3, isMoving : Boolean, isPathFound : Boolean, isMoveAccessible : Boolean
     )

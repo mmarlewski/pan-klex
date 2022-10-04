@@ -14,7 +14,7 @@ abstract class BaseScreen(val baseName : String, val baseGame : PanKlexGame) : S
 
     override fun show()
     {
-        Gdx.app.log(baseName, "show")
+        Gdx.app.log("screen $baseName", "show")
     }
 
     override fun render(delta : Float)
@@ -23,28 +23,28 @@ abstract class BaseScreen(val baseName : String, val baseGame : PanKlexGame) : S
 
     override fun resize(width : Int, height : Int)
     {
-        Gdx.app.log(baseName, "resize")
+        Gdx.app.log("screen $baseName", "resize")
         viewport.update(width, height, true)
     }
 
     override fun pause()
     {
-        Gdx.app.log(baseName, "pause")
+        Gdx.app.log("screen $baseName", "pause")
     }
 
     override fun resume()
     {
-        Gdx.app.log(baseName, "resume")
+        Gdx.app.log("screen $baseName", "resume")
     }
 
     override fun hide()
     {
-        Gdx.app.log(baseName, "hide")
+        Gdx.app.log("screen $baseName", "hide")
     }
 
     override fun dispose()
     {
-        Gdx.app.log(baseName, "dispose")
+        Gdx.app.log("screen $baseName", "dispose")
         stage.dispose()
     }
 }

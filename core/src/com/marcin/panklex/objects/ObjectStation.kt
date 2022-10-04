@@ -12,10 +12,9 @@ class ObjectStation(val stationPosition : Vector3, val upgrade : PlayerUpgrade) 
         "add upgrade",
         "( change screen )")
     {
-        val objectStation = it.mouseObject as ObjectStation
         val entityPlayer = it.level.entityPlayer
 
-        it.game.screenStation.setStationAndPlayer(objectStation, entityPlayer)
+        it.game.screenStation.setStationAndPlayer(this, entityPlayer)
         it.game.screenStation.updateWidgets()
         it.game.changeScreen(it.game.screenStation)
     }

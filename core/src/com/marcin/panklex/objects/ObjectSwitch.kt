@@ -4,8 +4,77 @@ import com.badlogic.gdx.maps.tiled.TiledMapTile
 import com.badlogic.gdx.math.Vector3
 import com.marcin.panklex.*
 
-class ObjectSwitch(var switchPosition : Vector3, var switchDirection : Direction2d) : Object("switch")
+class ObjectSwitch(
+        val switchPosition : Vector3, var switchDirection : Direction2d, val actionOn : Action, val actionOff : Action
+) : Object("switch")
 {
+    var isOn = false
+
+    val actionManualSwitch = Action(
+            "switch manually",
+            "( no arrow or upgrade )"
+    )
+    {
+        val entityPlayer = it.level.entityPlayer
+
+        if (arePositionsNextToEachOther(entityPlayer.playerPosition, this.switchPosition))
+        {
+            when (isOn)
+            {
+                true  -> actionOn.performAction(it)
+                false -> actionOff.performAction(it)
+            }
+            isOn = !isOn
+        }
+    }
+
+    val actionArrowSwitch = Action(
+            "switch with arrow",
+            "( -1 pointing arrow )"
+    )
+    {
+        val entityPlayer = it.level.entityPlayer
+
+        if (entityPlayer.getPlayerItem(PlayerItem.PointingArrow) > 0)
+        {
+            it.lineFinding.findLine(entityPlayer.playerPosition, this.switchPosition)
+            if (it.lineFinding.isLineFound && !it.lineFinding.isLineObstructed)
+            {
+                when (isOn)
+                {
+                    true  -> actionOn.performAction(it)
+                    false -> actionOff.performAction(it)
+                }
+                isOn = !isOn
+
+                entityPlayer.changePlayerItem(PlayerItem.PointingArrow, -1)
+                it.updateItemLabels()
+            }
+        }
+    }
+
+    val actionUpgradeSwitch = Action(
+            "switch with ext. hand",
+            "( ext. hand required )"
+    )
+    {
+        val entityPlayer = it.level.entityPlayer
+
+        if (entityPlayer.hasPlayerUpgrade(PlayerUpgrade.ExtendedArm))
+        {
+            it.lineFinding.findLine(entityPlayer.playerPosition, this.switchPosition)
+            if (it.lineFinding.isLineFound && !it.lineFinding.isLineObstructed)
+            {
+                when (isOn)
+                {
+                    true  -> actionOn.performAction(it)
+                    false -> actionOff.performAction(it)
+                }
+                isOn = !isOn
+            }
+        }
+    }
+
     override fun getOccupiedPositions(positions : MutableList<Vector3>)
     {
         positions.add(switchPosition)
@@ -17,8 +86,9 @@ class ObjectSwitch(var switchPosition : Vector3, var switchDirection : Direction
     }
 
     override fun getTiles(
-        tiles : Tiles, spaceLayerTiles : MutableMap<SpaceLayer, TiledMapTile?>, spacePosition : Vector3,
-        mapDirection : Direction2d)
+            tiles : Tiles, spaceLayerTiles : MutableMap<SpaceLayer, TiledMapTile?>, spacePosition : Vector3,
+            mapDirection : Direction2d
+    )
     {
         val vendingMachineRelativeDirection = objectiveToRelativeDirection2d(switchDirection, mapDirection)
 
@@ -73,6 +143,14 @@ class ObjectSwitch(var switchPosition : Vector3, var switchDirection : Direction
 
     override fun getActions(actionArray : Array<Action?>, spacePosition : Vector3)
     {
-        //
+        actionArray[0] = actionManualSwitch.apply {
+            isActionPossible = true
+        }
+        actionArray[1] = actionArrowSwitch.apply {
+            isActionPossible = true
+        }
+        actionArray[2] = actionUpgradeSwitch.apply {
+            isActionPossible = true
+        }
     }
 }

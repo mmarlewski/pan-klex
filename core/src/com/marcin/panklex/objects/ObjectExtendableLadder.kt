@@ -23,8 +23,7 @@ class ObjectExtendableLadder(val ladderOriginPosition : Vector3, var ladderDirec
             "extend ladder",
             "")
     {
-        val objectExtendableLadder = it.mouseObject as ObjectExtendableLadder
-        objectExtendableLadder.isExtended = true
+        this.isExtended = true
         it.level.updateObjects()
         it.room.updateObjectTiles(it.tiles, it.map.mapDirection)
         it.map.updateMap()
@@ -34,8 +33,7 @@ class ObjectExtendableLadder(val ladderOriginPosition : Vector3, var ladderDirec
             "fold ladder",
             "")
     {
-        val objectExtendableLadder = it.mouseObject as ObjectExtendableLadder
-        objectExtendableLadder.isExtended = false
+        this.isExtended = false
         it.level.updateObjects()
         it.room.updateObjectTiles(it.tiles, it.map.mapDirection)
         it.map.updateMap()

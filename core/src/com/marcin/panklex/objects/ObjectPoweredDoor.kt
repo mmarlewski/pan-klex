@@ -19,13 +19,12 @@ class ObjectPoweredDoor(val poweredDoorPosition : Vector3, val poweredDoorDirect
         "power door",
         "")
     {
-        val objectPoweredDoor = it.mouseObject as ObjectPoweredDoor
         val entityPlayer = it.level.entityPlayer
 
         if (entityPlayer.getPlayerItem(PlayerItem.Cell) > 0)
         {
             entityPlayer.changePlayerItem(PlayerItem.Cell, -1)
-            objectPoweredDoor.isPowered = true
+            this.isPowered = true
             it.updateItemLabels()
         }
         it.room.updateObjectTiles(it.tiles, it.map.mapDirection)
@@ -36,11 +35,10 @@ class ObjectPoweredDoor(val poweredDoorPosition : Vector3, val poweredDoorDirect
         "unpower door",
         "")
     {
-        val objectPoweredDoor = it.mouseObject as ObjectPoweredDoor
         val entityPlayer = it.level.entityPlayer
 
         entityPlayer.changePlayerItem(PlayerItem.Cell, 1)
-        objectPoweredDoor.isPowered = false
+        this.isPowered = false
         it.updateItemLabels()
         it.room.updateObjectTiles(it.tiles, it.map.mapDirection)
         it.map.updateMap()
@@ -50,7 +48,6 @@ class ObjectPoweredDoor(val poweredDoorPosition : Vector3, val poweredDoorDirect
         "use door",
         "change room")
     {
-        val objectPoweredDoor = it.mouseObject as ObjectPoweredDoor
         val entityPlayer = it.level.entityPlayer
 
         if (isPowered)

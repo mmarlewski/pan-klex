@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Vector3
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-class Pathfinding(val room : Room)
+class PathFinding(val room : Room)
 {
     val startPosition = Vector3()
     val endPosition = Vector3()
@@ -23,7 +23,7 @@ class Pathfinding(val room : Room)
 
     fun findPath(start : Vector3, end : Vector3)
     {
-        Gdx.app.log("pathfinding", "finding path...")
+        Gdx.app.log("pathFinding", "finding path...")
 
         // init
 
@@ -130,8 +130,8 @@ class Pathfinding(val room : Room)
 
         when (isPathFound)
         {
-            true  -> Gdx.app.log("pathfinding", "path found")
-            false -> Gdx.app.log("pathfinding", "path not found")
+            true  -> Gdx.app.log("pathFinding", "path found")
+            false -> Gdx.app.log("pathFinding", "path not found")
         }
     }
 }

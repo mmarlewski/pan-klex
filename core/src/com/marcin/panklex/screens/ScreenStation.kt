@@ -38,6 +38,7 @@ class ScreenStation(val name : String, val game : PanKlexGame) : BaseScreen(name
                                          player.changePlayerUpgrade(station.upgrade, true)
                                          station.isUpgradeTaken = true
                                          updateWidgets()
+                                         game.screenGame.updateUpgradeLabels()
                                      }
                                  }
                              }

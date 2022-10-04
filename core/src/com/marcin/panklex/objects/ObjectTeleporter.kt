@@ -27,13 +27,12 @@ class ObjectTeleporter(val teleporterPosition : Vector3) : Object("teleporter")
         "power teleport",
         "")
     {
-        val objectTeleporter = it.mouseObject as ObjectTeleporter
         val entityPlayer = it.level.entityPlayer
 
         if (entityPlayer.getPlayerItem(PlayerItem.Cell) > 0)
         {
             entityPlayer.changePlayerItem(PlayerItem.Cell, -1)
-            objectTeleporter.isPowered = true
+            this.isPowered = true
             it.updateItemLabels()
         }
         it.room.updateObjectTiles(it.tiles, it.map.mapDirection)
@@ -44,11 +43,10 @@ class ObjectTeleporter(val teleporterPosition : Vector3) : Object("teleporter")
         "unpower teleport",
         "")
     {
-        val objectTeleporter = it.mouseObject as ObjectTeleporter
         val entityPlayer = it.level.entityPlayer
 
         entityPlayer.changePlayerItem(PlayerItem.Cell, 1)
-        objectTeleporter.isPowered = false
+        this.isPowered = false
         it.updateItemLabels()
         it.room.updateObjectTiles(it.tiles, it.map.mapDirection)
         it.map.updateMap()

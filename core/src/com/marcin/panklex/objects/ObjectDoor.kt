@@ -33,7 +33,6 @@ class ObjectDoor(val doorPosition : Vector3, val doorDirection : Direction2d) : 
         it.room.updateObjectTiles(it.tiles, it.map.mapDirection)
         it.room.updateLinesTiles(it.tiles, it.map.mapDirection)
         it.map.updateMap()
-        println(entityPlayer.playerPosition)
     }
 
     override fun getOccupiedPositions(positions : MutableList<Vector3>)

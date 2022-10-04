@@ -18,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.marcin.panklex.*
+import kotlin.math.abs
 import kotlin.math.floor
 
 class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, game), InputProcessor
@@ -34,7 +35,8 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
     val level = Level()
     val room = Room(level)
     val map = Map(room, tiles)
-    val pathfinding = Pathfinding(room)
+    val pathFinding = PathFinding(room)
+    val lineFinding = LineFinding(room)
 
     // dragging
 
@@ -62,6 +64,8 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
     var currentFloor = 0
     var isMoving = false
     var isMoveAccessible = false
+    var isLine = false
+    var isShowingAllFloors = true
     val actionArray = Array<Action?>(5) { null }
 
     // hud
@@ -82,6 +86,11 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
     val itemRopeArrowLabel = Label("-", Label.LabelStyle(BitmapFont(), Color.PURPLE))
     val itemPointingArrowImage = Image(tiles.itemPointingArrow)
     val itemPointingArrowLabel = Label("-", Label.LabelStyle(BitmapFont(), Color.PURPLE))
+
+    val upgradeLongFallLegImage = Image()
+    val upgradeSpringLegImage = Image()
+    val upgradeDrillArmImage = Image()
+    val upgradeExtendedArmImage = Image()
 
     val mouseObjectTypeLabel = Label("type", Label.LabelStyle(BitmapFont(), Color.CYAN))
     val levelMousePositionLabel = Label("position", Label.LabelStyle(BitmapFont(), Color.BLUE))
@@ -114,6 +123,12 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
         this.row()
         this.add(itemPointingArrowImage)
         this.add(itemPointingArrowLabel)
+        this.row()
+        this.add(upgradeLongFallLegImage)
+        this.add(upgradeSpringLegImage)
+        this.row()
+        this.add(upgradeDrillArmImage)
+        this.add(upgradeExtendedArmImage)
         this.row()
         this.add(levelMousePositionLabel)
         this.row()
@@ -160,7 +175,7 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
         room.updateObjectTiles(tiles, map.mapDirection)
         room.updateLinesTiles(tiles, map.mapDirection)
         room.updateMoveTiles(tiles, map.mapDirection)
-        room.updateSelectTiles(tiles, levelMousePosition, isMoving, pathfinding.isPathFound, isMoveAccessible)
+        room.updateSelectTiles(tiles, levelMousePosition, isMoving, pathFinding.isPathFound, isMoveAccessible)
         map.createMap()
         map.updateMap()
 
@@ -168,12 +183,13 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
         changeFloor(0)
         changeIsMoving(false)
         updateItemLabels()
+        updateUpgradeLabels()
         updateLevelMousePositionLabel()
         updateMouseObjectLabel()
         updateActionLabels()
 
-        gameCamera.position.set(
-            (tileLengthHalf * map.mapWidth).toFloat(), (tileLengthQuarter * map.mapHeight).toFloat(), 0f)
+        gameCamera.position.x = (tileLengthHalf * map.mapWidth + tileLengthQuarter * map.mapHeight) * 0.5f
+        gameCamera.position.y = (tileLengthHalf * map.mapHeight - tileLengthQuarter * map.mapWidth) * 0.5f
         gameCamera.zoom = 0.5f
     }
 
@@ -219,6 +235,30 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
         itemGearLabel.setText(level.entityPlayer.playerItems[PlayerItem.Gear].toString())
         itemRopeArrowLabel.setText(level.entityPlayer.playerItems[PlayerItem.RopeArrow].toString())
         itemPointingArrowLabel.setText(level.entityPlayer.playerItems[PlayerItem.PointingArrow].toString())
+    }
+
+    fun updateUpgradeLabels()
+    {
+        upgradeLongFallLegImage.drawable = when (level.entityPlayer.hasPlayerUpgrade(PlayerUpgrade.LongFallLeg))
+        {
+            true  -> tiles.upgradeLongFallLegUnlockedDrawable
+            false -> tiles.upgradeLongFallLegLockedDrawable
+        }
+        upgradeSpringLegImage.drawable = when (level.entityPlayer.hasPlayerUpgrade(PlayerUpgrade.SpringLeg))
+        {
+            true  -> tiles.upgradeSpringLegUnlockedDrawable
+            false -> tiles.upgradeSpringLegLockedDrawable
+        }
+        upgradeDrillArmImage.drawable = when (level.entityPlayer.hasPlayerUpgrade(PlayerUpgrade.DrillArm))
+        {
+            true  -> tiles.upgradeDrillArmUnlockedDrawable
+            false -> tiles.upgradeDrillArmLockedDrawable
+        }
+        upgradeExtendedArmImage.drawable = when (level.entityPlayer.hasPlayerUpgrade(PlayerUpgrade.ExtendedArm))
+        {
+            true  -> tiles.upgradeExtendedArmUnlockedDrawable
+            false -> tiles.upgradeExtendedArmLockedDrawable
+        }
     }
 
     fun updateLevelMousePositionLabel()
@@ -286,7 +326,7 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
     {
         isMoveAccessible = false
 
-        if (isMoving && pathfinding.isPathFound)
+        if (isMoving && pathFinding.isPathFound)
         {
             val levelMouseSpace = room.getSpace(levelMousePosition)
 
@@ -314,17 +354,19 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
         // mapRelativeMousePosition
 
         mapRelativeMousePosition.x =
-            floor(
-                (0.5f * worldMousePosition.x - worldMousePosition.y + tileLengthQuarter) / tileLengthHalf) + (currentFloor + 1)
+                floor(
+                        (0.5f * worldMousePosition.x - worldMousePosition.y + tileLengthQuarter) / tileLengthHalf
+                ) + (currentFloor + 1)
         mapRelativeMousePosition.y =
-            floor(
-                (0.5f * worldMousePosition.x + worldMousePosition.y - tileLengthQuarter) / tileLengthHalf) - (currentFloor + 1)
+                floor(
+                        (0.5f * worldMousePosition.x + worldMousePosition.y - tileLengthQuarter) / tileLengthHalf
+                ) - (currentFloor + 1)
         mapRelativeMousePosition.z = currentFloor.toFloat()
 
         // the rest
 
         isMouseInMap =
-            (mapRelativeMousePosition.x.toInt() in 0 until map.mapWidth && mapRelativeMousePosition.y.toInt() in 0 until map.mapHeight && mapRelativeMousePosition.z.toInt() in 0 until map.mapFloors)
+                (mapRelativeMousePosition.x.toInt() in 0 until map.mapWidth && mapRelativeMousePosition.y.toInt() in 0 until map.mapHeight && mapRelativeMousePosition.z.toInt() in 0 until map.mapFloors)
         map.getObjectiveMapPosition(mapRelativeMousePosition, mapObjectiveMousePosition)
         map.getLevelPosition(mapObjectiveMousePosition, newLevelMousePosition)
         wasLevelMousePositionChanged = levelMousePosition != newLevelMousePosition
@@ -342,12 +384,12 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
             if (isMoving)
             {
                 level.clearPathfinding()
-                pathfinding.findPath(level.entityPlayer.playerPosition, levelMousePosition)
+                pathFinding.findPath(level.entityPlayer.playerPosition, levelMousePosition)
                 updateIsMoveAccessible()
                 room.updateMoveTiles(tiles, map.mapDirection)
             }
 
-            room.updateSelectTiles(tiles, levelMousePosition, isMoving, pathfinding.isPathFound, isMoveAccessible)
+            room.updateSelectTiles(tiles, levelMousePosition, isMoving, pathFinding.isPathFound, isMoveAccessible)
             map.updateMap()
 
             wasLevelMousePositionChanged = false
@@ -372,8 +414,11 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
         gameCamera.update()
         for (k in 0 until map.mapFloors)
         {
-            map.renderers[k].setView(gameCamera)
-            map.renderers[k].renderAllLayers()
+            if (!(!isShowingAllFloors && abs(k - currentFloor) > 1))
+            {
+                map.renderers[k].setView(gameCamera)
+                map.renderers[k].renderAllLayers()
+            }
         }
         for (k in 0 until map.mapFloors)
         {
@@ -409,7 +454,7 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
             Input.Keys.D     -> changeFloor(room.roomFloorEnd)
 
             // move
-            Input.Keys.X     ->
+            Input.Keys.Z     ->
             {
                 isLevelMousePositionFixed = false
                 changeIsMoving(!isMoving)
@@ -417,14 +462,33 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
                 level.clearPathfinding()
                 if (isMoving)
                 {
-                    pathfinding.findPath(level.entityPlayer.playerPosition, levelMousePosition)
+                    pathFinding.findPath(level.entityPlayer.playerPosition, levelMousePosition)
                     updateIsMoveAccessible()
                 }
                 room.updateMoveTiles(tiles, map.mapDirection)
-                room.updateSelectTiles(tiles, levelMousePosition, isMoving, pathfinding.isPathFound, isMoveAccessible)
+                room.updateSelectTiles(tiles, levelMousePosition, isMoving, pathFinding.isPathFound, isMoveAccessible)
                 map.updateMap()
             }
-
+            /*
+            //line
+            Input.Keys.X     ->
+            {
+                lineFinding.findLine(level.entityPlayer.playerPosition, levelMousePosition)
+                room.updateLineTiles(tiles, lineFinding.linePositions)
+                map.updateMap()
+            }
+            Input.Keys.C     ->
+            {
+                lineFinding.linePositions.clear()
+                room.updateLineTiles(tiles, lineFinding.linePositions)
+                map.updateMap()
+            }
+             */
+            // showing floors
+            Input.Keys.V     ->
+            {
+                isShowingAllFloors = !isShowingAllFloors
+            }
             // numbers
             Input.Keys.NUM_1 -> changeFloor(1)
             Input.Keys.NUM_2 -> changeFloor(2)

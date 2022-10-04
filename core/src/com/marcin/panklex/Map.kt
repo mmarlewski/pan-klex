@@ -34,6 +34,9 @@ class Map(val room : Room, val tiles : Tiles)
             val layers = mutableListOf<TiledMapTileLayer>()
 
             layers.add(TiledMapTileLayer(mapMaxWidth, mapMaxHeight, tileLength, tileLengthHalf).apply {
+                name = SpaceLayer.LineBack.name
+            })
+            layers.add(TiledMapTileLayer(mapMaxWidth, mapMaxHeight, tileLength, tileLengthHalf).apply {
                 name = SpaceLayer.SelectBack.name
             })
             layers.add(TiledMapTileLayer(mapMaxWidth, mapMaxHeight, tileLength, tileLengthHalf).apply {
@@ -74,6 +77,9 @@ class Map(val room : Room, val tiles : Tiles)
             })
             layers.add(TiledMapTileLayer(mapMaxWidth, mapMaxHeight, tileLength, tileLengthHalf).apply {
                 name = SpaceLayer.MoveWhole.name
+            })
+            layers.add(TiledMapTileLayer(mapMaxWidth, mapMaxHeight, tileLength, tileLengthHalf).apply {
+                name = SpaceLayer.LineFront.name
             })
             layers.add(TiledMapTileLayer(mapMaxWidth, mapMaxHeight, tileLength, tileLengthHalf).apply {
                 name = SpaceLayer.SelectFront.name
