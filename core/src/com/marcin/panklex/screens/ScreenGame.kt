@@ -1,590 +1,404 @@
 package com.marcin.panklex.screens
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.scenes.scene2d.InputEvent
-import com.badlogic.gdx.scenes.scene2d.ui.*
+import com.badlogic.gdx.scenes.scene2d.ui.Image
+import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
-import com.badlogic.gdx.utils.Align
-import com.badlogic.gdx.utils.Json
-import com.badlogic.gdx.utils.ScreenUtils
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.marcin.panklex.*
-import kotlin.math.truncate
+import kotlin.math.abs
+import kotlin.math.floor
 
 class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, game), InputProcessor
 {
-    // main
+    // technical
 
     val inputMultiplexer = InputMultiplexer(stage, this)
-    val mapCamera = OrthographicCamera()
-    val mapViewport = FitViewport(1080f, 720f, mapCamera)
+    val gameCamera = OrthographicCamera()
+    val gameViewport = FitViewport(screenResolution.x, screenResolution.y, gameCamera)
 
-    val level = KlexLevel()
-    val map = KlexMap(100, 100, 32, 32)
-    val tiles = KlexTiles(game.assetManager)
-    val mapTilesLogic = KlexMapTilesLogic(tiles, map, level)
-    val pathFinding = KlexPathFinding(level)
+    // main
 
-    // hud
+    val tiles = Tiles(game.assetManager)
+    val level = Level()
+    val room = Room(level)
+    val map = Map(room, tiles)
+    val pathFinding = PathFinding(room)
+    val lineFinding = LineFinding(room)
 
-    val heartImage1 = Image(game.assetManager.get<Texture>("graphics/hud/heart.png"))
-    val heartImage2 = Image(game.assetManager.get<Texture>("graphics/hud/heart.png"))
-    val heartImage3 = Image(game.assetManager.get<Texture>("graphics/hud/heart.png"))
-    val heartImage4 = Image(game.assetManager.get<Texture>("graphics/hud/heart.png"))
-
-    val pickaxeUnselected = TextureRegion(game.assetManager.get<Texture>("graphics/actions/pickaxe.png"), 0, 0, 32, 32)
-    val pickaxeSelected = TextureRegion(game.assetManager.get<Texture>("graphics/actions/pickaxe.png"), 32, 0, 32, 32)
-    val bombUnselected = TextureRegion(game.assetManager.get<Texture>("graphics/actions/bomb.png"), 0, 0, 32, 32)
-    val bombSelected = TextureRegion(game.assetManager.get<Texture>("graphics/actions/bomb.png"), 32, 0, 32, 32)
-    val coinUnselected = TextureRegion(game.assetManager.get<Texture>("graphics/actions/coin.png"), 0, 0, 32, 32)
-    val coinSelected = TextureRegion(game.assetManager.get<Texture>("graphics/actions/coin.png"), 32, 0, 32, 32)
-    val cellUnselected = TextureRegion(game.assetManager.get<Texture>("graphics/actions/cell.png"), 0, 0, 32, 32)
-    val cellSelected = TextureRegion(game.assetManager.get<Texture>("graphics/actions/cell.png"), 32, 0, 32, 32)
-    val handUnselected = TextureRegion(game.assetManager.get<Texture>("graphics/actions/hand.png"), 0, 0, 32, 32)
-    val handSelected = TextureRegion(game.assetManager.get<Texture>("graphics/actions/hand.png"), 32, 0, 32, 32)
-    val walkUnselected = TextureRegion(game.assetManager.get<Texture>("graphics/actions/walk.png"), 0, 0, 32, 32)
-    val walkSelected = TextureRegion(game.assetManager.get<Texture>("graphics/actions/walk.png"), 32, 0, 32, 32)
-    val cancelImage = game.assetManager.get<Texture>("graphics/actions/cancel.png")
-
-    val pickaxeButton = ImageButton(
-        TextureRegionDrawable(pickaxeUnselected),
-        TextureRegionDrawable(pickaxeUnselected),
-        TextureRegionDrawable(pickaxeSelected)
-    )
-    val bombButton = ImageButton(
-        TextureRegionDrawable(bombUnselected),
-        TextureRegionDrawable(bombUnselected),
-        TextureRegionDrawable(bombSelected)
-    )
-    val coinButton = ImageButton(
-        TextureRegionDrawable(coinUnselected),
-        TextureRegionDrawable(coinUnselected),
-        TextureRegionDrawable(coinSelected)
-    )
-    val cellButton = ImageButton(
-        TextureRegionDrawable(cellUnselected),
-        TextureRegionDrawable(cellUnselected),
-        TextureRegionDrawable(cellSelected)
-    )
-    val handButton = ImageButton(
-        TextureRegionDrawable(handUnselected),
-        TextureRegionDrawable(handUnselected),
-        TextureRegionDrawable(handSelected)
-    )
-    val walkButton = ImageButton(
-        TextureRegionDrawable(walkUnselected),
-        TextureRegionDrawable(walkUnselected),
-        TextureRegionDrawable(walkSelected)
-    )
-    val cancelButton = ImageButton(TextureRegionDrawable(cancelImage))
-
-    val currentLevelLabel =
-        Label("level: 0", Label.LabelStyle(BitmapFont(), Color.GREEN)).apply { setAlignment(Align.center) }
-
-    val pickaxeLabel = Label("0", Label.LabelStyle(BitmapFont(), Color.YELLOW)).apply { setAlignment(Align.center) }
-    val bombLabel = Label("0", Label.LabelStyle(BitmapFont(), Color.YELLOW)).apply { setAlignment(Align.center) }
-    val coinLabel = Label("0", Label.LabelStyle(BitmapFont(), Color.YELLOW)).apply { setAlignment(Align.center) }
-    val cellLabel = Label("0", Label.LabelStyle(BitmapFont(), Color.YELLOW)).apply { setAlignment(Align.center) }
-
-    // input
-
-    var isTouchDown = false
-    var isTouched = false
-    var screenTouchPosition = Vector2()
-    var worldTouchPosition = Vector2()
-    var mapTouchPosition = Vector2()
-    var isTouchInMap = false
-    var levelTouchPosition = Vector3()
-    var mapTouchBlock = LevelBlock()
-    var mapTouchBlockUp : LevelBlock? = null
-
-    // other
-
-    var currentHearts = 0
-    var currentBlock = Block.UndamagedStone
-    var currentLevel = 0
-    var currentAction = Action.None
-
-    var playerPosition = Vector3()
-
-    var pickaxeCount = 0
-    var bombCount = 0
-    var coinCount = 0
-    var cellCount = 0
+    // dragging
 
     var isDragging = false
     var dragOrigin = Vector2()
     var dragDifference = Vector2()
 
-    init
-    {
-        // hud
+    // mouse
 
-        pickaxeButton.addListener(object : ClickListener()
-        {
-            override fun clicked(event : InputEvent?, x : Float, y : Float)
-            {
-                changeAction(Action.Pickaxe)
-                refreshActions()
-            }
-        })
-        bombButton.addListener(object : ClickListener()
-        {
-            override fun clicked(event : InputEvent?, x : Float, y : Float)
-            {
-                changeAction(Action.Bomb)
-                refreshActions()
-            }
-        })
-        coinButton.addListener(object : ClickListener()
-        {
-            override fun clicked(event : InputEvent?, x : Float, y : Float)
-            {
-                changeAction(Action.Coin)
-                refreshActions()
-            }
-        })
-        cellButton.addListener(object : ClickListener()
-        {
-            override fun clicked(event : InputEvent?, x : Float, y : Float)
-            {
-                changeAction(Action.Cell)
-                refreshActions()
-            }
-        })
-        handButton.addListener(object : ClickListener()
-        {
-            override fun clicked(event : InputEvent?, x : Float, y : Float)
-            {
-                changeAction(Action.Hand)
-                refreshActions()
-            }
-        })
-        walkButton.addListener(object : ClickListener()
-        {
-            override fun clicked(event : InputEvent?, x : Float, y : Float)
-            {
-                changeAction(Action.Walk)
-                refreshActions()
-            }
-        })
-        cancelButton.addListener(object : ClickListener()
-        {
-            override fun clicked(event : InputEvent?, x : Float, y : Float)
-            {
-                changeAction(Action.None)
-                refreshActions()
-            }
-        })
+    var isBeingTouched = false
+    var isTouched = false
+    var screenMousePosition = Vector2()
+    var worldMousePosition = Vector2()
+    var isMouseInMap = false
+    var mapRelativeMousePosition = Vector3()
+    var mapObjectiveMousePosition = Vector3()
+    var levelMousePosition = Vector3()
+    var isLevelMousePositionFixed = false
+    var newLevelMousePosition = Vector3()
+    var wasLevelMousePositionChanged = false
+    var mouseObject : Object? = null
 
-        val table = Table()
-        table.top()
-        table.setFillParent(true)
-        table.defaults().pad(10f)
-        table.add(heartImage1)
-        table.add(heartImage2)
-        table.add(heartImage3)
-        table.add(heartImage4)
-        table.row()
-        table.add(currentLevelLabel)
-        table.add(handButton)
-        table.add(walkButton)
-        table.add(cancelButton)
-        table.row()
-        table.add(pickaxeButton)
-        table.add(bombButton)
-        table.add(coinButton)
-        table.add(cellButton)
-        table.row()
-        table.add(pickaxeLabel)
-        table.add(bombLabel)
-        table.add(coinLabel)
-        table.add(cellLabel)
-        stage.addActor(table)
+    // other
 
-        // other
+    var currentFloor = 0
+    var isMoving = false
+    var isMoveAccessible = false
+    var isLine = false
+    var isShowingAllFloors = true
+    val actionArray = Array<Action?>(5) { null }
 
-        loadLevelFromJson("levels/2.json")
-        pathFinding.setUpMap()
-        changeHearts(4)
-        changeBlock(Block.UndamagedStone)
-        changeLevel(playerPosition.z.toInt())
-        changeAction(Action.None)
-        refreshEntities()
-        refreshDepths()
-        refreshMap()
-        refreshHearts()
-        refreshCurrentLevel()
-        refreshActions()
-        refreshEquipment()
-        showPlayerOnMap()
-        mapCamera.zoom = 0.5f
-        mapCamera.position.x = map.width / 2f
-        mapCamera.position.y = map.height / 2f
+    // hud
+
+    val currentDirectionLabel = Label("direction", Label.LabelStyle(BitmapFont(), Color.CYAN))
+    val currentFloorLabel = Label("floor", Label.LabelStyle(BitmapFont(), Color.YELLOW))
+    val isMovingLabel = Label("move", Label.LabelStyle(BitmapFont(), Color.GREEN))
+
+    val itemCellImage = Image(tiles.itemCell)
+    val itemCellLabel = Label("-", Label.LabelStyle(BitmapFont(), Color.PURPLE))
+    val itemCoinImage = Image(tiles.itemCoin)
+    val itemCoinLabel = Label("-", Label.LabelStyle(BitmapFont(), Color.PURPLE))
+    val itemPickaxeImage = Image(tiles.itemPickaxe)
+    val itemPickaxeLabel = Label("-", Label.LabelStyle(BitmapFont(), Color.PURPLE))
+    val itemGearImage = Image(tiles.itemGear)
+    val itemGearLabel = Label("-", Label.LabelStyle(BitmapFont(), Color.PURPLE))
+    val itemRopeArrowImage = Image(tiles.itemRopeArrow)
+    val itemRopeArrowLabel = Label("-", Label.LabelStyle(BitmapFont(), Color.PURPLE))
+    val itemPointingArrowImage = Image(tiles.itemPointingArrow)
+    val itemPointingArrowLabel = Label("-", Label.LabelStyle(BitmapFont(), Color.PURPLE))
+
+    val upgradeLongFallLegImage = Image()
+    val upgradeSpringLegImage = Image()
+    val upgradeDrillArmImage = Image()
+    val upgradeExtendedArmImage = Image()
+
+    val mouseObjectTypeLabel = Label("type", Label.LabelStyle(BitmapFont(), Color.CYAN))
+    val levelMousePositionLabel = Label("position", Label.LabelStyle(BitmapFont(), Color.BLUE))
+    val actionTitleTextButtons = Array(5) { TextButton("title", TextButton.TextButtonStyle(null, null, null, BitmapFont())) }
+    val actionDescriptionLabels = Array(5) { Label("description", Label.LabelStyle(BitmapFont(), Color.RED)) }
+
+    val table = Table().apply {
+        this.top().left().setFillParent(true)
+        this.defaults().pad(5f)
+        this.add(currentDirectionLabel)
+        this.row()
+        this.add(currentFloorLabel)
+        this.row()
+        this.add(isMovingLabel)
+        this.row()
+        this.add(itemCellImage)
+        this.add(itemCellLabel)
+        this.row()
+        this.add(itemCoinImage)
+        this.add(itemCoinLabel)
+        this.row()
+        this.add(itemPickaxeImage)
+        this.add(itemPickaxeLabel)
+        this.row()
+        this.add(itemGearImage)
+        this.add(itemGearLabel)
+        this.row()
+        this.add(itemRopeArrowImage)
+        this.add(itemRopeArrowLabel)
+        this.row()
+        this.add(itemPointingArrowImage)
+        this.add(itemPointingArrowLabel)
+        this.row()
+        this.add(upgradeLongFallLegImage)
+        this.add(upgradeSpringLegImage)
+        this.row()
+        this.add(upgradeDrillArmImage)
+        this.add(upgradeExtendedArmImage)
+        this.row()
+        this.add(levelMousePositionLabel)
+        this.row()
+        this.add(mouseObjectTypeLabel)
+        this.row()
+        this.add(actionTitleTextButtons[0])
+        this.row()
+        this.add(actionDescriptionLabels[0])
+        this.row()
+        this.add(actionTitleTextButtons[1])
+        this.row()
+        this.add(actionDescriptionLabels[1])
+        this.row()
+        this.add(actionTitleTextButtons[2])
+        this.row()
+        this.add(actionDescriptionLabels[2])
+        this.row()
+        this.add(actionTitleTextButtons[3])
+        this.row()
+        this.add(actionDescriptionLabels[3])
+        this.row()
+        this.add(actionTitleTextButtons[4])
+        this.row()
+        this.add(actionDescriptionLabels[4])
     }
 
-    fun gameLoop()
+    init
     {
-        // action
+        stage.addActor(table)
 
-        if (isTouchInMap)
+        // main
+
+        level.createLevel()
+        level.updateEntities()
+        level.updateObjects()
+        level.updateSideTransparency()
+        level.updateGround()
+        level.updateSpacesAboveAndBelow()
+        level.clearSideVisibility()
+        level.clearBorder()
+        level.clearPathfinding()
+        room.updateRoom(level.entityPlayer.playerPosition)
+        room.updateEntityTiles(tiles)
+        room.updateObjectTiles(tiles, map.mapDirection)
+        room.updateLinesTiles(tiles, map.mapDirection)
+        room.updateMoveTiles(tiles, map.mapDirection)
+        room.updateSelectTiles(tiles, levelMousePosition, isMoving, pathFinding.isPathFound, isMoveAccessible)
+        map.createMap()
+        map.updateMap()
+
+        changeDirection(map.mapDirection)
+        changeFloor(0)
+        changeIsMoving(false)
+        updateItemLabels()
+        updateUpgradeLabels()
+        updateLevelMousePositionLabel()
+        updateMouseObjectLabel()
+        updateActionLabels()
+
+        gameCamera.position.x = (tileLengthHalf * map.mapWidth + tileLengthQuarter * map.mapHeight) * 0.5f
+        gameCamera.position.y = (tileLengthHalf * map.mapHeight - tileLengthQuarter * map.mapWidth) * 0.5f
+        gameCamera.zoom = 0.5f
+    }
+
+    fun changeDirection(direction : Direction2d)
+    {
+        currentDirectionLabel.setText("$direction")
+        for (i in actionArray.indices)
         {
-            // is action possible
+            actionArray[i] = null
+        }
+        updateActionLabels()
+        map.changeMapDirection(direction)
+        room.updateObjectTiles(tiles, map.mapDirection)
+        room.updateLinesTiles(tiles, map.mapDirection)
+        map.updateMap()
+    }
 
-            val isActionPossible = if (mapTouchBlock.isEntity())
+    fun changeFloor(floor : Int)
+    {
+        if (floor in 0 until map.mapFloors)
+        {
+            currentFloorLabel.setText("floor: $floor")
+            currentFloor = floor
+        }
+    }
+
+    fun changeIsMoving(newIsMoving : Boolean)
+    {
+        when (newIsMoving)
+        {
+            true  -> isMovingLabel.setText("moving player")
+            false -> isMovingLabel.setText("not moving")
+        }
+
+        isMoving = newIsMoving
+    }
+
+    fun updateItemLabels()
+    {
+        itemCellLabel.setText(level.entityPlayer.playerItems[PlayerItem.Cell].toString())
+        itemCoinLabel.setText(level.entityPlayer.playerItems[PlayerItem.Coin].toString())
+        itemPickaxeLabel.setText(level.entityPlayer.playerItems[PlayerItem.Pickaxe].toString())
+        itemGearLabel.setText(level.entityPlayer.playerItems[PlayerItem.Gear].toString())
+        itemRopeArrowLabel.setText(level.entityPlayer.playerItems[PlayerItem.RopeArrow].toString())
+        itemPointingArrowLabel.setText(level.entityPlayer.playerItems[PlayerItem.PointingArrow].toString())
+    }
+
+    fun updateUpgradeLabels()
+    {
+        upgradeLongFallLegImage.drawable = when (level.entityPlayer.hasPlayerUpgrade(PlayerUpgrade.LongFallLeg))
+        {
+            true  -> tiles.upgradeLongFallLegUnlockedDrawable
+            false -> tiles.upgradeLongFallLegLockedDrawable
+        }
+        upgradeSpringLegImage.drawable = when (level.entityPlayer.hasPlayerUpgrade(PlayerUpgrade.SpringLeg))
+        {
+            true  -> tiles.upgradeSpringLegUnlockedDrawable
+            false -> tiles.upgradeSpringLegLockedDrawable
+        }
+        upgradeDrillArmImage.drawable = when (level.entityPlayer.hasPlayerUpgrade(PlayerUpgrade.DrillArm))
+        {
+            true  -> tiles.upgradeDrillArmUnlockedDrawable
+            false -> tiles.upgradeDrillArmLockedDrawable
+        }
+        upgradeExtendedArmImage.drawable = when (level.entityPlayer.hasPlayerUpgrade(PlayerUpgrade.ExtendedArm))
+        {
+            true  -> tiles.upgradeExtendedArmUnlockedDrawable
+            false -> tiles.upgradeExtendedArmLockedDrawable
+        }
+    }
+
+    fun updateLevelMousePositionLabel()
+    {
+        levelMousePositionLabel.setText(levelMousePosition.toString())
+    }
+
+    fun updateMouseObjectLabel()
+    {
+        val mouseObj = mouseObject
+
+        if (mouseObj != null)
+        {
+            mouseObjectTypeLabel.setText(mouseObj.objectType)
+        }
+        else
+        {
+            mouseObjectTypeLabel.setText("no object")
+        }
+    }
+
+    fun updateActionLabels()
+    {
+        for (i in actionArray.indices)
+        {
+            actionTitleTextButtons[i].listeners.clear()
+
+            val action = actionArray[i]
+
+            if (action != null)
             {
-                mapTouchBlock.entity!!.isActionPossible(levelTouchPosition, currentAction)
+                val screenGame = this
+
+                actionTitleTextButtons[i].isVisible = true
+                actionTitleTextButtons[i].setText(action.actionTitle)
+                if (action.isActionPossible)
+                {
+                    actionTitleTextButtons[i].addListener(object : ClickListener()
+                                                          {
+                                                              override fun clicked(event : InputEvent?, x : Float, y : Float)
+                                                              {
+                                                                  action.performAction(screenGame)
+                                                                  for (j in actionArray.indices)
+                                                                  {
+                                                                      actionArray[j] = null
+                                                                  }
+                                                                  updateActionLabels()
+                                                                  isLevelMousePositionFixed = false
+                                                              }
+                                                          })
+                }
+                actionDescriptionLabels[i].isVisible = true
+                actionDescriptionLabels[i].setText(action.actionDescription)
+                actionDescriptionLabels[i].style.fontColor = if (action.isActionPossible) Color.GREEN else Color.RED
             }
             else
             {
-                when (currentAction)
+                actionTitleTextButtons[i].isVisible = false
+                actionDescriptionLabels[i].isVisible = false
+            }
+        }
+    }
+
+    fun updateIsMoveAccessible()
+    {
+        isMoveAccessible = false
+
+        if (isMoving && pathFinding.isPathFound)
+        {
+            val levelMouseSpace = room.getSpace(levelMousePosition)
+
+            if (levelMouseSpace != null && levelMouseSpace.isOnGround)
+            {
+                if (levelMouseSpace.isObjectOccupyingNullOrCanStoreEntity(levelMousePosition))
                 {
-                    Action.Pickaxe ->
-                    {
-                        if (mapTouchBlockUp!!.isRock())
-                        {
-                            when (mapTouchBlockUp!!.rock)
-                            {
-                                Block.UndamagedStone, Block.DamagedStone, Block.Brick -> true
-                                else                                                  -> false
-                            }
-                        }
-                        else
-                        {
-                            when (mapTouchBlock.rock)
-                            {
-                                Block.UndamagedStone, Block.DamagedStone, Block.Brick -> true
-                                else                                                  -> false
-                            }
-                        }
-                    }
-                    Action.Walk    -> !mapTouchBlockUp!!.isRock()
-                    else           -> false
-                }
-            }
-
-            // executing action
-
-            if (isTouched && isActionPossible && playerPosition.z.toInt() == currentLevel)
-            {
-                pathFinding.findPath(
-                    playerPosition.x.toInt(),
-                    playerPosition.y.toInt(),
-                    mapTouchPosition.x.toInt(),
-                    mapTouchPosition.y.toInt(),
-                    currentLevel
-                )
-
-                if (pathFinding.isTraversable)
-                {
-                    if (mapTouchBlock.isEntity())
-                    {
-                        mapTouchBlock.entity?.onAction(levelTouchPosition, currentAction, this)
-                    }
-                    else
-                    {
-                        when (currentAction)
-                        {
-                            Action.Pickaxe ->
-                            {
-                                if (mapTouchBlockUp!!.isRock())
-                                {
-                                    mapTouchBlockUp!!.rock = when (mapTouchBlockUp!!.rock)
-                                    {
-                                        Block.UndamagedStone            -> Block.DamagedStone
-                                        Block.DamagedStone, Block.Brick -> Block.Empty
-                                        else                            -> Block.Metal
-                                    }
-                                }
-                                else
-                                {
-                                    mapTouchBlock.rock = when (mapTouchBlock.rock)
-                                    {
-                                        Block.UndamagedStone            -> Block.DamagedStone
-                                        Block.DamagedStone, Block.Brick -> Block.Empty
-                                        else                            -> Block.Metal
-                                    }
-                                }
-
-                                pickaxeCount--
-                                if (pickaxeCount <= 0)
-                                {
-                                    changeAction(Action.None)
-                                    refreshActions()
-                                }
-
-                                refreshDepths()
-
-                                if (mapTouchPosition.x == playerPosition.x && mapTouchPosition.y == playerPosition.y && !mapTouchBlock.isRock())
-                                {
-                                    changePlayerPosition(
-                                        Vector3(
-                                            mapTouchPosition.x,
-                                            mapTouchPosition.y,
-                                            (currentLevel - mapTouchBlock.depth).toFloat()
-                                        )
-                                    )
-
-                                    changeLevel(currentLevel - mapTouchBlock.depth)
-                                    changeHearts(-mapTouchBlock.depth)
-                                }
-                            }
-                            Action.Walk    ->
-                            {
-                                if (mapTouchBlock.isRock())
-                                {
-                                    changePlayerPosition(
-                                        Vector3(
-                                            mapTouchPosition.x,
-                                            mapTouchPosition.y,
-                                            currentLevel.toFloat()
-                                        )
-                                    )
-                                }
-                                else
-                                {
-                                    changePlayerPosition(
-                                        Vector3(
-                                            mapTouchPosition.x,
-                                            mapTouchPosition.y,
-                                            (currentLevel - mapTouchBlock.depth).toFloat()
-                                        )
-                                    )
-
-                                    changeLevel(currentLevel - mapTouchBlock.depth)
-                                    changeHearts(-mapTouchBlock.depth)
-                                }
-                            }
-                            else           ->
-                            {
-                            }
-                        }
-                    }
-                }
-
-                refreshEntities()
-                refreshDepths()
-                refreshMap()
-                refreshHearts()
-                refreshCurrentLevel()
-                refreshActions()
-                refreshEquipment()
-            }
-        }
-    }
-
-    fun changePlayerPosition(position : Vector3)
-    {
-        playerPosition = position
-    }
-
-    fun showPlayerOnMap()
-    {
-        map.clearLayer(MapLayer.Player)
-
-        if (playerPosition.z.toInt() == currentLevel)
-        {
-            map.setTile(MapLayer.Player, playerPosition.x.toInt(), playerPosition.y.toInt(), tiles.player)
-        }
-    }
-
-    fun loadLevelFromJson(jsonPath : String)
-    {
-        val jsonFile = Gdx.files.internal(jsonPath)
-        val jsonString = jsonFile.readString()
-        val jsonLevel = Json().fromJson(JsonLevel::class.java, jsonString)
-
-        level.version = jsonLevel.version
-        level.name = jsonLevel.name
-        level.levels = jsonLevel.levels
-        level.width = jsonLevel.width
-        level.height = jsonLevel.height
-
-        playerPosition = jsonLevel.playerPosition
-
-        val levelList = mutableListOf<List<List<LevelBlock>>>()
-
-        for (i in 0 until level.levels)
-        {
-            val columnList = mutableListOf<List<LevelBlock>>()
-
-            for (j in 0 until level.height)
-            {
-                val rowList = mutableListOf<LevelBlock>()
-
-                for (k in 0 until level.width)
-                {
-                    val levelBlock = LevelBlock()
-                    levelBlock.position.x = k.toFloat()
-                    levelBlock.position.y = j.toFloat()
-                    levelBlock.position.z = i.toFloat()
-                    levelBlock.rock = when (jsonLevel.map[i][level.height - j - 1][k])
-                    {
-                        0    -> Block.Empty
-                        1    -> Block.UndamagedStone
-                        2    -> Block.DamagedStone
-                        3    -> Block.Brick
-                        4    -> Block.Metal
-                        else -> Block.Empty
-                    }
-
-                    rowList.add(levelBlock)
-                }
-
-                columnList.add(rowList)
-            }
-
-            levelList.add(columnList)
-        }
-
-        level.map = levelList
-        level.entities.addAll(jsonLevel.entities)
-    }
-
-    fun refreshEntities()
-    {
-        for (i in 0 until level.width)
-        {
-            for (j in 0 until level.height)
-            {
-                level.map[currentLevel][j][i].entity = null
-            }
-        }
-
-        for (e in level.entities)
-        {
-            for (p in e.getPositions())
-            {
-                level.map[p.z.toInt()][p.y.toInt()][p.x.toInt()].entity = e
-            }
-        }
-    }
-
-    fun refreshDepths()
-    {
-        for (i in 0 until level.levels)
-        {
-            for (j in 0 until level.height)
-            {
-                for (k in 0 until level.width)
-                {
-                    var depth = 0
-
-                    for (l in i - 1 downTo 0)
-                    {
-                        if (!level.map[i - l][j][k].isRock()) depth++
-                    }
-
-                    level.map[i][j][k].depth = depth
+                    isMoveAccessible = true
                 }
             }
         }
     }
 
-    fun refreshMap()
+    fun updateMouse(screenX : Int, screenY : Int)
     {
-        mapTilesLogic.setUpMap(currentLevel)
-        showPlayerOnMap()
+        screenMousePosition.set(screenX.toFloat(), screenY.toFloat())
+        worldMousePosition.set(screenMousePosition)
+        gameViewport.unproject(worldMousePosition)
+
+        updateMouse()
     }
 
-    fun changeHearts(by : Int)
+    fun updateMouse()
     {
-        currentHearts += by
+        // mapRelativeMousePosition
 
-        if (currentHearts < 1)
+        mapRelativeMousePosition.x =
+                floor(
+                        (0.5f * worldMousePosition.x - worldMousePosition.y + tileLengthQuarter) / tileLengthHalf
+                ) + (currentFloor + 1)
+        mapRelativeMousePosition.y =
+                floor(
+                        (0.5f * worldMousePosition.x + worldMousePosition.y - tileLengthQuarter) / tileLengthHalf
+                ) - (currentFloor + 1)
+        mapRelativeMousePosition.z = currentFloor.toFloat()
+
+        // the rest
+
+        isMouseInMap =
+                (mapRelativeMousePosition.x.toInt() in 0 until map.mapWidth && mapRelativeMousePosition.y.toInt() in 0 until map.mapHeight && mapRelativeMousePosition.z.toInt() in 0 until map.mapFloors)
+        map.getObjectiveMapPosition(mapRelativeMousePosition, mapObjectiveMousePosition)
+        map.getLevelPosition(mapObjectiveMousePosition, newLevelMousePosition)
+        wasLevelMousePositionChanged = levelMousePosition != newLevelMousePosition
+        levelMousePosition.set(newLevelMousePosition)
+        mouseObject = room.getSpace(levelMousePosition)?.objectOccupying
+    }
+
+    fun screenLoop()
+    {
+        if (wasLevelMousePositionChanged)
         {
-            game.log("hearts", "Dead!")
-            currentHearts = 1
+            updateLevelMousePositionLabel()
+            updateMouseObjectLabel()
+
+            if (isMoving)
+            {
+                level.clearPathfinding()
+                pathFinding.findPath(level.entityPlayer.playerPosition, levelMousePosition)
+                updateIsMoveAccessible()
+                room.updateMoveTiles(tiles, map.mapDirection)
+            }
+
+            room.updateSelectTiles(tiles, levelMousePosition, isMoving, pathFinding.isPathFound, isMoveAccessible)
+            map.updateMap()
+
+            wasLevelMousePositionChanged = false
         }
-        if (currentHearts > 4)
-        {
-            game.log("hearts", "Healthy!")
-            currentHearts = 4
-        }
-    }
-
-    fun changeBlock(block : Block)
-    {
-        currentBlock = block
-    }
-
-    fun changeLevel(levelNr : Int)
-    {
-        currentLevel = levelNr
-
-        if (currentLevel < 0)
-        {
-            game.log("level", "Too deep!")
-            currentLevel = 0
-        }
-        if (currentLevel > level.levels - 1)
-        {
-            game.log("level", "Too high!")
-            currentLevel = level.levels - 1
-        }
-    }
-
-    fun changeAction(action : Action)
-    {
-        when (action)
-        {
-            Action.Pickaxe -> if (pickaxeCount > 0) currentAction = Action.Pickaxe
-            Action.Bomb    -> if (bombCount > 0) currentAction = Action.Bomb
-            Action.Coin    -> if (coinCount > 0) currentAction = Action.Coin
-            Action.Cell    -> if (cellCount > 0) currentAction = Action.Cell
-            Action.Hand    -> currentAction = Action.Hand
-            Action.Walk    -> currentAction = Action.Walk
-            Action.None    -> currentAction = Action.None
-        }
-    }
-
-    fun refreshHearts()
-    {
-        heartImage1.isVisible = (currentHearts >= 1)
-        heartImage2.isVisible = (currentHearts >= 2)
-        heartImage3.isVisible = (currentHearts >= 3)
-        heartImage4.isVisible = (currentHearts >= 4)
-    }
-
-    fun refreshCurrentLevel()
-    {
-        currentLevelLabel.setText("Level: $currentLevel")
-    }
-
-    fun refreshActions()
-    {
-        pickaxeButton.isChecked = (currentAction == Action.Pickaxe)
-        bombButton.isChecked = (currentAction == Action.Bomb)
-        coinButton.isChecked = (currentAction == Action.Coin)
-        cellButton.isChecked = (currentAction == Action.Cell)
-        handButton.isChecked = (currentAction == Action.Hand)
-        walkButton.isChecked = (currentAction == Action.Walk)
-    }
-
-    fun refreshEquipment()
-    {
-        pickaxeLabel.setText(pickaxeCount)
-        bombLabel.setText(bombCount)
-        coinLabel.setText(coinCount)
-        cellLabel.setText(cellCount)
     }
 
     override fun show()
     {
         super.show()
-
-        isTouchDown = false
-        isTouched = false
         game.changeInputProcessor(inputMultiplexer)
     }
 
@@ -592,34 +406,105 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
     {
         super.render(delta)
 
-        gameLoop()
+        screenLoop()
 
-        if (isTouched) isTouched = false
-
-        ScreenUtils.clear(0f, 0f, 0f, 1f)
+        Gdx.gl.glClearColor(0f, 0f, 0f, 0f)
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         camera.update()
-        mapCamera.update()
-        map.renderer.setView(mapCamera)
-        map.renderer.render()
+        gameCamera.update()
+        for (k in 0 until map.mapFloors)
+        {
+            if (!(!isShowingAllFloors && abs(k - currentFloor) > 1))
+            {
+                map.renderers[k].setView(gameCamera)
+                map.renderers[k].renderAllLayers()
+            }
+        }
+        for (k in 0 until map.mapFloors)
+        {
+            map.renderers[k].setView(gameCamera)
+            map.renderers[k].renderOutlineLayers()
+        }
         stage.draw()
     }
 
     override fun resize(width : Int, height : Int)
     {
         super.resize(width, height)
-        mapViewport.update(width, height)
+        gameViewport.update(width, height)
     }
 
     override fun dispose()
     {
         super.dispose()
-
-        map.dispose()
     }
 
     override fun keyDown(keycode : Int) : Boolean
     {
-        return false
+        when (keycode)
+        {
+            // direction
+            Input.Keys.Q     -> changeDirection(direction2dToLeft(map.mapDirection))
+            Input.Keys.E     -> changeDirection(direction2dToRight(map.mapDirection))
+
+            // floor
+            Input.Keys.W     -> changeFloor(currentFloor + 1)
+            Input.Keys.S     -> changeFloor(currentFloor - 1)
+            Input.Keys.A     -> changeFloor(room.roomFloorStart)
+            Input.Keys.D     -> changeFloor(room.roomFloorEnd)
+
+            // move
+            Input.Keys.Z     ->
+            {
+                isLevelMousePositionFixed = false
+                changeIsMoving(!isMoving)
+                updateMouse()
+                level.clearPathfinding()
+                if (isMoving)
+                {
+                    pathFinding.findPath(level.entityPlayer.playerPosition, levelMousePosition)
+                    updateIsMoveAccessible()
+                }
+                room.updateMoveTiles(tiles, map.mapDirection)
+                room.updateSelectTiles(tiles, levelMousePosition, isMoving, pathFinding.isPathFound, isMoveAccessible)
+                map.updateMap()
+            }
+            /*
+            //line
+            Input.Keys.X     ->
+            {
+                lineFinding.findLine(level.entityPlayer.playerPosition, levelMousePosition)
+                room.updateLineTiles(tiles, lineFinding.linePositions)
+                map.updateMap()
+            }
+            Input.Keys.C     ->
+            {
+                lineFinding.linePositions.clear()
+                room.updateLineTiles(tiles, lineFinding.linePositions)
+                map.updateMap()
+            }
+             */
+            // showing floors
+            Input.Keys.V     ->
+            {
+                isShowingAllFloors = !isShowingAllFloors
+            }
+            // numbers
+            Input.Keys.NUM_1 -> changeFloor(1)
+            Input.Keys.NUM_2 -> changeFloor(2)
+            Input.Keys.NUM_3 -> changeFloor(3)
+            Input.Keys.NUM_4 -> changeFloor(4)
+            Input.Keys.NUM_5 -> changeFloor(5)
+            Input.Keys.NUM_6 -> changeFloor(6)
+            Input.Keys.NUM_7 -> changeFloor(7)
+            Input.Keys.NUM_8 -> changeFloor(8)
+            Input.Keys.NUM_9 -> changeFloor(9)
+            Input.Keys.NUM_0 -> changeFloor(0)
+        }
+
+        updateMouse()
+
+        return true
     }
 
     override fun keyUp(keycode : Int) : Boolean
@@ -634,31 +519,74 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
 
     override fun touchDown(screenX : Int, screenY : Int, pointer : Int, button : Int) : Boolean
     {
-        if (isTouched) isTouched = false
-        if (!isTouchDown) isTouchDown = true
+        isBeingTouched = true
 
-        screenTouchPosition.set(Gdx.input.x.toFloat(), Gdx.input.y.toFloat())
-        worldTouchPosition = mapViewport.unproject(screenTouchPosition)
-        mapTouchPosition.set(
-            truncate(worldTouchPosition.x / map.tileWidth),
-            truncate(worldTouchPosition.y / map.tileHeight)
-        )
-        isTouchInMap =
-            (worldTouchPosition.x > 0 && worldTouchPosition.x < map.width && worldTouchPosition.y > 0 && worldTouchPosition.y < map.height)
-        levelTouchPosition = Vector3(mapTouchPosition.x, mapTouchPosition.y, currentLevel.toFloat())
-        mapTouchBlock =
-            if (isTouchInMap) level.map[currentLevel][mapTouchPosition.y.toInt()][mapTouchPosition.x.toInt()] else LevelBlock()
-        mapTouchBlockUp =
-            if (isTouchInMap) level.map[currentLevel + 1][mapTouchPosition.y.toInt()][mapTouchPosition.x.toInt()] else null
+        when (button)
+        {
+            Input.Buttons.LEFT  ->
+            {
+                when (isMoving)
+                {
+                    false ->
+                    {
+                        updateMouse(screenX, screenY)
+                        isLevelMousePositionFixed = true
+                        for (i in actionArray.indices)
+                        {
+                            actionArray[i] = null
+                        }
+                        mouseObject?.getActions(actionArray, levelMousePosition)
+                        updateActionLabels()
+                    }
+                }
+            }
+            Input.Buttons.RIGHT ->
+            {
+                when (isMoving)
+                {
+                    true  ->
+                    {
+                        updateMouse(screenX, screenY)
+                        updateIsMoveAccessible()
+
+                        if (isMoveAccessible)
+                        {
+                            level.changePlayerPosition(levelMousePosition)
+                            level.updateEntities()
+                            level.clearPathfinding()
+                            room.updateEntityTiles(tiles)
+                            room.updateMoveTiles(tiles, map.mapDirection)
+                            map.updateMap()
+                        }
+                    }
+                    false ->
+                    {
+                        if (isLevelMousePositionFixed)
+                        {
+                            isLevelMousePositionFixed = false
+                            for (i in actionArray.indices)
+                            {
+                                actionArray[i] = null
+                            }
+                            updateActionLabels()
+                            updateMouse()
+                        }
+                    }
+                }
+            }
+        }
 
         return true
     }
 
     override fun touchUp(screenX : Int, screenY : Int, pointer : Int, button : Int) : Boolean
     {
-        if (isTouchDown) isTouched = true
+        if (isBeingTouched)
+        {
+            isTouched = true
+            isBeingTouched = false
+        }
 
-        isTouchDown = false
         isDragging = false
 
         return true
@@ -666,21 +594,21 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
 
     override fun touchDragged(screenX : Int, screenY : Int, pointer : Int) : Boolean
     {
+        isBeingTouched = true
+
+        updateMouse(screenX, screenY)
+
         if (isDragging)
         {
-            val dragPosition = mapViewport.unproject(Vector2(screenX.toFloat(), screenY.toFloat()))
-            dragDifference.x = dragPosition.x - mapCamera.position.x
-            dragDifference.y = dragPosition.y - mapCamera.position.y
-            mapCamera.position.x = dragOrigin.x - dragDifference.x
-            mapCamera.position.y = dragOrigin.y - dragDifference.y
+            dragDifference.x = worldMousePosition.x - gameCamera.position.x
+            dragDifference.y = worldMousePosition.y - gameCamera.position.y
+            gameCamera.position.x = dragOrigin.x - dragDifference.x
+            gameCamera.position.y = dragOrigin.y - dragDifference.y
         }
         else
         {
-            if (currentAction == Action.None)
-            {
-                dragOrigin = mapViewport.unproject(Vector2(screenX.toFloat(), screenY.toFloat()))
-                isDragging = true
-            }
+            dragOrigin.set(worldMousePosition)
+            isDragging = true
         }
 
         return true
@@ -688,13 +616,17 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
 
     override fun mouseMoved(screenX : Int, screenY : Int) : Boolean
     {
-        return false
+        if (isMoving || !isLevelMousePositionFixed)
+        {
+            updateMouse(screenX, screenY)
+        }
+
+        return true
     }
 
     override fun scrolled(amountX : Float, amountY : Float) : Boolean
     {
-        if (amountY > 0) mapCamera.zoom += 0.1f
-        else mapCamera.zoom -= 0.1f
+        gameCamera.zoom += amountY * 0.1f
 
         return true
     }
