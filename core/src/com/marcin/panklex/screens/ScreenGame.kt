@@ -97,6 +97,11 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
     val actionTitleTextButtons = Array(5) { TextButton("title", TextButton.TextButtonStyle(null, null, null, BitmapFont())) }
     val actionDescriptionLabels = Array(5) { Label("description", Label.LabelStyle(BitmapFont(), Color.RED)) }
 
+    val floorUpButton=TextButton("/\\", TextButton.TextButtonStyle(null, null, null, BitmapFont()))
+    val floorDownButton=TextButton("\\/", TextButton.TextButtonStyle(null, null, null, BitmapFont()))
+    val turnRightButton=TextButton("->", TextButton.TextButtonStyle(null, null, null, BitmapFont()))
+    val turnLeftButton=TextButton("<-", TextButton.TextButtonStyle(null, null, null, BitmapFont()))
+
     val table = Table().apply {
         this.top().left().setFillParent(true)
         this.defaults().pad(5f)
@@ -153,6 +158,12 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
         this.add(actionTitleTextButtons[4])
         this.row()
         this.add(actionDescriptionLabels[4])
+        this.row()
+        this.add(floorUpButton)
+        this.add(floorDownButton)
+        this.row()
+        this.add(turnLeftButton)
+        this.add(turnRightButton)
     }
 
     init
@@ -187,6 +198,35 @@ class ScreenGame(val name : String, val game : PanKlexGame) : BaseScreen(name, g
         updateLevelMousePositionLabel()
         updateMouseObjectLabel()
         updateActionLabels()
+
+        floorUpButton.addListener(object : ClickListener()
+        {
+            override fun clicked(event : InputEvent?, x : Float, y : Float)
+            {
+                changeFloor(currentFloor + 1)
+            }
+        })
+        floorDownButton.addListener(object : ClickListener()
+        {
+            override fun clicked(event : InputEvent?, x : Float, y : Float)
+            {
+                changeFloor(currentFloor - 1)
+            }
+        })
+        turnRightButton.addListener(object : ClickListener()
+        {
+            override fun clicked(event : InputEvent?, x : Float, y : Float)
+            {
+                changeDirection(direction2dToRight(map.mapDirection))
+            }
+        })
+        turnLeftButton.addListener(object : ClickListener()
+        {
+            override fun clicked(event : InputEvent?, x : Float, y : Float)
+            {
+                changeDirection(direction2dToLeft(map.mapDirection))
+            }
+        })
 
         gameCamera.position.x = (tileLengthHalf * map.mapWidth + tileLengthQuarter * map.mapHeight) * 0.5f
         gameCamera.position.y = (tileLengthHalf * map.mapHeight - tileLengthQuarter * map.mapWidth) * 0.5f
